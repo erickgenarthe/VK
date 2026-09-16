@@ -1,0 +1,20 @@
+{
+  "name": "Voluntia · Escalas e Check-in de Voluntários",
+  "short_name": "Voluntia",
+  "description": "Viver, amar e servir — gestão de escalas e check-in para voluntários.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7F1",
+  "theme_color": "#1F6F5C",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzAiIGZpbGw9IiNGQkY3RjEiLz48Y2lyY2xlIGN4PSIyOCIgY3k9IjI0IiByPSIxNiIgZmlsbD0iI0U4NTQzQSIgZmlsbC1vcGFjaXR5PSIwLjg1Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMTYiIGZpbGw9IiMxRjZGNUMiIGZpbGwtb3BhY2l0eT0iMC44NSIvPjxjaXJjbGUgY3g9IjM4IiBjeT0iNDAiIHI9IjE2IiBmaWxsPSIjRjRCNzQwIiBmaWxsLW9wYWNpdHk9IjAuODUiLz48L3N2Zz4=",
+      "sizes": "64x64",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

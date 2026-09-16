@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voluntia — Escalas e check-in de voluntários</title>
+<meta name="description" content="Voluntia: o app de escalas e check-in de voluntários para igrejas e organizações. Cada voluntário confirma a própria presença — sem planilha, sem grupo de WhatsApp lotado.">
+<meta name="theme-color" content="#1F6F5C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coral:#E8543A; --coral-suave:#FDE7E1;
+    --teal:#1F6F5C; --teal-escuro:#143F35; --teal-suave:#E1F1EC;
+    --ouro:#F4B740; --ouro-suave:#FDF1D6;
+    --creme:#FBF7F1; --grafite:#1B2430; --grafite-suave:#6B6459; --branco:#fff;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Nunito',sans-serif; color:var(--grafite); background:var(--creme); line-height:1.5;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; color:var(--teal-escuro); margin:0 0 12px 0;}
+  a{color:var(--teal);}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:14px 26px; border-radius:14px; font-weight:800; text-decoration:none; font-size:15px;}
+  .btn-primario{background:var(--teal); color:#fff;}
+  .btn-primario:hover{background:var(--teal-escuro);}
+  .btn-fantasma{background:rgba(255,255,255,0.15); color:#fff; border:1.5px solid rgba(255,255,255,0.5);}
+
+  header.hero{
+    background:linear-gradient(135deg, var(--teal-escuro) 0%, var(--teal) 55%, var(--ouro) 140%);
+    color:#fff; padding:60px 0 90px 0; position:relative; overflow:hidden;
+  }
+  nav{display:flex; align-items:center; justify-content:space-between; margin-bottom:56px;}
+  .marca{display:flex; align-items:center; gap:10px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px;}
+  .marca-selo{width:34px; height:34px; border-radius:10px; background:#fff; display:flex; align-items:center; justify-content:center;}
+  .hero-conteudo{display:grid; grid-template-columns:1.1fr 0.9fr; gap:40px; align-items:center;}
+  @media (max-width:860px){ .hero-conteudo{grid-template-columns:1fr;} nav{flex-wrap:wrap; gap:16px;} }
+  .lema-hero{font-size:13.5px; font-weight:800; letter-spacing:2px; text-transform:uppercase; opacity:0.85; margin-bottom:14px;}
+  .hero-conteudo h1{color:#fff; font-size:42px; line-height:1.15; margin-bottom:16px;}
+  .hero-conteudo p.sub{font-size:17px; opacity:0.92; margin-bottom:28px; max-width:480px;}
+  .hero-botoes{display:flex; gap:14px; flex-wrap:wrap;}
+
+  .mockup-card{
+    background:#fff; border-radius:26px; padding:20px; box-shadow:0 30px 60px rgba(0,0,0,0.25);
+    color:var(--grafite); max-width:320px; margin:0 auto;
+  }
+  .mockup-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;}
+  .mockup-badge{background:var(--coral); color:#fff; font-size:11px; font-weight:800; padding:4px 10px; border-radius:100px;}
+  .mockup-linha{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #F1ECE0; font-size:13.5px;}
+  .mockup-linha:last-child{border-bottom:none;}
+  .mockup-pill{background:var(--teal-suave); color:var(--teal-escuro); font-size:11px; font-weight:800; padding:3px 9px; border-radius:100px;}
+
+  section{padding:64px 0;}
+  .selo-secao{display:inline-block; background:var(--ouro-suave); color:#8C6300; font-weight:800; font-size:12px; letter-spacing:1px; text-transform:uppercase; padding:5px 14px; border-radius:100px; margin-bottom:14px;}
+  .grade{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:32px;}
+  @media (max-width:860px){ .grade{grid-template-columns:1fr;} }
+  .card{background:#fff; border-radius:22px; padding:26px; box-shadow:0 4px 18px rgba(27,36,48,0.06);}
+  .card .emoji{font-size:30px; margin-bottom:12px; display:block;}
+  .card h3{font-size:17px; margin-bottom:8px;}
+  .card p{font-size:14px; color:var(--grafite-suave); margin:0;}
+
+  .faixa-valores{background:var(--teal-escuro); color:#fff; text-align:center;}
+  .faixa-valores .grade{grid-template-columns:repeat(3,1fr);}
+  .faixa-valores .card{background:rgba(255,255,255,0.06); box-shadow:none; text-align:center;}
+  .faixa-valores h3{color:#fff;}
+  .faixa-valores p{color:rgba(255,255,255,0.75);}
+
+  .passos{counter-reset:passo; margin-top:32px; display:grid; gap:18px;}
+  .passo{display:flex; gap:18px; align-items:flex-start; background:#fff; border-radius:20px; padding:20px; box-shadow:0 2px 10px rgba(27,36,48,0.05);}
+  .passo-num{counter-increment:passo; width:36px; height:36px; border-radius:50%; background:var(--coral); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .passo-num::before{content: counter(passo);}
+
+  .planos{display:grid; grid-template-columns:repeat(3,1fr); gap:22px; margin-top:32px;}
+  @media (max-width:860px){ .planos{grid-template-columns:1fr;} }
+  .plano{background:#fff; border-radius:24px; padding:28px; border:2px solid #F1ECE0;}
+  .plano.destaque{border-color:var(--teal); position:relative;}
+  .plano.destaque::before{content:'Mais escolhido'; position:absolute; top:-13px; left:24px; background:var(--teal); color:#fff; font-size:11px; font-weight:800; padding:4px 12px; border-radius:100px;}
+  .plano h3{font-size:18px;}
+  .plano .preco{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px; color:var(--grafite); margin:6px 0 16px 0;}
+  .plano .preco span{font-size:13px; font-weight:600; color:var(--grafite-suave);}
+  .plano ul{list-style:none; padding:0; margin:0 0 20px 0; font-size:13.5px; color:var(--grafite-suave); display:flex; flex-direction:column; gap:10px;}
+  .plano ul li::before{content:'✓ '; color:var(--teal); font-weight:800;}
+
+  .cta-final{background:linear-gradient(135deg, var(--coral) 0%, #C43A24 100%); color:#fff; text-align:center; border-radius:32px; padding:56px 32px; margin:0 24px;}
+  .cta-final h2{color:#fff;}
+  .cta-final p{max-width:520px; margin:0 auto 26px auto; opacity:0.95;}
+
+  footer{padding:40px 0 60px 0; text-align:center; color:var(--grafite-suave); font-size:13px;}
+  footer .lema-footer{font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro); margin-bottom:6px;}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav>
+      <div class="marca">
+        <div class="marca-selo">
+          <svg width="20" height="20" viewBox="0 0 64 64"><circle cx="28" cy="24" r="16" fill="#E8543A" fill-opacity="0.85"/><circle cx="20" cy="40" r="16" fill="#1F6F5C" fill-opacity="0.85"/><circle cx="38" cy="40" r="16" fill="#F4B740" fill-opacity="0.85"/></svg>
+        </div>
+        Voluntia
+      </div>
+      <a href="#contato" class="btn btn-fantasma">Falar com a gente</a>
+    </nav>
+    <div class="hero-conteudo">
+      <div>
+        <div class="lema-hero">Viver · Amar · Servir</div>
+        <h1>Escala de voluntários e check-in, sem planilha e sem grupo lotado.</h1>
+        <p class="sub">O Voluntia organiza quem serve, quando e onde — e deixa cada voluntário confirmar a própria presença, na hora, pelo celular. Sua equipe de liderança ganha tempo de volta.</p>
+        <div class="hero-botoes">
+          <a href="#contato" class="btn btn-primario">Quero conhecer</a>
+          <a href="#como-funciona" class="btn btn-fantasma">Ver como funciona</a>
+        </div>
+      </div>
+      <div class="mockup-card">
+        <div class="mockup-top"><strong>Escala · Domingo</strong><span class="mockup-badge">hoje</span></div>
+        <div class="mockup-linha"><span>📍 Check-in feito às 08:52</span><span class="mockup-pill">Louvor</span></div>
+        <div class="mockup-linha"><span>🔥 6 serviços seguidos</span><span class="mockup-pill">sequência</span></div>
+        <div class="mockup-linha"><span>💛 32 pontos este mês</span><span class="mockup-pill">impacto</span></div>
+        <div class="mockup-linha"><span>🙌 Vaga aberta: Recepção</span><span class="mockup-pill">quero servir</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <div class="selo-secao">O problema</div>
+    <h2 style="font-size:28px; max-width:640px;">Montar escala no grupo de WhatsApp funciona… até não funcionar mais.</h2>
+    <div class="grade">
+      <div class="card"><span class="emoji">😵‍💫</span><h3>Ninguém sabe quem confirmou</h3><p>Mensagens se perdem, a planilha desatualiza e no dia do culto falta gente sem ninguém saber com antecedência.</p></div>
+      <div class="card"><span class="emoji">📋</span><h3>Check-in manual na entrada</h3><p>Alguém da liderança precisa ficar de caderno em punho anotando quem chegou — tempo que podia ir pra pastoreio de verdade.</p></div>
+      <div class="card"><span class="emoji">🙅</span><h3>Sempre os mesmos servindo</h3><p>Sem visibilidade de quem já serviu recentemente, o rodízio fica injusto e os voluntários se cansam.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="faixa-valores">
+  <div class="wrap">
+    <div class="selo-secao" style="background:rgba(255,255,255,0.12); color:#fff;">Nossa cultura de voluntariado</div>
+    <h2 style="color:#fff; font-size:28px;">Viver, amar e servir pessoas — dentro do produto, não só no discurso.</h2>
+    <div class="grade">
+      <div class="card"><h3>🌅 Viver</h3><p>Voluntário engajado é voluntário que vê o próprio crescimento: sequência de serviços, conquistas, impacto acumulado.</p></div>
+      <div class="card"><h3>💛 Amar</h3><p>Líderes podem elogiar publicamente um gesto de cuidado — um "obrigado" que fica registrado, não se perde no fim do culto.</p></div>
+      <div class="card"><h3>🤝 Servir</h3><p>Vagas abertas visíveis pra quem quer se oferecer, trocas de turno entre a própria equipe, tudo sem depender só da liderança.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="como-funciona">
+  <div class="wrap">
+    <div class="selo-secao">Como funciona</div>
+    <h2 style="font-size:28px;">Do cadastro ao check-in, em 4 passos.</h2>
+    <div class="passos">
+      <div class="passo"><div class="passo-num"></div><div><h3 style="font-size:16px; margin-bottom:4px;">O voluntário se cadastra e escolhe a área</h3><p style="margin:0; color:var(--grafite-suave); font-size:14px;">Nome, WhatsApp, departamentos e disponibilidade — menos de um minuto, direto do celular.</p></div></div>
+      <div class="passo"><div class="passo-num"></div><div><h3 style="font-size:16px; margin-bottom:4px;">A liderança monta a escala (ou deixa a equipe se oferecer)</h3><p style="margin:0; color:var(--grafite-suave); font-size:14px;">Vagas abertas ficam visíveis pra quem quer se candidatar; quem já lidera aprova ou escala direto, com sugestão de rodízio justo.</p></div></div>
+      <div class="passo"><div class="passo-num"></div><div><h3 style="font-size:16px; margin-bottom:4px;">Lembretes automáticos por WhatsApp</h3><p style="margin:0; color:var(--grafite-suave); font-size:14px;">Ninguém esquece o compromisso, e a liderança recebe um resumo de quem ainda falta confirmar.</p></div></div>
+      <div class="passo"><div class="passo-num"></div><div><h3 style="font-size:16px; margin-bottom:4px;">Check-in do próprio voluntário, no dia</h3><p style="margin:0; color:var(--grafite-suave); font-size:14px;">Escaneando o QR da portaria ou confirmando manualmente — sem fila, sem papel, sem depender de mais ninguém.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="selo-secao">O que vem incluso</div>
+    <h2 style="font-size:28px;">Feito pra quem lidera equipe de voluntários de verdade.</h2>
+    <div class="grade">
+      <div class="card"><span class="emoji">📅</span><h3>Escala colaborativa</h3><p>Vagas abertas, trocas de turno entre voluntários e aprovação por departamento.</p></div>
+      <div class="card"><span class="emoji">📍</span><h3>Check-in por QR ou manual</h3><p>O próprio voluntário confirma presença — sem depender de ninguém na porta.</p></div>
+      <div class="card"><span class="emoji">💬</span><h3>Lembretes por WhatsApp</h3><p>Antes do compromisso e depois, com uma palavra de agradecimento.</p></div>
+      <div class="card"><span class="emoji">🏆</span><h3>Gamificação leve</h3><p>Pontos, sequência de fidelidade e conquistas — sem virar ranking competitivo.</p></div>
+      <div class="card"><span class="emoji">🗂️</span><h3>Departamentos ilimitados</h3><p>Configure as áreas da sua casa do jeito que já funciona hoje.</p></div>
+      <div class="card"><span class="emoji">⬇️</span><h3>Exportação e auditoria</h3><p>Escala em Excel/PDF e histórico de quem fez o quê, quando precisar prestar contas.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="selo-secao">Investimento</div>
+    <h2 style="font-size:28px;">Simples de começar, simples de crescer.</h2>
+    <p style="max-width:560px; color:var(--grafite-suave);">Valores de referência — cada igreja tem um tamanho e uma realidade diferente. Fale com a gente pra fechar a proposta certa pra vocês.</p>
+    <div class="planos">
+      <div class="plano">
+        <h3>Comunidade</h3>
+        <div class="preco">Sob consulta</div>
+        <ul><li>Até 1 departamento</li><li>Check-in por QR e manual</li><li>Escala colaborativa</li></ul>
+        <a href="#contato" class="btn btn-primario" style="width:100%; justify-content:center;">Pedir proposta</a>
+      </div>
+      <div class="plano destaque">
+        <h3>Igreja</h3>
+        <div class="preco">Sob consulta</div>
+        <ul><li>Departamentos ilimitados</li><li>Lembretes por WhatsApp</li><li>Gamificação e conquistas</li><li>Exportação e auditoria</li></ul>
+        <a href="#contato" class="btn btn-primario" style="width:100%; justify-content:center;">Pedir proposta</a>
+      </div>
+      <div class="plano">
+        <h3>Rede / Multicampi</h3>
+        <div class="preco">Sob consulta</div>
+        <ul><li>Vários campi, uma liderança</li><li>Marca personalizada</li><li>Suporte prioritário</li></ul>
+        <a href="#contato" class="btn btn-primario" style="width:100%; justify-content:center;">Pedir proposta</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contato">
+  <div class="wrap">
+    <div class="cta-final">
+      <h2>Vamos organizar a escala da sua equipe?</h2>
+      <p>Conta pra gente quantos voluntários e departamentos sua casa tem, e a gente mostra o Voluntia funcionando com a cara da sua igreja.</p>
+      <a href="mailto:contato@suaigreja.exemplo?subject=Quero%20conhecer%20o%20Voluntia" class="btn" style="background:#fff; color:var(--coral);">✉️ contato@suaigreja.exemplo</a>
+      <p style="font-size:12px; margin-top:16px; opacity:0.85;">Troque pelo seu e-mail ou WhatsApp de contato antes de publicar esta página.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="lema-footer">Voluntia</div>
+    <p>Viver, amar e servir — o app de escalas e check-in de voluntários.</p>
+  </div>
+</footer>
+
+</body>
+</html>

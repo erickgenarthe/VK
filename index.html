@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Voluntia · Escalas e Check-in</title>
+<meta name="description" content="Voluntia: gestão de escalas de voluntários e check-in de presença para igrejas e organizações. Viver, amar e servir — na prática.">
+<meta name="theme-color" content="#1F6F5C">
+<meta property="og:title" content="Voluntia · Escalas e Check-in">
+<meta property="og:description" content="Gestão de escalas e check-in de voluntários. Viver, amar e servir.">
+<meta property="og:type" content="website">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzAiIGZpbGw9IiNGQkY3RjEiLz48Y2lyY2xlIGN4PSIyOCIgY3k9IjI0IiByPSIxNiIgZmlsbD0iI0U4NTQzQSIgZmlsbC1vcGFjaXR5PSIwLjg1Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMTYiIGZpbGw9IiMxRjZGNUMiIGZpbGwtb3BhY2l0eT0iMC44NSIvPjxjaXJjbGUgY3g9IjM4IiBjeT0iNDAiIHI9IjE2IiBmaWxsPSIjRjRCNzQwIiBmaWxsLW9wYWNpdHk9IjAuODUiLz48L3N2Zz4=">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PGNpcmNsZSBjeD0iMzIiIGN5PSIzMiIgcj0iMzAiIGZpbGw9IiNGQkY3RjEiLz48Y2lyY2xlIGN4PSIyOCIgY3k9IjI0IiByPSIxNiIgZmlsbD0iI0U4NTQzQSIgZmlsbC1vcGFjaXR5PSIwLjg1Ii8+PGNpcmNsZSBjeD0iMjAiIGN5PSI0MCIgcj0iMTYiIGZpbGw9IiMxRjZGNUMiIGZpbGwtb3BhY2l0eT0iMC44NSIvPjxjaXJjbGUgY3g9IjM4IiBjeT0iNDAiIHI9IjE2IiBmaWxsPSIjRjRCNzQwIiBmaWxsLW9wYWNpdHk9IjAuODUiLz48L3N2Zz4=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<style>
+  :root{
+    /* As três cores nascem do lema da casa: viver (ouro, luz, vida), amar
+       (coral, calor humano) e servir (verde-petróleo, firmeza, serviço). Cada
+       uma aparece em pontos diferentes do app em vez de só decoração. */
+    --coral: #E8543A;        /* amar */
+    --coral-suave: #FDE7E1;
+    --teal: #1F6F5C;         /* servir */
+    --teal-escuro: #143F35;
+    --teal-suave: #E1F1EC;
+    --ouro: #F4B740;         /* viver */
+    --ouro-suave: #FDF1D6;
+    --creme: #FBF7F1;
+    --grafite: #1B2430;
+    --grafite-suave: #6B6459;
+    --branco: #FFFFFF;
+    --vermelho: #D64545;
+    --radius: 20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito', sans-serif;
+    background: var(--creme);
+    color: var(--grafite);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Baloo 2', sans-serif;
+    margin:0;
+    color: var(--teal-escuro);
+  }
+  a{ color: var(--teal); }
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background: var(--creme);
+    position:relative;
+    padding-bottom:86px;
+  }
+  #app.sem-nav{ padding-bottom:24px; }
+
+  @media (min-width: 860px){
+    body{
+      background: linear-gradient(160deg, #FFF3E4 0%, var(--creme) 45%, #EAF6F0 100%);
+      padding: 32px 16px;
+    }
+    #app{
+      min-height: auto;
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(27,36,48,0.14);
+      overflow: hidden;
+    }
+    #app.modo-equipe{ max-width: 760px; }
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    background: linear-gradient(135deg, var(--teal-escuro) 0%, var(--teal) 55%, var(--ouro) 130%);
+    padding:22px 20px 26px 20px;
+    position:relative;
+    color:var(--branco);
+  }
+  .topbar.modo-simples{ padding-bottom:20px; }
+  .topbar-linha1{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .marca{ display:flex; align-items:center; gap:10px; }
+  .marca-selo{
+    width:38px; height:38px; border-radius:12px; background:var(--branco);
+    display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.18);
+    flex-shrink:0;
+  }
+  .marca-nome{ font-family:'Baloo 2', sans-serif; font-weight:800; font-size:20px; letter-spacing:0.2px; }
+  .marca-sub{ font-size:11px; opacity:0.85; margin-top:-2px; }
+  .topbar-acoes{ display:flex; gap:8px; align-items:center; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:50%; border:none; background:rgba(255,255,255,0.18);
+    color:var(--branco); font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .icon-btn:active{ background:rgba(255,255,255,0.32); }
+  .topbar-titulo{ margin-top:16px; font-size:22px; font-weight:800; }
+  .topbar-legenda{ margin-top:4px; font-size:13px; opacity:0.9; }
+
+  /* ---------- Componentes básicos ---------- */
+  .conteudo{ padding:18px 18px 8px 18px; }
+  .cartao{
+    background:var(--branco); border-radius:var(--radius); padding:16px;
+    box-shadow:0 2px 10px rgba(27,36,48,0.06); margin-bottom:14px;
+  }
+  .cartao-titulo{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:16px; color:var(--teal-escuro); margin-bottom:8px; }
+  .hint{ font-size:12.5px; color:var(--grafite-suave); line-height:1.5; }
+  .linha{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .col{ display:flex; flex-direction:column; gap:10px; }
+  .gap-8{ gap:8px; } .gap-6{ gap:6px; }
+  .row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .espaco-8{ height:8px; } .espaco-14{ height:14px; } .espaco-20{ height:20px; }
+
+  label{ font-size:12.5px; font-weight:700; color:var(--teal-escuro); display:block; margin-bottom:4px; }
+  input, select, textarea{
+    width:100%; padding:11px 13px; border-radius:14px; border:1.5px solid #E7E0D4;
+    font-family:inherit; font-size:14.5px; background:var(--branco); color:var(--grafite);
+  }
+  input:focus, select:focus, textarea:focus{ outline:none; border-color: var(--teal); }
+  .campo{ margin-bottom:12px; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    padding:12px 18px; border-radius:16px; border:none; font-family:'Nunito', sans-serif;
+    font-weight:800; font-size:14.5px; cursor:pointer; text-align:center;
+  }
+  .btn-block{ width:100%; }
+  .btn-primary{ background: var(--teal); color:var(--branco); }
+  .btn-primary:active{ background: var(--teal-escuro); }
+  .btn-coral{ background: var(--coral); color:var(--branco); }
+  .btn-ouro{ background: var(--ouro); color:var(--grafite); }
+  .btn-secondary{ background: var(--teal-suave); color: var(--teal-escuro); }
+  .btn-ghost{ background: #F1ECE0; color: var(--grafite); }
+  .btn-danger{ background: #FBE4E4; color: var(--vermelho); }
+  .btn-small{ padding:8px 12px; font-size:12.5px; border-radius:12px; }
+  .btn[disabled]{ opacity:0.5; pointer-events:none; }
+
+  .badge{ display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:800; background:#F1ECE0; color:var(--grafite-suave); }
+  .badge-servir{ background: var(--teal-suave); color: var(--teal-escuro); }
+  .badge-amar{ background: var(--coral-suave); color: var(--coral); }
+  .badge-viver{ background: var(--ouro-suave); color:#8C6300; }
+  .badge-alerta{ background:#FBE4E4; color:var(--vermelho); }
+
+  .chip{
+    padding:8px 14px; border-radius:100px; border:1.5px solid #E7E0D4; background:var(--branco);
+    font-size:13px; font-weight:700; cursor:pointer; color:var(--grafite);
+  }
+  .chip.ativo{ background: var(--teal); border-color: var(--teal); color:var(--branco); }
+
+  .lista-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 0; border-bottom:1px solid #F1ECE0;
+  }
+  .lista-item:last-child{ border-bottom:none; }
+
+  .toast{
+    position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:200;
+    background: var(--grafite); color:var(--branco); padding:12px 18px; border-radius:14px;
+    font-size:13.5px; font-weight:700; box-shadow:0 10px 24px rgba(0,0,0,0.25); max-width:88%; text-align:center;
+  }
+
+  .overlay{
+    position:fixed; inset:0; background:rgba(27,36,48,0.5); z-index:150;
+    display:flex; align-items:flex-end; justify-content:center;
+  }
+  @media (min-width:860px){ .overlay{ align-items:center; } }
+  .modal{
+    background:var(--branco); width:100%; max-width:480px; border-radius:24px 24px 0 0;
+    padding:22px 20px 26px 20px; max-height:88vh; overflow-y:auto;
+  }
+  @media (min-width:860px){ .modal{ border-radius:24px; } }
+
+  /* ---------- Navegação inferior ---------- */
+  .nav-inferior{
+    position:fixed; left:0; right:0; bottom:0; max-width:480px; margin:0 auto;
+    background:var(--branco); border-top:1px solid #F1ECE0; display:flex;
+    box-shadow:0 -4px 14px rgba(27,36,48,0.08); z-index:80;
+  }
+  @media (min-width:860px){ .nav-inferior{ max-width:760px; border-radius:0 0 24px 24px; } }
+  .nav-item{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
+    padding:10px 4px 8px 4px; border:none; background:none; cursor:pointer; color:var(--grafite-suave);
+    font-family:inherit; font-size:10.5px; font-weight:800;
+  }
+  .nav-item .nav-icone{ font-size:19px; }
+  .nav-item.ativo{ color: var(--teal); }
+
+  /* ---------- Telas de autenticação ---------- */
+  .tela-auth{ padding:36px 26px 26px 26px; }
+  .tela-auth .marca-central{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; margin-bottom:28px; }
+  .tela-auth .marca-selo-grande{ width:64px; height:64px; border-radius:20px; box-shadow:0 8px 20px rgba(27,36,48,0.14); }
+  .lema{ font-family:'Baloo 2', sans-serif; font-weight:800; color:var(--teal-escuro); font-size:14px; letter-spacing:0.5px; }
+  .lema span{ padding:2px 6px; }
+  .lema .l-viver{ color:#8C6300; }
+  .lema .l-amar{ color:var(--coral); }
+  .lema .l-servir{ color:var(--teal); }
+
+  /* ---------- Utilidades de estado vazio ---------- */
+  .vazio{ text-align:center; padding:30px 10px; color:var(--grafite-suave); }
+  .vazio .vazio-emoji{ font-size:34px; display:block; margin-bottom:8px; }
+
+  /* ---------- Progresso / medidor de pontos ---------- */
+  .barra-fundo{ background:#F1ECE0; border-radius:100px; height:10px; overflow:hidden; }
+  .barra-preenchida{ height:100%; border-radius:100px; background: linear-gradient(90deg, var(--teal), var(--ouro)); }
+
+  .selo-conquista{
+    display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center;
+    padding:12px 6px; border-radius:16px; background:var(--teal-suave);
+  }
+  .selo-conquista.bloqueado{ background:#F1ECE0; opacity:0.55; }
+  .selo-conquista .selo-emoji{ font-size:26px; }
+  .selo-conquista .selo-nome{ font-size:10.5px; font-weight:800; color:var(--teal-escuro); line-height:1.3; }
+
+  .grade-2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .grade-3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+
+  #qr-leitor-video{ width:100%; border-radius:16px; background:#000; }
+  #qr-exibicao{ display:flex; justify-content:center; padding:14px; background:var(--branco); border-radius:16px; }
+
+  ::-webkit-scrollbar{ width:0; height:0; }
+</style>
+</head>
+<body>
+<div id="app"><div class="vazio" style="padding-top:60px;">Carregando o Voluntia…</div></div>
+<script>
+/* =====================================================================
+   VOLUNTIA — escalas e check-in de voluntários
+   Viver. Amar. Servir.
+   Arquivo único, sem build (mesmo espírito do Videira Kids): abre e roda.
+   ===================================================================== */
+
+/* ============ 1) FIREBASE (opcional — sem config, roda em modo local) ============
+   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o Voluntia
+   funciona em MODO DEMONSTRAÇÃO, salvando tudo no localStorage do próprio
+   navegador — dá pra testar o app inteiro sem configurar nada. Assim que
+   você colar as credenciais reais de um projeto Firebase (gratuito em
+   firebase.google.com), o app troca sozinho pra usar o Firestore de
+   verdade, e passa a funcionar publicado, com todo mundo vendo os mesmos
+   dados. Veja o passo a passo completo no README.md. */
+const firebaseConfig = {
+  apiKey: "COLE_AQUI_SUA_API_KEY",
+  authDomain: "COLE_AQUI.firebaseapp.com",
+  projectId: "COLE_AQUI",
+  storageBucket: "COLE_AQUI.firebasestorage.app",
+  messagingSenderId: "COLE_AQUI",
+  appId: "COLE_AQUI",
+};
+const FIREBASE_CONFIGURADO = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('COLE_AQUI');
+let db = null;
+let auth = null;
+if (FIREBASE_CONFIGURADO){
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    auth = firebase.auth();
+    db.enablePersistence({synchronizeTabs:true}).catch(err => {
+      console.warn('Persistência offline do Firestore não pôde ser ativada:', err.code);
+    });
+    console.log('Voluntia: usando Firestore (Firebase) como banco de dados.');
+  }catch(e){
+    console.error('Erro ao iniciar o Firebase — verifique se o firebaseConfig está correto.', e);
+  }
+} else {
+  console.log('Voluntia: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
+}
+
+/* ============ 2) MARCA / DADOS-PADRÃO DA IGREJA ============
+   Isso tudo pode ser mudado na tela "Configurações" pelo admin, sem mexer
+   em código — o app é pensado pra ser reaproveitado por qualquer igreja. */
+const DEPARTAMENTOS_PADRAO = [
+  'Artes Criativo','Balcão de Informações','Cafezinho','Comunicação','Conexão',
+  'Coordenação de Voluntários','Ensino','Eventos','House','Intercessão',
+  'Liderança de Culto','Louvor','Oferta','Protec','Recepção Externa',
+  'Recepção Interna','Sala de Materiais','Segurança','Social IVV','Store',
+];
+const CONFIG_PADRAO = {
+  nomeIgreja: 'Minha Igreja',
+  lema: 'Viver, amar e servir pessoas.',
+  departamentos: DEPARTAMENTOS_PADRAO.slice(),
+  eventos: [
+    { id: 'culto-dom-manha', nome: 'Culto de Domingo · Manhã', dia: 'domingo', horario: '09:00', horarioFim: '11:00' },
+    { id: 'culto-dom-noite', nome: 'Culto de Domingo · Noite', dia: 'domingo', horario: '18:00', horarioFim: '20:00' },
+    { id: 'culto-qua', nome: 'Culto de Quarta', dia: 'quarta', horario: '20:00', horarioFim: '21:30' },
+  ],
+};
+const PONTOS_POR_SERVICO = 5;
+const TIPOS_ELOGIO = [
+  { tipo: 'Pontualidade', pontos: 2, emoji: '⏰' },
+  { tipo: 'Chegou cedo', pontos: 3, emoji: '🌅' },
+  { tipo: 'Bom trabalho em equipe', pontos: 2, emoji: '🤝' },
+  { tipo: 'Atenção aos detalhes', pontos: 2, emoji: '🔎' },
+  { tipo: 'Atitude de servo', pontos: 3, emoji: '💛' },
+  { tipo: 'Foi além do esperado', pontos: 4, emoji: '🚀' },
+];
+const CONQUISTAS = [
+  { id: 'primeiro-passo', nome: 'Primeiro Passo', emoji: '🌱', descricao: 'Fez o 1º check-in', meta: v => (v.totalCheckins||0) >= 1 },
+  { id: 'fiel-poucos', nome: 'Fiel nos Poucos', emoji: '🔥', descricao: '4 serviços seguidos, sem faltar', meta: v => (v.sequenciaAtual||0) >= 4 },
+  { id: 'coracao-servo', nome: 'Coração Servo', emoji: '💛', descricao: '20 serviços completos', meta: v => (v.totalCheckins||0) >= 20 },
+  { id: 'sempre-presente', nome: 'Sempre Presente', emoji: '✨', descricao: '10 serviços seguidos, sem faltar', meta: v => (v.sequenciaAtual||0) >= 10 },
+  { id: 'um-ano', nome: 'Um Ano de Serviço', emoji: '🏆', descricao: '52 serviços completos', meta: v => (v.totalCheckins||0) >= 52 },
+];
+const DIAS_SEMANA_ID = ['domingo','segunda','terca','quarta','quinta','sexta','sabado'];
+const DIAS_SEMANA_NOME = ['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
+const VERSICULOS_RESERVA = [
+  { texto: 'Servi uns aos outros pelo amor.', referencia: 'Gálatas 5:13' },
+  { texto: 'Cada um exercite o dom que recebeu, servindo uns aos outros.', referencia: '1 Pedro 4:10' },
+  { texto: 'Tudo quanto fizerdes, fazei-o de todo o coração, como ao Senhor.', referencia: 'Colossenses 3:23' },
+  { texto: 'Eu vim para que tenham vida, e a tenham com abundância.', referencia: 'João 10:10' },
+  { texto: 'Amados, amemo-nos uns aos outros, porque o amor procede de Deus.', referencia: '1 João 4:7' },
+  { texto: 'Não nos cansemos de fazer o bem, pois no tempo próprio colheremos.', referencia: 'Gálatas 6:9' },
+];
+function versiculoDoDia(isoData){
+  const d = new Date(isoData + 'T00:00:00');
+  const inicioAno = new Date(d.getFullYear(), 0, 1);
+  const diaDoAno = Math.floor((d - inicioAno) / 86400000);
+  return VERSICULOS_RESERVA[diaDoAno % VERSICULOS_RESERVA.length];
+}
+
+/* ============ 3) CAMADA DE DADOS (mesma "interface" pro resto do app,
+   dois motores por baixo: Firestore de verdade, ou localStorage no modo
+   demonstração — o resto do código nunca precisa saber qual dos dois). ============ */
+const LS_PREFIX = 'voluntia:';
+function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 9); }
+
+function lsLista(nome){
+  try{ return JSON.parse(localStorage.getItem(LS_PREFIX + nome) || '[]'); }catch(e){ return []; }
+}
+function lsSalvarLista(nome, lista){ localStorage.setItem(LS_PREFIX + nome, JSON.stringify(lista)); }
+function lsUpsert(nome, item){
+  const lista = lsLista(nome);
+  const idx = lista.findIndex(x => x.id === item.id);
+  if (idx >= 0) lista[idx] = item; else lista.push(item);
+  lsSalvarLista(nome, lista);
+}
+function lsAtualizar(nome, id, patch){
+  const lista = lsLista(nome);
+  const idx = lista.findIndex(x => x.id === id);
+  if (idx >= 0){ lista[idx] = { ...lista[idx], ...patch }; lsSalvarLista(nome, lista); }
+}
+
+async function colLista(nome){
+  if (FIREBASE_CONFIGURADO && db){
+    const snap = await db.collection(nome).get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  return lsLista(nome);
+}
+async function colAdicionar(nome, obj){
+  const id = genId();
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).set(obj);
+  } else {
+    lsUpsert(nome, { id, ...obj });
+  }
+  return id;
+}
+async function colDefinir(nome, id, obj){
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).set(obj, { merge: true });
+  } else {
+    const lista = lsLista(nome);
+    const atual = lista.find(x => x.id === id) || {};
+    lsUpsert(nome, { ...atual, ...obj, id });
+  }
+}
+async function colAtualizar(nome, id, patch){
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).update(patch);
+  } else {
+    lsAtualizar(nome, id, patch);
+  }
+}
+
+async function lerConfig(){
+  if (FIREBASE_CONFIGURADO && db){
+    const doc = await db.collection('dados').doc('config').get();
+    return doc.exists ? { ...CONFIG_PADRAO, ...doc.data() } : null;
+  }
+  try{
+    const salvo = JSON.parse(localStorage.getItem(LS_PREFIX + 'config') || 'null');
+    return salvo ? { ...CONFIG_PADRAO, ...salvo } : null;
+  }catch(e){ return null; }
+}
+async function salvarConfig(cfg){
+  state.config = cfg;
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection('dados').doc('config').set(cfg, { merge: true });
+  } else {
+    localStorage.setItem(LS_PREFIX + 'config', JSON.stringify(cfg));
+  }
+}
+async function garantirConfigInicial(){
+  let cfg = await lerConfig();
+  if (!cfg){
+    cfg = { ...CONFIG_PADRAO };
+    await salvarConfig(cfg);
+  }
+  state.config = cfg;
+}
+
+async function registrarAuditoria(acao, detalhes){
+  if (!state.usuario) return;
+  const registro = {
+    usuarioNome: state.usuario.nome, usuarioEmail: state.usuario.email,
+    acao, detalhes: detalhes || '', criadoEm: new Date().toISOString(),
+  };
+  try{ await colAdicionar('auditoria', registro); }catch(e){ console.error('Erro ao registrar auditoria', e); }
+}
+
+/* ============ 4) AUTENTICAÇÃO ============
+   Com Firebase configurado, usa e-mail/senha de verdade (firebase.auth()).
+   Sem Firebase, o "modo demonstração" guarda contas no localStorage — dá
+   pra criar quantas contas quiser só pra testar o app, num único navegador. */
+function demoContas(){ return lsLista('contas'); }
+function demoCriarConta(email, senha){
+  const contas = demoContas();
+  if (contas.some(c => c.email.toLowerCase() === email.toLowerCase())) throw new Error('Já existe uma conta com esse e-mail.');
+  const uid = 'demo-' + genId();
+  contas.push({ id: uid, email, senha });
+  lsSalvarLista('contas', contas);
+  return uid;
+}
+function demoLogin(email, senha){
+  const conta = demoContas().find(c => c.email.toLowerCase() === email.toLowerCase());
+  if (!conta || conta.senha !== senha) throw new Error('E-mail ou senha incorretos.');
+  return conta.id;
+}
+function demoSessaoSalvar(uid){ localStorage.setItem(LS_PREFIX + 'sessao', uid); }
+function demoSessaoLer(){ return localStorage.getItem(LS_PREFIX + 'sessao'); }
+function demoSessaoLimpar(){ localStorage.removeItem(LS_PREFIX + 'sessao'); }
+
+async function carregarPerfilVoluntario(uid){
+  if (FIREBASE_CONFIGURADO && db){
+    const doc = await db.collection('voluntarios').doc(uid).get();
+    return doc.exists ? { id: uid, ...doc.data() } : null;
+  }
+  const lista = lsLista('voluntarios');
+  return lista.find(v => v.id === uid) || null;
+}
+
+async function fazerLogin(email, senha){
+  if (FIREBASE_CONFIGURADO && auth){
+    const cred = await auth.signInWithEmailAndPassword(email, senha);
+    return cred.user.uid;
+  }
+  return demoLogin(email, senha);
+}
+
+async function fazerCadastro(dados){
+  const { email, senha, nome, telefone, departamentos, disponibilidade } = dados;
+  let uid;
+  if (FIREBASE_CONFIGURADO && auth){
+    const cred = await auth.createUserWithEmailAndPassword(email, senha);
+    uid = cred.user.uid;
+  } else {
+    uid = demoCriarConta(email, senha);
+  }
+  const todos = await colLista('voluntarios');
+  const ehPrimeiro = todos.length === 0; // primeira pessoa a se cadastrar vira admin automaticamente
+  const perfil = {
+    nome, email, telefone: telefone || '',
+    departamentos: departamentos || [],
+    disponibilidade: disponibilidade || [],
+    role: ehPrimeiro ? 'admin' : 'voluntario',
+    ativo: true,
+    avisarVagaAberta: true,
+    notificacoesDesativadas: false,
+    pontos: 0, totalCheckins: 0, sequenciaAtual: 0, horasServidas: 0,
+    ultimaVezServiu: null, conquistas: [],
+    criadoEm: new Date().toISOString(),
+  };
+  await colDefinir('voluntarios', uid, perfil);
+  if (!FIREBASE_CONFIGURADO) demoSessaoSalvar(uid);
+  return uid;
+}
+
+async function fazerLogout(){
+  if (FIREBASE_CONFIGURADO && auth){ await auth.signOut(); }
+  else { demoSessaoLimpar(); }
+  state.usuario = null;
+  state.aba = 'painel';
+  render();
+}
+
+/* ============ 5) ESTADO GLOBAL ============ */
+const state = {
+  carregando: true,
+  telaAuth: 'login', // 'login' | 'cadastro'
+  usuario: null,
+  config: null,
+  voluntarios: [],
+  escalas: [],
+  eventosEsporadicos: [],
+  elogios: [],
+  trocas: [],
+  auditoria: [],
+  aba: 'painel', // painel | escala | vagas | trocas | checkin | impacto | mais | admin-*
+  toast: null,
+  modal: null,
+  cadastroForm: { nome:'', email:'', telefone:'', senha:'', departamentos:[], disponibilidade:[] },
+  loginForm: { email:'', senha:'' },
+  mesEscala: null, // 'YYYY-MM'
+  qrCamAtivo: false,
+  qrStream: null,
+  qrLoopId: null,
+  qrExibicaoTimer: null,
+  filtroDeptoVagas: 'todos',
+  novoEventoForm: null,
+  novoDeptoNome: '',
+};
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function hojeISO(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function horaAgora(){
+  const d = new Date();
+  return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+function diaSemanaISO(iso){
+  const [a,m,d] = iso.split('-').map(Number);
+  return DIAS_SEMANA_ID[new Date(a, m-1, d).getDay()];
+}
+function formatarDataBonita(iso){
+  const [a,m,d] = iso.split('-').map(Number);
+  const dt = new Date(a, m-1, d);
+  return String(d).padStart(2,'0') + '/' + String(m).padStart(2,'0') + ' · ' + DIAS_SEMANA_NOME[dt.getDay()];
+}
+function formatarMesNome(idMes){
+  const [ano, mes] = idMes.split('-').map(Number);
+  const nomes = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+  return nomes[mes-1] + ' de ' + ano;
+}
+function somarMinutosHorario(hhmm, minutosSomar){
+  const [h,m] = (hhmm||'00:00').split(':').map(Number);
+  const total = h*60+m+minutosSomar;
+  const hh = Math.floor(((total%1440)+1440)%1440/60), mm = ((total%60)+60)%60;
+  return String(hh).padStart(2,'0') + ':' + String(mm).padStart(2,'0');
+}
+function minutosEntre(hhmmA, hhmmB){
+  const [ha,ma] = hhmmA.split(':').map(Number), [hb,mb] = hhmmB.split(':').map(Number);
+  return (hb*60+mb) - (ha*60+ma);
+}
+
+function showToast(msg){
+  state.toast = msg;
+  render();
+  clearTimeout(state._toastTimer);
+  state._toastTimer = setTimeout(() => { state.toast = null; render(); }, 2600);
+}
+function abrirModal(modal){ state.modal = modal; render(); }
+function fecharModal(){ pararLeitorQr(); state.modal = null; render(); }
+
+/* ============ 6) GERAR DATAS DO MÊS (cruza recorrentes + avulsos) ============ */
+function gerarDatasDoMes(idMes){
+  const [ano, mesNum] = idMes.split('-').map(Number);
+  const diasNoMes = new Date(ano, mesNum, 0).getDate();
+  const linhas = [];
+  for (let dia = 1; dia <= diasNoMes; dia++){
+    const iso = ano + '-' + String(mesNum).padStart(2,'0') + '-' + String(dia).padStart(2,'0');
+    const diaSemana = diaSemanaISO(iso);
+    (state.config.eventos || []).forEach(ev => {
+      const bate = ev.dataEspecifica ? ev.dataEspecifica === iso : ev.dia === diaSemana;
+      if (bate) linhas.push({ data: iso, tipo:'recorrente', eventoId: ev.id, eventoNome: ev.nome, horario: ev.horario, horarioFim: ev.horarioFim });
+    });
+  }
+  (state.eventosEsporadicos || []).forEach(ev => {
+    if (ev.data && ev.data.slice(0,7) === idMes && !ev.excluido){
+      linhas.push({ data: ev.data, tipo:'esporadico', eventoId: ev.id, eventoNome: ev.nome, horario: ev.horario, horarioFim: ev.horarioFim });
+    }
+  });
+  return linhas.sort((a,b) => (a.data+(a.horario||'')).localeCompare(b.data+(b.horario||'')));
+}
+function proximosEventos(diasAFrente){
+  const hoje = hojeISO();
+  const limite = new Date(); limite.setDate(limite.getDate() + (diasAFrente||30));
+  const limiteISO = limite.getFullYear() + '-' + String(limite.getMonth()+1).padStart(2,'0') + '-' + String(limite.getDate()).padStart(2,'0');
+  const meses = new Set([hoje.slice(0,7), limiteISO.slice(0,7)]);
+  let linhas = [];
+  meses.forEach(m => linhas = linhas.concat(gerarDatasDoMes(m)));
+  return linhas.filter(l => l.data >= hoje && l.data <= limiteISO);
+}
+
+/* ============ 7) PAPÉIS E PERMISSÕES ============ */
+function souAdmin(){ return state.usuario && state.usuario.role === 'admin'; }
+function souLider(){ return state.usuario && (state.usuario.role === 'lider' || state.usuario.role === 'admin'); }
+function souLiderDe(departamento){
+  if (!state.usuario) return false;
+  if (state.usuario.role === 'admin') return true;
+  return state.usuario.role === 'lider' && (state.usuario.departamentos||[]).includes(departamento);
+}
+function meusDepartamentosLiderados(){
+  if (!state.usuario) return [];
+  if (state.usuario.role === 'admin') return (state.config && state.config.departamentos) || [];
+  if (state.usuario.role === 'lider') return state.usuario.departamentos || [];
+  return [];
+}
+function existeLiderPara(departamento){
+  return (state.voluntarios||[]).some(v => (v.role === 'lider'||v.role==='admin') && (v.departamentos||[]).includes(departamento));
+}
+
+/* ============ 8) GAMIFICAÇÃO: pontos, sequência e conquistas ============ */
+function minhasEscalasPassadasOrdenadas(uid){
+  return (state.escalas||[])
+    .filter(i => !i.excluida && i.voluntarioUid === uid && i.status === 'confirmado' && i.data <= hojeISO())
+    .sort((a,b) => (b.data+(b.horario||'')).localeCompare(a.data+(a.horario||'')));
+}
+function calcularSequencia(uid){
+  const passadas = minhasEscalasPassadasOrdenadas(uid);
+  let seq = 0;
+  for (const i of passadas){
+    if (i.checkin) seq++; else break;
+  }
+  return seq;
+}
+async function recalcularStatsVoluntario(uid){
+  const vol = state.voluntarios.find(v => v.id === uid);
+  if (!vol) return;
+  const passadas = minhasEscalasPassadasOrdenadas(uid);
+  const comCheckin = passadas.filter(i => i.checkin);
+  const totalCheckins = comCheckin.length;
+  const sequenciaAtual = calcularSequencia(uid);
+  const horasServidas = comCheckin.reduce((soma, i) => {
+    if (i.checkin && i.checkout) soma += Math.max(0, minutosEntre(i.checkin.horario, i.checkout.horario)) / 60;
+    else soma += 1.5; // estimativa quando não fez check-out manual
+    return soma;
+  }, 0);
+  const pontosServico = totalCheckins * PONTOS_POR_SERVICO;
+  const pontosElogios = (state.elogios||[]).filter(e => e.voluntarioUid === uid).reduce((s,e)=>s+(e.pontos||0),0);
+  const conquistasAntes = new Set(vol.conquistas || []);
+  const statsParaConquista = { totalCheckins, sequenciaAtual };
+  const conquistasNovas = CONQUISTAS.filter(c => c.meta(statsParaConquista)).map(c => c.id);
+  const patch = {
+    totalCheckins, sequenciaAtual,
+    horasServidas: Math.round(horasServidas*10)/10,
+    pontos: pontosServico + pontosElogios,
+    conquistas: conquistasNovas,
+  };
+  Object.assign(vol, patch);
+  await colAtualizar('voluntarios', uid, patch);
+  const novasDeVerdade = conquistasNovas.filter(id => !conquistasAntes.has(id));
+  if (novasDeVerdade.length && uid === state.usuario?.id){
+    const c = CONQUISTAS.find(x => x.id === novasDeVerdade[0]);
+    showToast('🎉 Nova conquista: ' + c.emoji + ' ' + c.nome + '!');
+  }
+}
+
+/* ============ 9) CARREGAMENTO DE DADOS ============ */
+async function carregarTudo(){
+  const [voluntarios, escalas, eventosEsporadicos, elogios, trocas] = await Promise.all([
+    colLista('voluntarios'), colLista('escalas'), colLista('eventosEsporadicos'),
+    colLista('elogios'), colLista('trocas'),
+  ]);
+  state.voluntarios = voluntarios;
+  state.escalas = escalas;
+  state.eventosEsporadicos = eventosEsporadicos.sort((a,b)=>(a.data||'').localeCompare(b.data||''));
+  state.elogios = elogios;
+  state.trocas = trocas;
+  const eu = voluntarios.find(v => v.id === state.usuario.id);
+  if (eu) state.usuario = eu;
+}
+async function carregarAuditoria(){
+  state.auditoria = (await colLista('auditoria')).sort((a,b)=> (b.criadoEm||'').localeCompare(a.criadoEm||''));
+}
+
+/* ============ 10) RENDER — loop principal ============ */
+function render(){
+  const app = document.getElementById('app');
+  if (state.carregando){
+    app.className = 'sem-nav';
+    app.innerHTML = telaCarregando();
+    return;
+  }
+  if (!state.usuario){
+    app.className = 'sem-nav';
+    app.innerHTML = state.telaAuth === 'cadastro' ? telaCadastro() : telaLogin();
+  } else {
+    app.className = 'modo-equipe';
+    app.innerHTML = telaShell();
+  }
+  if (state.toast) app.insertAdjacentHTML('beforeend', `<div class="toast">${esc(state.toast)}</div>`);
+  if (state.modal) app.insertAdjacentHTML('beforeend', montarModal());
+  if (typeof aposRenderEfeitos === 'function') aposRenderEfeitos();
+}
+
+function telaCarregando(){
+  return `<div class="vazio" style="padding-top:70px;">
+    <span class="vazio-emoji">🌿</span>
+    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro);">Voluntia</p>
+    <p class="hint">Carregando…</p>
+  </div>`;
+}
+
+function marcaSeloSvg(tamanho){
+  return `<svg width="${tamanho}" height="${tamanho}" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="28" cy="24" r="16" fill="#E8543A" fill-opacity="0.85"/>
+    <circle cx="20" cy="40" r="16" fill="#1F6F5C" fill-opacity="0.85"/>
+    <circle cx="38" cy="40" r="16" fill="#F4B740" fill-opacity="0.85"/>
+  </svg>`;
+}
+
+function telaLogin(){
+  const f = state.loginForm;
+  return `<div class="tela-auth">
+    <div class="marca-central">
+      <div class="marca-selo-grande">${marcaSeloSvg(64)}</div>
+      <h1 style="font-size:26px;">Voluntia</h1>
+      <p class="lema"><span class="l-viver">Viver</span>·<span class="l-amar">Amar</span>·<span class="l-servir">Servir</span></p>
+      <p class="hint">Escalas e check-in de voluntários, sem complicação.</p>
+    </div>
+    <form data-form="login">
+      <div class="campo"><label>E-mail</label><input type="email" name="email" required value="${esc(f.email)}" placeholder="voce@email.com"></div>
+      <div class="campo"><label>Senha</label><input type="password" name="senha" required minlength="6" placeholder="••••••" value="${esc(f.senha)}"></div>
+      <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+    </form>
+    <p style="text-align:center; margin-top:16px; font-size:13.5px;">Ainda não tem conta? <a href="#" data-action="ir-cadastro">Cadastre-se</a></p>
+    ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:18px; background:var(--ouro-suave);"><p class="hint" style="margin:0;">🧪 <strong>Modo demonstração</strong> — os dados ficam salvos só neste navegador (localStorage). Configure o Firebase no arquivo <code>index.html</code> pra publicar de verdade. Veja o README.</p></div>` : ''}
+  </div>`;
+}
+
+function telaCadastro(){
+  const f = state.cadastroForm;
+  const deps = (state.config && state.config.departamentos) || DEPARTAMENTOS_PADRAO;
+  return `<div class="tela-auth">
+    <div class="marca-central">
+      <div class="marca-selo-grande">${marcaSeloSvg(56)}</div>
+      <h1 style="font-size:22px;">Criar minha conta</h1>
+      <p class="hint">Leva menos de um minuto.</p>
+    </div>
+    <form data-form="cadastro">
+      <div class="campo"><label>Nome completo</label><input type="text" name="nome" required value="${esc(f.nome)}"></div>
+      <div class="campo"><label>E-mail</label><input type="email" name="email" required value="${esc(f.email)}"></div>
+      <div class="campo"><label>WhatsApp (com DDD)</label><input type="tel" name="telefone" placeholder="(11) 91234-5678" value="${esc(f.telefone)}"></div>
+      <div class="campo"><label>Crie uma senha</label><input type="password" name="senha" required minlength="6" placeholder="mínimo 6 caracteres" value="${esc(f.senha)}"></div>
+      <div class="campo">
+        <label>Em quais áreas você quer servir?</label>
+        <p class="hint" style="margin:0 0 8px 0;">Pode marcar mais de uma.</p>
+        <div class="row">
+          ${deps.map(d => `<button type="button" class="chip ${f.departamentos.includes(d)?'ativo':''}" data-action="toggle-depto-cadastro" data-depto="${esc(d)}">${esc(d)}</button>`).join('')}
+        </div>
+      </div>
+      <div class="campo">
+        <label>Quando você costuma poder servir?</label>
+        <div class="row">
+          ${DIAS_SEMANA_NOME.map((nome,i) => `<button type="button" class="chip ${f.disponibilidade.includes(DIAS_SEMANA_ID[i])?'ativo':''}" data-action="toggle-dia-cadastro" data-dia="${DIAS_SEMANA_ID[i]}">${nome}</button>`).join('')}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">Criar conta e entrar</button>
+    </form>
+    <p style="text-align:center; margin-top:16px; font-size:13.5px;">Já tem conta? <a href="#" data-action="ir-login">Entrar</a></p>
+  </div>`;
+}
+
+/* ============ 11) CASCA (topbar + navegação) ============ */
+function tituloDaAba(){
+  return {
+    painel: 'Olá, ' + primeiroNome(state.usuario.nome),
+    escala: 'Escala',
+    checkin: 'Check-in',
+    impacto: 'Meu impacto',
+    mais: 'Mais',
+  }[state.aba] || 'Voluntia';
+}
+function primeiroNome(nome){ return (nome||'').split(' ')[0]; }
+
+function telaShell(){
+  return `<div class="topbar">
+      <div class="topbar-linha1">
+        <div class="marca">
+          <div class="marca-selo">${marcaSeloSvg(22)}</div>
+          <div><div class="marca-nome">Voluntia</div><div class="marca-sub">${esc((state.config&&state.config.nomeIgreja)||'')}</div></div>
+        </div>
+        <div class="topbar-acoes">
+          <button class="icon-btn" data-action="sair" title="Sair">⎋</button>
+        </div>
+      </div>
+      <div class="topbar-titulo">${esc(tituloDaAba())}</div>
+    </div>
+    <div class="conteudo">${telaConteudo()}</div>
+    ${navInferior()}`;
+}
+
+function navInferior(){
+  const itens = [
+    { id:'painel', icone:'🏠', nome:'Início' },
+    { id:'escala', icone:'📅', nome:'Escala' },
+    { id:'checkin', icone:'📍', nome:'Check-in' },
+    { id:'impacto', icone:'💛', nome:'Impacto' },
+    { id:'mais', icone:'☰', nome:'Mais' },
+  ];
+  return `<div class="nav-inferior">
+    ${itens.map(it => `<button class="nav-item ${state.aba===it.id?'ativo':''}" data-action="ir-aba" data-aba="${it.id}"><span class="nav-icone">${it.icone}</span>${it.nome}</button>`).join('')}
+  </div>`;
+}
+
+function telaConteudo(){
+  switch(state.aba){
+    case 'escala': return telaEscala();
+    case 'checkin': return telaCheckin();
+    case 'impacto': return telaImpacto();
+    case 'mais': return telaMais();
+    case 'admin-departamentos': return telaAdminDepartamentos();
+    case 'admin-eventos': return telaAdminEventos();
+    case 'admin-escala': return telaAdminEscala();
+    case 'admin-voluntarios': return telaAdminVoluntarios();
+    case 'admin-config': return telaAdminConfig();
+    case 'admin-auditoria': return telaAdminAuditoria();
+    case 'elogiar': return telaElogiar();
+    case 'perfil': return telaPerfil();
+    default: return telaPainel();
+  }
+}
+
+/* ============ 12) TELA: PAINEL (início) ============ */
+function meuProximoCompromisso(){
+  return (state.escalas||[])
+    .filter(i => !i.excluida && i.voluntarioUid === state.usuario.id && i.status === 'confirmado' && i.data >= hojeISO())
+    .sort((a,b) => (a.data+(a.horario||'')).localeCompare(b.data+(b.horario||'')))[0] || null;
+}
+function vagasAbertasParaMim(){
+  const deps = state.usuario.departamentos || [];
+  if (!deps.length) return [];
+  const eventos = proximosEventos(30);
+  const vagas = [];
+  eventos.forEach(ev => {
+    deps.forEach(dep => {
+      const preenchida = (state.escalas||[]).some(i => !i.excluida && i.status!=='cancelado_pendente' && i.eventoTipo===ev.tipo && i.eventoId===ev.eventoId && i.data===ev.data && i.departamento===dep);
+      if (!preenchida) vagas.push({ ...ev, departamento: dep });
+    });
+  });
+  return vagas.sort((a,b)=> (a.data+(a.horario||'')).localeCompare(b.data+(b.horario||'')));
+}
+function trocasAbertasParaMim(){
+  const deps = state.usuario.departamentos || [];
+  return (state.trocas||[]).filter(t => t.status==='aberta' && t.deVoluntarioUid !== state.usuario.id && deps.includes(t.departamento));
+}
+
+function telaPainel(){
+  const proximo = meuProximoCompromisso();
+  const vagas = vagasAbertasParaMim();
+  const trocas = trocasAbertasParaMim();
+  const v = versiculoDoDia(hojeISO());
+  const hojeTemCompromisso = proximo && proximo.data === hojeISO();
+  return `
+    <div class="cartao" style="background:linear-gradient(135deg, var(--teal) 0%, var(--teal-escuro) 100%); color:#fff;">
+      <p style="margin:0; font-size:12.5px; opacity:0.85;">Versículo do dia</p>
+      <p style="margin:6px 0 0 0; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; line-height:1.4;">"${esc(v.texto)}"</p>
+      <p style="margin:6px 0 0 0; font-size:12px; opacity:0.85;">${esc(v.referencia)}</p>
+    </div>
+
+    ${hojeTemCompromisso ? `
+    <div class="cartao" style="background:var(--coral); color:#fff;">
+      <div class="linha"><strong>🎈 Você serve hoje!</strong><span class="badge" style="background:rgba(255,255,255,0.25); color:#fff;">${esc(proximo.horario||'')}</span></div>
+      <p style="margin:8px 0 0 0;">${esc(proximo.eventoNome)} · ${esc(proximo.departamento)}</p>
+      <button class="btn btn-block" style="background:#fff; color:var(--coral); margin-top:12px;" data-action="ir-aba" data-aba="checkin">Ir para o check-in →</button>
+    </div>` : ''}
+
+    <div class="cartao">
+      <div class="cartao-titulo">Meu próximo compromisso</div>
+      ${proximo ? `
+        <div class="lista-item" style="border:none; padding:4px 0;">
+          <div>
+            <strong>${esc(proximo.eventoNome)}</strong><br>
+            <span class="hint">${formatarDataBonita(proximo.data)} · ${esc(proximo.horario||'')} · ${esc(proximo.departamento)}</span>
+          </div>
+          <span class="badge badge-servir">Confirmado</span>
+        </div>` : `<p class="hint" style="margin:0;">Nenhum compromisso à vista. Dá uma olhada nas <a href="#" data-action="ir-vagas">vagas abertas</a>?</p>`}
+    </div>
+
+    <div class="grade-2">
+      <div class="cartao" style="text-align:center;">
+        <div style="font-size:26px;">🔥</div>
+        <div style="font-size:22px; font-weight:800; font-family:'Baloo 2',sans-serif;">${state.usuario.sequenciaAtual||0}</div>
+        <div class="hint">sequência atual</div>
+      </div>
+      <div class="cartao" style="text-align:center;">
+        <div style="font-size:26px;">💛</div>
+        <div style="font-size:22px; font-weight:800; font-family:'Baloo 2',sans-serif;">${state.usuario.pontos||0}</div>
+        <div class="hint">pontos</div>
+      </div>
+    </div>
+
+    <div class="cartao">
+      <div class="linha"><div class="cartao-titulo" style="margin:0;">Vagas abertas na minha área</div><span class="badge badge-amar">${vagas.length}</span></div>
+      ${vagas.length===0 ? `<p class="hint" style="margin:6px 0 0 0;">Tudo preenchido por enquanto. 🎉</p>` : `
+        <div class="col" style="margin-top:8px;">
+          ${vagas.slice(0,3).map(v => `<div class="lista-item"><div><strong>${esc(v.eventoNome)}</strong><br><span class="hint">${formatarDataBonita(v.data)} · ${esc(v.departamento)}</span></div><button class="btn btn-secondary btn-small" data-action="quero-servir" data-tipo="${v.tipo}" data-evento="${esc(v.eventoId)}" data-data="${v.data}" data-depto="${esc(v.departamento)}" data-nome="${esc(v.eventoNome)}" data-horario="${esc(v.horario||'')}">Quero servir</button></div>`).join('')}
+        </div>
+        ${vagas.length>3 ? `<button class="btn btn-ghost btn-small btn-block" style="margin-top:8px;" data-action="ir-vagas">Ver todas (${vagas.length})</button>`:''}
+      `}
+    </div>
+
+    ${trocas.length ? `<div class="cartao">
+      <div class="linha"><div class="cartao-titulo" style="margin:0;">Pedidos de troca</div><span class="badge badge-alerta">${trocas.length}</span></div>
+      <p class="hint" style="margin:6px 0 0 0;">Alguém da sua área não pode servir e está procurando substituto.</p>
+      <button class="btn btn-secondary btn-small btn-block" style="margin-top:10px;" data-action="ir-trocas">Ver pedidos →</button>
+    </div>` : ''}
+  `;
+}
+
+/* ============ 13) TELA: ESCALA (meus compromissos / vagas / trocas / montar) ============ */
+function telaEscala(){
+  const sub = state.escalaSubaba || 'meus';
+  const podeMontar = souLider();
+  const pills = [
+    {id:'meus', nome:'Meus compromissos'},
+    {id:'vagas', nome:'Vagas abertas'},
+    {id:'trocas', nome:'Trocas'},
+  ];
+  if (podeMontar) pills.push({id:'montar', nome:'Montar escala'});
+  let corpo = '';
+  if (sub==='meus') corpo = telaEscalaMeus();
+  else if (sub==='vagas') corpo = telaEscalaVagas();
+  else if (sub==='trocas') corpo = telaEscalaTrocas();
+  else if (sub==='montar') corpo = telaEscalaMontar();
+  return `<div class="row" style="margin-bottom:14px;">
+    ${pills.map(p => `<button class="chip ${sub===p.id?'ativo':''}" data-action="escala-subaba" data-sub="${p.id}">${p.nome}</button>`).join('')}
+  </div>${corpo}`;
+}
+
+function telaEscalaMeus(){
+  const minhas = (state.escalas||[]).filter(i => !i.excluida && i.voluntarioUid===state.usuario.id && i.data>=hojeISO())
+    .sort((a,b)=>(a.data+(a.horario||'')).localeCompare(b.data+(b.horario||'')));
+  if (!minhas.length) return `<div class="vazio"><span class="vazio-emoji">📅</span>Você ainda não está em nenhuma escala.<br><button class="btn btn-primary btn-small" style="margin-top:14px;" data-action="escala-subaba" data-sub="vagas">Ver vagas abertas</button></div>`;
+  return `<div class="cartao">${minhas.map(i => `
+    <div class="lista-item">
+      <div>
+        <strong>${esc(i.eventoNome)}</strong><br>
+        <span class="hint">${formatarDataBonita(i.data)} · ${esc(i.horario||'')} · ${esc(i.departamento)}</span><br>
+        <span class="badge ${i.status==='proposto'?'badge-alerta':'badge-servir'}">${i.status==='proposto'?'Aguardando aprovação':(i.checkin?'Check-in feito':'Confirmado')}</span>
+      </div>
+      <div class="col" style="align-items:flex-end;">
+        ${i.status!=='proposto' ? `<button class="btn btn-ghost btn-small" data-action="abrir-pedir-troca" data-escala="${i.id}">Pedir troca</button>`:''}
+        <button class="btn btn-danger btn-small" data-action="abrir-desmarcar" data-escala="${i.id}">Desmarcar</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function telaEscalaVagas(){
+  const vagas = vagasAbertasParaMim();
+  if (!vagas.length) return `<div class="vazio"><span class="vazio-emoji">🎉</span>Tudo preenchido nas suas áreas por enquanto.</div>`;
+  return `<div class="cartao">${vagas.map(v => `
+    <div class="lista-item">
+      <div><strong>${esc(v.eventoNome)}</strong><br><span class="hint">${formatarDataBonita(v.data)} · ${esc(v.horario||'')} · ${esc(v.departamento)}</span></div>
+      <button class="btn btn-secondary btn-small" data-action="quero-servir" data-tipo="${v.tipo}" data-evento="${esc(v.eventoId)}" data-data="${v.data}" data-depto="${esc(v.departamento)}" data-nome="${esc(v.eventoNome)}" data-horario="${esc(v.horario||'')}">Quero servir</button>
+    </div>`).join('')}</div>`;
+}
+
+function telaEscalaTrocas(){
+  const abertasParaMim = trocasAbertasParaMim();
+  const minhas = (state.trocas||[]).filter(t => t.deVoluntarioUid===state.usuario.id).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+  return `
+    <div class="cartao-titulo" style="margin:4px 0 8px 4px;">Pedidos que você pode aceitar</div>
+    ${abertasParaMim.length ? `<div class="cartao">${abertasParaMim.map(t => `
+      <div class="lista-item">
+        <div><strong>${esc(t.departamento)}</strong> · ${formatarDataBonita(t.data)}<br><span class="hint">${esc(t.eventoNome)} — pedido de ${esc(t.deVoluntarioNome)}${t.motivo?': "'+esc(t.motivo)+'"':''}</span></div>
+        <button class="btn btn-secondary btn-small" data-action="aceitar-troca" data-troca="${t.id}">Aceitar</button>
+      </div>`).join('')}</div>` : `<p class="hint" style="margin:0 0 18px 4px;">Nenhum pedido em aberto nas suas áreas agora.</p>`}
+
+    <div class="cartao-titulo" style="margin:14px 0 8px 4px;">Meus pedidos de troca</div>
+    ${minhas.length ? `<div class="cartao">${minhas.map(t => `
+      <div class="lista-item">
+        <div><strong>${esc(t.departamento)}</strong> · ${formatarDataBonita(t.data)}<br><span class="badge ${t.status==='aberta'?'badge-alerta':(t.status==='aceita'?'badge-servir':'')}">${t.status==='aberta'?'Aguardando alguém aceitar':(t.status==='aceita'?'Aceito por '+esc(t.paraVoluntarioNome||''):'Cancelado')}</span></div>
+        ${t.status==='aberta' ? `<button class="btn btn-ghost btn-small" data-action="cancelar-troca" data-troca="${t.id}">Cancelar</button>`:''}
+      </div>`).join('')}</div>` : `<p class="hint" style="margin:0 4px;">Você ainda não pediu nenhuma troca.</p>`}
+  `;
+}
+
+function eventualLideradosOrdenados(departamento){
+  return (state.voluntarios||[]).filter(v => v.ativo!==false && (v.departamentos||[]).includes(departamento))
+    .sort((a,b) => (a.ultimaVezServiu||'0000-00-00').localeCompare(b.ultimaVezServiu||'0000-00-00'));
+}
+
+function telaEscalaMontar(){
+  const deps = meusDepartamentosLiderados();
+  const eventos = proximosEventos(21);
+  const propostos = (state.escalas||[]).filter(i => !i.excluida && i.status==='proposto' && deps.includes(i.departamento));
+  return `
+    ${propostos.length ? `<div class="cartao" style="background:var(--ouro-suave);">
+      <div class="cartao-titulo">Pedidos aguardando sua aprovação</div>
+      ${propostos.map(i => `<div class="lista-item">
+        <div><strong>${esc(i.voluntarioNome)}</strong> · ${esc(i.departamento)}<br><span class="hint">${formatarDataBonita(i.data)} · ${esc(i.eventoNome)}</span></div>
+        <div class="row"><button class="btn btn-secondary btn-small" data-action="aprovar-proposto" data-escala="${i.id}">Aprovar</button><button class="btn btn-ghost btn-small" data-action="abrir-desmarcar" data-escala="${i.id}">Recusar</button></div>
+      </div>`).join('')}
+    </div>` : ''}
+
+    ${eventos.map(ev => `
+      <div class="cartao">
+        <div class="cartao-titulo">${esc(ev.eventoNome)} · ${formatarDataBonita(ev.data)}</div>
+        ${deps.map(dep => {
+          const escaladosDep = (state.escalas||[]).filter(i => !i.excluida && i.status==='confirmado' && i.eventoTipo===ev.tipo && i.eventoId===ev.eventoId && i.data===ev.data && i.departamento===dep);
+          return `<div class="lista-item">
+            <div><strong>${esc(dep)}</strong><br><span class="hint">${escaladosDep.length ? escaladosDep.map(e=>esc(e.voluntarioNome)).join(', ') : 'Ninguém escalado ainda'}</span></div>
+            <button class="btn btn-secondary btn-small" data-action="abrir-escalar-alguem" data-tipo="${ev.tipo}" data-evento="${esc(ev.eventoId)}" data-data="${ev.data}" data-depto="${esc(dep)}" data-nome="${esc(ev.eventoNome)}" data-horario="${esc(ev.horario||'')}">+ Escalar</button>
+          </div>`;
+        }).join('')}
+      </div>`).join('')}
+    ${eventos.length===0 ? `<div class="vazio">Nenhum evento configurado ainda. Peça pro admin cadastrar os cultos/eventos em Mais → Eventos.</div>` : ''}
+  `;
+}
+
+/* ============ 14) TELA: CHECK-IN ============ */
+function compromissoDeHoje(){
+  return (state.escalas||[]).find(i => !i.excluida && i.voluntarioUid===state.usuario.id && i.status==='confirmado' && i.data===hojeISO());
+}
+function telaCheckin(){
+  const compromisso = compromissoDeHoje();
+  let corpo;
+  if (!compromisso){
+    const proximo = meuProximoCompromisso();
+    corpo = `<div class="vazio">
+      <span class="vazio-emoji">📍</span>
+      Você não tem compromisso hoje.
+      ${proximo ? `<p class="hint" style="margin-top:8px;">Seu próximo é em ${formatarDataBonita(proximo.data)} (${esc(proximo.departamento)}).</p>` : ''}
+    </div>`;
+  } else if (!compromisso.checkin){
+    corpo = `<div class="cartao" style="text-align:center;">
+      <div style="font-size:34px;">📍</div>
+      <div class="cartao-titulo" style="justify-content:center;">${esc(compromisso.eventoNome)}</div>
+      <p class="hint">${esc(compromisso.departamento)} · ${esc(compromisso.horario||'')}</p>
+      <div class="col" style="margin-top:16px;">
+        <button class="btn btn-primary btn-block" data-action="abrir-scanner-qr" data-escala="${compromisso.id}">📷 Escanear QR da portaria</button>
+        <button class="btn btn-secondary btn-block" data-action="fazer-checkin-manual" data-escala="${compromisso.id}">✋ Confirmar chegada manualmente</button>
+      </div>
+    </div>`;
+  } else if (!compromisso.checkout){
+    corpo = `<div class="cartao" style="text-align:center; background:var(--teal-suave);">
+      <div style="font-size:34px;">✅</div>
+      <p style="font-weight:800; color:var(--teal-escuro);">Check-in feito às ${esc(compromisso.checkin.horario)}</p>
+      <p class="hint">${esc(compromisso.eventoNome)} · ${esc(compromisso.departamento)}</p>
+      <button class="btn btn-coral btn-block" style="margin-top:14px;" data-action="fazer-checkout" data-escala="${compromisso.id}">Finalizar meu turno</button>
+    </div>`;
+  } else {
+    corpo = `<div class="cartao" style="text-align:center;">
+      <div style="font-size:34px;">🙏</div>
+      <p style="font-weight:800; color:var(--teal-escuro);">Turno concluído — obrigado por servir hoje!</p>
+      <p class="hint">Entrada ${esc(compromisso.checkin.horario)} · Saída ${esc(compromisso.checkout.horario)}</p>
+    </div>`;
+  }
+  const portaria = souLider() ? `<div class="cartao">
+      <div class="cartao-titulo">Modo portaria</div>
+      <p class="hint">Mostre o QR na entrada pra quem for escalado hoje escanear e fazer o próprio check-in.</p>
+      <button class="btn btn-ghost btn-block" style="margin-top:8px;" data-action="abrir-qr-portaria">Abrir QR de hoje →</button>
+    </div>` : '';
+  return corpo + portaria;
+}
+
+/* ============ 15) TELA: MEU IMPACTO (gamificação) ============ */
+function telaImpacto(){
+  const u = state.usuario;
+  const meusElogios = (state.elogios||[]).filter(e => e.voluntarioUid===u.id).sort((a,b)=>(b.criadoEm||'').localeCompare(a.criadoEm||''));
+  return `
+    <div class="grade-3">
+      <div class="cartao" style="text-align:center;"><div style="font-size:22px;">💛</div><div style="font-weight:800; font-size:19px;">${u.pontos||0}</div><div class="hint">pontos</div></div>
+      <div class="cartao" style="text-align:center;"><div style="font-size:22px;">🙌</div><div style="font-weight:800; font-size:19px;">${u.totalCheckins||0}</div><div class="hint">serviços</div></div>
+      <div class="cartao" style="text-align:center;"><div style="font-size:22px;">⏱️</div><div style="font-weight:800; font-size:19px;">${u.horasServidas||0}h</div><div class="hint">servidas</div></div>
+    </div>
+    <div class="cartao">
+      <div class="linha"><div class="cartao-titulo" style="margin:0;">Sequência atual</div><span class="badge badge-amar">🔥 ${u.sequenciaAtual||0}</span></div>
+      <p class="hint" style="margin:6px 0 0 0;">Serviços seguidos em que você fez check-in, sem faltar.</p>
+    </div>
+    <div class="cartao">
+      <div class="cartao-titulo">Conquistas</div>
+      <div class="grade-3" style="margin-top:8px;">
+        ${CONQUISTAS.map(c => {
+          const conquistada = (u.conquistas||[]).includes(c.id);
+          return `<div class="selo-conquista ${conquistada?'':'bloqueado'}" title="${esc(c.descricao)}"><span class="selo-emoji">${c.emoji}</span><span class="selo-nome">${esc(c.nome)}</span></div>`;
+        }).join('')}
+      </div>
+    </div>
+    ${meusElogios.length ? `<div class="cartao">
+      <div class="cartao-titulo">Elogios recebidos</div>
+      ${meusElogios.map(e => `<div class="lista-item"><div><strong>${e.emoji||'💛'} ${esc(e.tipo)}</strong>${e.mensagem?`<br><span class="hint">"${esc(e.mensagem)}"</span>`:''}<br><span class="hint">de ${esc(e.deQuemNome)}</span></div><span class="badge badge-viver">+${e.pontos}</span></div>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+/* ============ 16) TELA: MAIS (menu) ============ */
+function telaMais(){
+  const u = state.usuario;
+  return `
+    <div class="cartao">
+      <div class="linha">
+        <div><strong>${esc(u.nome)}</strong><br><span class="hint">${esc(u.email)}</span></div>
+        <span class="badge ${u.role==='admin'?'badge-amar':(u.role==='lider'?'badge-servir':'')}">${u.role==='admin'?'Admin':(u.role==='lider'?'Líder':'Voluntário')}</span>
+      </div>
+      <button class="btn btn-ghost btn-small btn-block" style="margin-top:10px;" data-action="ir-perfil">Editar meu perfil</button>
+    </div>
+
+    ${souLider() ? `<div class="cartao">
+      <div class="cartao-titulo">Liderança</div>
+      <div class="col">
+        <button class="btn btn-ghost" data-action="ir-elogiar">💛 Elogiar um voluntário</button>
+        <button class="btn btn-ghost" data-action="exportar-escala">⬇️ Exportar escala do mês</button>
+      </div>
+    </div>` : ''}
+
+    ${souAdmin() ? `<div class="cartao">
+      <div class="cartao-titulo">Administração</div>
+      <div class="col">
+        <button class="btn btn-ghost" data-action="ir-admin-departamentos">🗂️ Departamentos</button>
+        <button class="btn btn-ghost" data-action="ir-admin-eventos">🗓️ Eventos e cultos</button>
+        <button class="btn btn-ghost" data-action="ir-admin-voluntarios">👥 Voluntários</button>
+        <button class="btn btn-ghost" data-action="ir-admin-config">⚙️ Configurações</button>
+        <button class="btn btn-ghost" data-action="ir-admin-auditoria">🧾 Auditoria</button>
+      </div>
+    </div>` : ''}
+
+    <div class="cartao">
+      <div class="cartao-titulo">Sobre</div>
+      <p class="hint">Voluntia — viver, amar e servir, na prática. Gestão de escalas e check-in de voluntários.</p>
+    </div>
+    <button class="btn btn-danger btn-block" data-action="sair">Sair da minha conta</button>
+  `;
+}
+
+function telaPerfil(){
+  const u = state.usuario;
+  const deps = (state.config && state.config.departamentos) || DEPARTAMENTOS_PADRAO;
+  return `<form data-form="perfil">
+    <div class="cartao">
+      <div class="campo"><label>Nome</label><input type="text" name="nome" value="${esc(u.nome)}" required></div>
+      <div class="campo"><label>WhatsApp</label><input type="tel" name="telefone" value="${esc(u.telefone||'')}"></div>
+      <div class="campo">
+        <label>Minhas áreas</label>
+        <div class="row">${deps.map(d => `<button type="button" class="chip ${(u.departamentos||[]).includes(d)?'ativo':''}" data-action="toggle-depto-perfil" data-depto="${esc(d)}">${esc(d)}</button>`).join('')}</div>
+      </div>
+      <div class="campo">
+        <label>Disponibilidade</label>
+        <div class="row">${DIAS_SEMANA_NOME.map((nome,i)=>`<button type="button" class="chip ${(u.disponibilidade||[]).includes(DIAS_SEMANA_ID[i])?'ativo':''}" data-action="toggle-dia-perfil" data-dia="${DIAS_SEMANA_ID[i]}">${nome}</button>`).join('')}</div>
+      </div>
+      <div class="campo linha"><label style="margin:0;">Avisar quando abrir vaga na minha área</label><input type="checkbox" name="avisarVagaAberta" style="width:auto;" ${u.avisarVagaAberta!==false?'checked':''}></div>
+      <div class="campo linha"><label style="margin:0;">Desativar notificações por WhatsApp</label><input type="checkbox" name="notificacoesDesativadas" style="width:auto;" ${u.notificacoesDesativadas?'checked':''}></div>
+      <button type="submit" class="btn btn-primary btn-block">Salvar</button>
+    </div>
+  </form>`;
+}
+
+/* ============ 17) TELA: ELOGIAR ============ */
+function telaElogiar(){
+  const elegiveis = (state.voluntarios||[]).filter(v => v.ativo!==false && (souAdmin() || (v.departamentos||[]).some(d=>meusDepartamentosLiderados().includes(d))));
+  return `<form data-form="elogiar">
+    <div class="cartao">
+      <div class="campo">
+        <label>Voluntário</label>
+        <select name="voluntarioUid" required>
+          <option value="">Escolha…</option>
+          ${elegiveis.map(v => `<option value="${v.id}">${esc(v.nome)}</option>`).join('')}
+        </select>
+      </div>
+      <div class="campo">
+        <label>Motivo</label>
+        <select name="tipo" required>
+          ${TIPOS_ELOGIO.map(t => `<option value="${esc(t.tipo)}">${t.emoji} ${esc(t.tipo)} (+${t.pontos})</option>`).join('')}
+        </select>
+      </div>
+      <div class="campo"><label>Mensagem (opcional)</label><textarea name="mensagem" rows="3" placeholder="Uma palavra de encorajamento…"></textarea></div>
+      <button type="submit" class="btn btn-coral btn-block">Enviar elogio 💛</button>
+    </div>
+  </form>`;
+}
+
+/* ============ 18) TELAS ADMIN ============ */
+function telaAdminDepartamentos(){
+  const deps = (state.config && state.config.departamentos) || [];
+  return `
+    <div class="cartao">
+      <div class="cartao-titulo">Adicionar departamento</div>
+      <form data-form="novo-depto" class="row" style="align-items:flex-end;">
+        <div style="flex:1;"><input type="text" name="nome" placeholder="Nome do departamento" required></div>
+        <button type="submit" class="btn btn-primary btn-small">Adicionar</button>
+      </form>
+    </div>
+    <div class="cartao">
+      <div class="cartao-titulo">Departamentos (${deps.length})</div>
+      ${deps.map(d => `<div class="lista-item"><div><strong>${esc(d)}</strong><br><span class="hint">${existeLiderPara(d)?'Tem líder':'Sem líder — aprovações ficam automáticas'}</span></div><button class="btn btn-danger btn-small" data-action="remover-depto" data-depto="${esc(d)}">Remover</button></div>`).join('')}
+    </div>
+  `;
+}
+
+function telaAdminEventos(){
+  const recorrentes = (state.config && state.config.eventos) || [];
+  const avulsos = state.eventosEsporadicos.filter(e => !e.excluido);
+  return `
+    <div class="cartao">
+      <div class="cartao-titulo">Culto/evento recorrente</div>
+      <form data-form="novo-evento-recorrente" class="col">
+        <div class="campo"><label>Nome</label><input type="text" name="nome" required placeholder="Culto de Domingo · Manhã"></div>
+        <div class="campo"><label>Dia da semana</label><select name="dia">${DIAS_SEMANA_NOME.map((n,i)=>`<option value="${DIAS_SEMANA_ID[i]}">${n}</option>`).join('')}</select></div>
+        <div class="row"><div class="campo" style="flex:1;"><label>Início</label><input type="time" name="horario" required value="09:00"></div><div class="campo" style="flex:1;"><label>Fim</label><input type="time" name="horarioFim" value="11:00"></div></div>
+        <button type="submit" class="btn btn-primary btn-block">Adicionar recorrente</button>
+      </form>
+    </div>
+    <div class="cartao">
+      ${recorrentes.map(ev => `<div class="lista-item"><div><strong>${esc(ev.nome)}</strong><br><span class="hint">Toda(o) ${DIAS_SEMANA_NOME[DIAS_SEMANA_ID.indexOf(ev.dia)]} · ${esc(ev.horario)}${ev.horarioFim?'–'+esc(ev.horarioFim):''}</span></div><button class="btn btn-danger btn-small" data-action="remover-evento-recorrente" data-id="${esc(ev.id)}">Remover</button></div>`).join('') || '<p class="hint">Nenhum evento recorrente cadastrado.</p>'}
+    </div>
+    <div class="cartao">
+      <div class="cartao-titulo">Evento avulso (data única)</div>
+      <form data-form="novo-evento-avulso" class="col">
+        <div class="campo"><label>Nome</label><input type="text" name="nome" required placeholder="Conferência, evento especial…"></div>
+        <div class="campo"><label>Data</label><input type="date" name="data" required></div>
+        <div class="row"><div class="campo" style="flex:1;"><label>Início</label><input type="time" name="horario" required></div><div class="campo" style="flex:1;"><label>Fim</label><input type="time" name="horarioFim"></div></div>
+        <button type="submit" class="btn btn-primary btn-block">Adicionar avulso</button>
+      </form>
+    </div>
+    <div class="cartao">
+      ${avulsos.map(ev => `<div class="lista-item"><div><strong>${esc(ev.nome)}</strong><br><span class="hint">${formatarDataBonita(ev.data)} · ${esc(ev.horario)}</span></div><button class="btn btn-danger btn-small" data-action="remover-evento-avulso" data-id="${esc(ev.id)}">Remover</button></div>`).join('') || '<p class="hint">Nenhum evento avulso cadastrado.</p>'}
+    </div>
+  `;
+}
+
+function telaAdminEscala(){ state.escalaSubaba = 'montar'; return telaEscala(); }
+
+function telaAdminVoluntarios(){
+  const lista = [...state.voluntarios].sort((a,b)=>a.nome.localeCompare(b.nome));
+  return `<div class="cartao">${lista.map(v => `
+    <div class="lista-item" style="align-items:flex-start;">
+      <div>
+        <strong>${esc(v.nome)}</strong> ${v.ativo===false?'<span class="badge badge-alerta">Inativo</span>':''}<br>
+        <span class="hint">${esc(v.email)} ${v.telefone?'· '+esc(v.telefone):''}</span><br>
+        <span class="hint">${(v.departamentos||[]).join(', ')||'sem área'}</span>
+      </div>
+      <div class="col" style="align-items:flex-end;">
+        <select data-action="mudar-role" data-uid="${v.id}" style="width:auto; padding:6px 10px; font-size:12px;">
+          <option value="voluntario" ${v.role==='voluntario'?'selected':''}>Voluntário</option>
+          <option value="lider" ${v.role==='lider'?'selected':''}>Líder</option>
+          <option value="admin" ${v.role==='admin'?'selected':''}>Admin</option>
+        </select>
+        <button class="btn btn-ghost btn-small" data-action="editar-departamentos-voluntario" data-uid="${v.id}">Áreas</button>
+        <button class="btn ${v.ativo===false?'btn-secondary':'btn-danger'} btn-small" data-action="toggle-ativo-voluntario" data-uid="${v.id}">${v.ativo===false?'Reativar':'Desativar'}</button>
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function telaAdminConfig(){
+  const c = state.config || CONFIG_PADRAO;
+  return `<form data-form="config-igreja">
+    <div class="cartao">
+      <div class="campo"><label>Nome da igreja/organização</label><input type="text" name="nomeIgreja" value="${esc(c.nomeIgreja)}" required></div>
+      <div class="campo"><label>Lema</label><input type="text" name="lema" value="${esc(c.lema||'')}"></div>
+      <button type="submit" class="btn btn-primary btn-block">Salvar</button>
+    </div>
+  </form>
+  <div class="cartao">
+    <div class="cartao-titulo">Exportar escala</div>
+    <div class="campo"><label>Mês</label><input type="month" id="mes-exportar" value="${esc(state.mesEscala || hojeISO().slice(0,7))}"></div>
+    <div class="col">
+      <button class="btn btn-ghost" data-action="exportar-escala">⬇️ Excel (.xlsx)</button>
+      <button class="btn btn-ghost" data-action="exportar-escala-pdf">⬇️ PDF</button>
+    </div>
+  </div>`;
+}
+
+function telaAdminAuditoria(){
+  return `<div class="cartao">${state.auditoria.slice(0,80).map(a => `
+    <div class="lista-item"><div><strong>${esc(a.usuarioNome)}</strong> — ${esc(a.acao)}<br><span class="hint">${esc(a.detalhes||'')}</span></div><span class="hint">${esc(new Date(a.criadoEm).toLocaleString('pt-BR'))}</span></div>`).join('') || '<p class="hint">Nada registrado ainda.</p>'}
+  </div>`;
+}
+
+/* ============ 19) MODAIS ============ */
+function montarModal(){
+  const m = state.modal;
+  let corpo = '';
+  if (m.tipo === 'pedir-troca') corpo = modalPedirTroca(m);
+  else if (m.tipo === 'desmarcar') corpo = modalDesmarcar(m);
+  else if (m.tipo === 'escalar-alguem') corpo = modalEscalarAlguem(m);
+  else if (m.tipo === 'qr-portaria') corpo = modalQrPortaria(m);
+  else if (m.tipo === 'scanner-qr') corpo = modalScannerQr(m);
+  else if (m.tipo === 'editar-departamentos') corpo = modalEditarDepartamentos(m);
+  return `<div class="overlay" data-action="fechar-modal-overlay"><div class="modal">${corpo}</div></div>`;
+}
+
+function modalPedirTroca(m){
+  const i = state.escalas.find(x => x.id === m.escalaId);
+  if (!i) return '';
+  return `<h3 style="margin-bottom:4px;">Pedir troca</h3>
+    <p class="hint" style="margin-bottom:14px;">${esc(i.eventoNome)} · ${formatarDataBonita(i.data)} · ${esc(i.departamento)}</p>
+    <p class="hint">Sua vaga fica visível pra outros voluntários da mesma área aceitarem. Assim que alguém aceitar, você é substituído(a) automaticamente.</p>
+    <form data-form="pedir-troca" data-escala="${i.id}">
+      <div class="campo"><label>Motivo (opcional)</label><textarea name="motivo" rows="2" placeholder="Ex.: viagem marcada"></textarea></div>
+      <button type="submit" class="btn btn-coral btn-block">Publicar pedido de troca</button>
+    </form>`;
+}
+
+function modalDesmarcar(m){
+  const i = state.escalas.find(x => x.id === m.escalaId);
+  if (!i) return '';
+  return `<h3 style="margin-bottom:4px;">Desmarcar</h3>
+    <p class="hint" style="margin-bottom:14px;">${esc(i.eventoNome)} · ${formatarDataBonita(i.data)} · ${esc(i.departamento)}${i.voluntarioNome && i.voluntarioUid!==state.usuario.id ? ' · '+esc(i.voluntarioNome) : ''}</p>
+    <form data-form="desmarcar" data-escala="${i.id}">
+      <div class="campo"><label>Motivo</label><textarea name="motivo" rows="2" placeholder="Conta rapidinho o motivo…"></textarea></div>
+      <button type="submit" class="btn btn-danger btn-block">Confirmar</button>
+    </form>`;
+}
+
+function modalEscalarAlguem(m){
+  const candidatos = eventualLideradosOrdenados(m.depto);
+  return `<h3 style="margin-bottom:4px;">Escalar em ${esc(m.depto)}</h3>
+    <p class="hint" style="margin-bottom:14px;">${esc(m.nome)} · ${formatarDataBonita(m.data)}</p>
+    ${candidatos.length ? candidatos.map(v => `
+      <div class="lista-item">
+        <div><strong>${esc(v.nome)}</strong><br><span class="hint">${v.ultimaVezServiu ? 'serviu por último em '+formatarDataBonita(v.ultimaVezServiu) : 'ainda não serviu'}</span></div>
+        <button class="btn btn-secondary btn-small" data-action="escalar-confirmar" data-uid="${v.id}" data-tipo="${m.eventoTipo}" data-evento="${esc(m.eventoId)}" data-data="${m.data}" data-depto="${esc(m.depto)}" data-nome="${esc(m.nome)}" data-horario="${esc(m.horario||'')}">Escalar</button>
+      </div>`).join('') : `<p class="hint">Ninguém cadastrado nessa área ainda.</p>`}`;
+}
+
+function modalQrPortaria(m){
+  const eventos = proximosEventos(0).filter(e => e.data === hojeISO());
+  const deps = meusDepartamentosLiderados();
+  const confirmadosHoje = state.escalas.filter(i => !i.excluida && i.status==='confirmado' && i.data===hojeISO() && deps.includes(i.departamento));
+  return `<h3 style="margin-bottom:4px;">QR de hoje</h3>
+    <p class="hint" style="margin-bottom:12px;">Deixe esta tela visível na entrada. Cada voluntário escaneia com o próprio celular pra fazer o check-in.</p>
+    <div id="qr-exibicao"></div>
+    <p class="hint" style="text-align:center; margin-top:10px;">${eventos.length ? eventos.map(e=>esc(e.eventoNome)).join(' · ') : 'Nenhum evento cadastrado pra hoje'}</p>
+    <div class="espaco-20"></div>
+    <div class="cartao-titulo">Marcar chegada manualmente</div>
+    <p class="hint">Pra quem não conseguir usar a câmera.</p>
+    ${confirmadosHoje.map(i => `<div class="lista-item">
+      <div><strong>${esc(i.voluntarioNome)}</strong><br><span class="hint">${esc(i.departamento)}</span></div>
+      ${i.checkin ? `<span class="badge badge-servir">Chegou às ${esc(i.checkin.horario)}</span>` : `<button class="btn btn-secondary btn-small" data-action="marcar-chegada-manual" data-escala="${i.id}">Marcar chegada</button>`}
+    </div>`).join('') || '<p class="hint">Ninguém escalado hoje nas suas áreas.</p>'}`;
+}
+
+function modalScannerQr(m){
+  return `<h3 style="margin-bottom:4px;">Escanear QR</h3>
+    <p class="hint" style="margin-bottom:12px;">Aponte a câmera pro QR mostrado na portaria.</p>
+    <video id="qr-leitor-video" playsinline muted></video>
+    <canvas id="qr-leitor-canvas" style="display:none;"></canvas>
+    <p class="hint" id="qr-leitor-status" style="text-align:center; margin-top:10px;">Procurando o código…</p>
+    <button class="btn btn-ghost btn-block" style="margin-top:10px;" data-action="fazer-checkin-manual" data-escala="${m.escalaId}">Sem câmera? Confirmar manualmente</button>`;
+}
+
+function modalEditarDepartamentos(m){
+  const vol = state.voluntarios.find(v => v.id === m.uid);
+  const deps = (state.config && state.config.departamentos) || DEPARTAMENTOS_PADRAO;
+  const selecionados = m.selecionados || vol.departamentos || [];
+  return `<h3 style="margin-bottom:4px;">Áreas de ${esc(vol.nome)}</h3>
+    <div class="row" style="margin:14px 0;">
+      ${deps.map(d => `<button type="button" class="chip ${selecionados.includes(d)?'ativo':''}" data-action="toggle-depto-editar" data-depto="${esc(d)}">${esc(d)}</button>`).join('')}
+    </div>
+    <button class="btn btn-primary btn-block" data-action="salvar-departamentos-voluntario" data-uid="${vol.id}">Salvar</button>`;
+}
+
+/* ============ 20) AÇÕES (clique) ============ */
+async function criarEscala(campos, status){
+  const id = await colAdicionar('escalas', {
+    voluntarioUid: state.usuario.id, voluntarioNome: state.usuario.nome,
+    departamento: campos.depto, data: campos.data,
+    eventoId: campos.evento, eventoNome: campos.nome, eventoTipo: campos.tipo,
+    horario: campos.horario || '', status,
+    excluida: false, criadoEm: new Date().toISOString(),
+  });
+  state.escalas.push({ id, voluntarioUid: state.usuario.id, voluntarioNome: state.usuario.nome,
+    departamento: campos.depto, data: campos.data, eventoId: campos.evento, eventoNome: campos.nome,
+    eventoTipo: campos.tipo, horario: campos.horario||'', status, excluida:false });
+}
+
+async function concluirCheckin(escalaId, metodo){
+  const i = state.escalas.find(x => x.id === escalaId);
+  if (!i || i.checkin) return;
+  const patch = { checkin: { horario: horaAgora(), metodo } };
+  Object.assign(i, patch);
+  await colAtualizar('escalas', escalaId, patch);
+  await colAtualizar('voluntarios', i.voluntarioUid, { ultimaVezServiu: i.data });
+  await recalcularStatsVoluntario(i.voluntarioUid);
+  await registrarAuditoria('check-in', i.eventoNome + ' · ' + i.departamento);
+  showToast('✅ Check-in feito! Bom serviço 🙌');
+  render();
+}
+
+async function handleClick(e){
+  const el = e.target.closest('[data-action]');
+  if (e.target.classList && e.target.classList.contains('overlay')){ fecharModal(); return; }
+  if (!el) return;
+  const a = el.dataset.action;
+  const d = el.dataset;
+  try{
+
+  if (a === 'ir-cadastro'){ e.preventDefault(); state.telaAuth='cadastro'; render(); }
+  else if (a === 'ir-login'){ e.preventDefault(); state.telaAuth='login'; render(); }
+  else if (a === 'toggle-depto-cadastro'){ togglearray(state.cadastroForm.departamentos, d.depto); render(); }
+  else if (a === 'toggle-dia-cadastro'){ togglearray(state.cadastroForm.disponibilidade, d.dia); render(); }
+  else if (a === 'toggle-depto-perfil'){ togglearray(state.usuario.departamentos = state.usuario.departamentos||[], d.depto); render(); }
+  else if (a === 'toggle-dia-perfil'){ togglearray(state.usuario.disponibilidade = state.usuario.disponibilidade||[], d.dia); render(); }
+  else if (a === 'sair'){ await fazerLogout(); }
+  else if (a === 'ir-aba'){ state.aba = d.aba; if (d.aba==='escala') state.escalaSubaba='meus'; render(); }
+  else if (a === 'ir-vagas'){ e.preventDefault(); state.aba='escala'; state.escalaSubaba='vagas'; render(); }
+  else if (a === 'ir-trocas'){ e.preventDefault(); state.aba='escala'; state.escalaSubaba='trocas'; render(); }
+  else if (a === 'escala-subaba'){ state.escalaSubaba = d.sub; render(); }
+  else if (a === 'ir-perfil'){ state.aba='perfil'; render(); }
+  else if (a === 'ir-elogiar'){ state.aba='elogiar'; render(); }
+  else if (a === 'ir-admin-departamentos'){ state.aba='admin-departamentos'; render(); }
+  else if (a === 'ir-admin-eventos'){ state.aba='admin-eventos'; render(); }
+  else if (a === 'ir-admin-voluntarios'){ state.aba='admin-voluntarios'; render(); }
+  else if (a === 'ir-admin-config'){ state.aba='admin-config'; render(); }
+  else if (a === 'ir-admin-auditoria'){ state.aba='admin-auditoria'; await carregarAuditoria(); render(); }
+  else if (a === 'fechar-modal-overlay' || a === 'fechar-modal'){ fecharModal(); }
+
+  else if (a === 'quero-servir'){
+    const status = existeLiderPara(d.depto) ? 'proposto' : 'confirmado';
+    await criarEscala({ tipo:d.tipo, evento:d.evento, data:d.data, depto:d.depto, nome:d.nome, horario:d.horario }, status);
+    await registrarAuditoria('escala', d.nome + ' · ' + d.depto);
+    showToast(status==='confirmado' ? '✅ Você está escalado(a)!' : '📨 Pedido enviado — aguardando o líder aprovar.');
+    render();
+  }
+  else if (a === 'abrir-pedir-troca'){ abrirModal({ tipo:'pedir-troca', escalaId:d.escala }); }
+  else if (a === 'abrir-desmarcar'){ abrirModal({ tipo:'desmarcar', escalaId:d.escala }); }
+  else if (a === 'aceitar-troca'){
+    const t = state.trocas.find(x => x.id === d.troca);
+    if (!t) return;
+    const i = state.escalas.find(x => x.id === t.escalaId);
+    if (i){
+      const patchEscala = { voluntarioUid: state.usuario.id, voluntarioNome: state.usuario.nome };
+      Object.assign(i, patchEscala);
+      await colAtualizar('escalas', i.id, patchEscala);
+    }
+    const patchTroca = { status:'aceita', paraVoluntarioUid: state.usuario.id, paraVoluntarioNome: state.usuario.nome };
+    Object.assign(t, patchTroca);
+    await colAtualizar('trocas', t.id, patchTroca);
+    await registrarAuditoria('troca aceita', t.departamento + ' · ' + t.data);
+    showToast('🤝 Troca aceita — você assumiu a vaga!');
+    render();
+  }
+  else if (a === 'cancelar-troca'){
+    const t = state.trocas.find(x => x.id === d.troca);
+    Object.assign(t, { status:'cancelada' });
+    await colAtualizar('trocas', t.id, { status:'cancelada' });
+    render();
+  }
+  else if (a === 'abrir-escalar-alguem'){ abrirModal({ tipo:'escalar-alguem', eventoTipo:d.tipo, eventoId:d.evento, data:d.data, depto:d.depto, nome:d.nome, horario:d.horario }); }
+  else if (a === 'escalar-confirmar'){
+    const vol = state.voluntarios.find(v => v.id === d.uid);
+    const id = await colAdicionar('escalas', {
+      voluntarioUid: vol.id, voluntarioNome: vol.nome, departamento: d.depto, data: d.data,
+      eventoId: d.evento, eventoNome: d.nome, eventoTipo: d.tipo, horario: d.horario || '',
+      status: 'confirmado', excluida:false, criadoEm: new Date().toISOString(),
+    });
+    state.escalas.push({ id, voluntarioUid: vol.id, voluntarioNome: vol.nome, departamento: d.depto, data: d.data, eventoId: d.evento, eventoNome: d.nome, eventoTipo: d.tipo, horario: d.horario||'', status:'confirmado', excluida:false });
+    await registrarAuditoria('escalou voluntário', vol.nome + ' em ' + d.depto);
+    showToast('✅ ' + vol.nome + ' escalado(a)!');
+    fecharModal();
+  }
+  else if (a === 'aprovar-proposto'){
+    const i = state.escalas.find(x => x.id === d.escala);
+    Object.assign(i, { status:'confirmado' });
+    await colAtualizar('escalas', i.id, { status:'confirmado' });
+    await registrarAuditoria('aprovou escala', i.voluntarioNome + ' · ' + i.departamento);
+    showToast('✅ Aprovado!');
+    render();
+  }
+  else if (a === 'abrir-scanner-qr'){ abrirModal({ tipo:'scanner-qr', escalaId:d.escala }); }
+  else if (a === 'fazer-checkin-manual'){ fecharModal(); await concluirCheckin(d.escala, 'manual'); }
+  else if (a === 'marcar-chegada-manual'){ await concluirCheckin(d.escala, 'lider'); }
+  else if (a === 'fazer-checkout'){
+    const i = state.escalas.find(x => x.id === d.escala);
+    const patch = { checkout: { horario: horaAgora() } };
+    Object.assign(i, patch);
+    await colAtualizar('escalas', i.id, patch);
+    await recalcularStatsVoluntario(i.voluntarioUid);
+    showToast('🙏 Turno finalizado. Obrigado por servir!');
+    render();
+  }
+  else if (a === 'abrir-qr-portaria'){ abrirModal({ tipo:'qr-portaria' }); }
+  else if (a === 'exportar-escala'){ exportarEscalaXlsx(); }
+  else if (a === 'exportar-escala-pdf'){ exportarEscalaPdf(); }
+  else if (a === 'remover-depto'){
+    if (!confirm('Remover "'+d.depto+'"? Isso não apaga escalas já feitas.')) return;
+    state.config.departamentos = state.config.departamentos.filter(x => x !== d.depto);
+    await salvarConfig(state.config);
+    render();
+  }
+  else if (a === 'remover-evento-recorrente'){
+    state.config.eventos = state.config.eventos.filter(x => x.id !== d.id);
+    await salvarConfig(state.config);
+    render();
+  }
+  else if (a === 'remover-evento-avulso'){
+    await colAtualizar('eventosEsporadicos', d.id, { excluido: true });
+    state.eventosEsporadicos = state.eventosEsporadicos.filter(x => x.id !== d.id);
+    render();
+  }
+  else if (a === 'editar-departamentos-voluntario'){ abrirModal({ tipo:'editar-departamentos', uid: d.uid }); }
+  else if (a === 'toggle-depto-editar'){ togglearray(state.modal.selecionados = state.modal.selecionados || [...(state.voluntarios.find(v=>v.id===state.modal.uid).departamentos||[])], d.depto); render(); }
+  else if (a === 'salvar-departamentos-voluntario'){
+    const vol = state.voluntarios.find(v => v.id === d.uid);
+    const novos = state.modal.selecionados || vol.departamentos;
+    Object.assign(vol, { departamentos: novos });
+    await colAtualizar('voluntarios', d.uid, { departamentos: novos });
+    fecharModal();
+    showToast('Áreas atualizadas.');
+  }
+  else if (a === 'toggle-ativo-voluntario'){
+    const vol = state.voluntarios.find(v => v.id === d.uid);
+    const novoAtivo = vol.ativo === false;
+    Object.assign(vol, { ativo: novoAtivo });
+    await colAtualizar('voluntarios', d.uid, { ativo: novoAtivo });
+    render();
+  }
+
+  }catch(err){
+    console.error(err);
+    showToast('Ops: ' + (err.message || 'algo deu errado.'));
+  }
+}
+function togglearray(arr, valor){
+  const idx = arr.indexOf(valor);
+  if (idx >= 0) arr.splice(idx,1); else arr.push(valor);
+}
+
+/* Mantém os campos de texto sincronizados com o state mesmo quando um clique
+   em outro elemento (ex.: um chip de departamento) força um novo render() no
+   meio do preenchimento — sem isso, o re-render apagaria o que a pessoa já
+   tinha digitado no formulário. */
+function handleInput(e){
+  const el = e.target;
+  const form = el.closest('form');
+  if (!form || !el.name) return;
+  const tipo = form.dataset.form;
+  if (tipo === 'cadastro' && (el.name in state.cadastroForm)) state.cadastroForm[el.name] = el.value;
+  else if (tipo === 'login' && (el.name in state.loginForm)) state.loginForm[el.name] = el.value;
+  else if (tipo === 'perfil' && (el.name === 'nome' || el.name === 'telefone')) state.usuario[el.name] = el.value;
+}
+
+async function handleChange(e){
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const a = el.dataset.action;
+  if (a === 'mudar-role'){
+    const vol = state.voluntarios.find(v => v.id === el.dataset.uid);
+    Object.assign(vol, { role: el.value });
+    await colAtualizar('voluntarios', el.dataset.uid, { role: el.value });
+    await registrarAuditoria('mudou papel', vol.nome + ' → ' + el.value);
+    showToast(vol.nome + ' agora é ' + el.value + '.');
+    render();
+  }
+}
+
+async function handleSubmit(e){
+  e.preventDefault();
+  const form = e.target.closest('form');
+  if (!form) return;
+  const tipo = form.dataset.form;
+  const fd = new FormData(form);
+
+  try{
+    if (tipo === 'login'){
+      const email = fd.get('email').trim(), senha = fd.get('senha');
+      state.carregando = true; render();
+      const uid = await fazerLogin(email, senha);
+      await entrarComUid(uid);
+    }
+    else if (tipo === 'cadastro'){
+      const dados = {
+        nome: fd.get('nome').trim(), email: fd.get('email').trim(), telefone: fd.get('telefone').trim(),
+        senha: fd.get('senha'), departamentos: state.cadastroForm.departamentos, disponibilidade: state.cadastroForm.disponibilidade,
+      };
+      if (!dados.departamentos.length){ showToast('Escolha ao menos uma área pra servir.'); return; }
+      state.carregando = true; render();
+      const uid = await fazerCadastro(dados);
+      await entrarComUid(uid);
+    }
+    else if (tipo === 'perfil'){
+      const patch = {
+        nome: fd.get('nome').trim(), telefone: fd.get('telefone').trim(),
+        departamentos: state.usuario.departamentos, disponibilidade: state.usuario.disponibilidade,
+        avisarVagaAberta: fd.get('avisarVagaAberta') === 'on',
+        notificacoesDesativadas: fd.get('notificacoesDesativadas') === 'on',
+      };
+      Object.assign(state.usuario, patch);
+      await colAtualizar('voluntarios', state.usuario.id, patch);
+      showToast('Perfil atualizado!');
+      state.aba='mais'; render();
+    }
+    else if (tipo === 'pedir-troca'){
+      const i = state.escalas.find(x => x.id === form.dataset.escala);
+      const id = await colAdicionar('trocas', {
+        escalaId: i.id, departamento: i.departamento, data: i.data, eventoNome: i.eventoNome,
+        eventoId: i.eventoId, eventoTipo: i.eventoTipo, deVoluntarioUid: i.voluntarioUid, deVoluntarioNome: i.voluntarioNome,
+        motivo: fd.get('motivo').trim(), status:'aberta', criadoEm: new Date().toISOString(),
+      });
+      state.trocas.push({ id, escalaId:i.id, departamento:i.departamento, data:i.data, eventoNome:i.eventoNome, eventoId:i.eventoId, eventoTipo:i.eventoTipo, deVoluntarioUid:i.voluntarioUid, deVoluntarioNome:i.voluntarioNome, motivo:fd.get('motivo'), status:'aberta' });
+      await registrarAuditoria('pediu troca', i.departamento + ' · ' + i.data);
+      fecharModal();
+      showToast('Pedido de troca publicado.');
+    }
+    else if (tipo === 'desmarcar'){
+      const id = form.dataset.escala;
+      const i = state.escalas.find(x => x.id === id);
+      const patch = { excluida:true, canceladoMotivo: fd.get('motivo').trim() };
+      Object.assign(i, patch);
+      await colAtualizar('escalas', id, patch);
+      await registrarAuditoria('desmarcou', i.eventoNome + ' · ' + i.departamento);
+      fecharModal();
+      showToast('Desmarcado.');
+    }
+    else if (tipo === 'elogiar'){
+      const vol = state.voluntarios.find(v => v.id === fd.get('voluntarioUid'));
+      const t = TIPOS_ELOGIO.find(x => x.tipo === fd.get('tipo'));
+      const id = await colAdicionar('elogios', {
+        voluntarioUid: vol.id, voluntarioNome: vol.nome, tipo: t.tipo, pontos: t.pontos, emoji: t.emoji,
+        mensagem: (fd.get('mensagem')||'').trim(), deQuemUid: state.usuario.id, deQuemNome: state.usuario.nome,
+        criadoEm: new Date().toISOString(),
+      });
+      state.elogios.push({ id, voluntarioUid: vol.id, voluntarioNome: vol.nome, tipo:t.tipo, pontos:t.pontos, emoji:t.emoji, mensagem: fd.get('mensagem'), deQuemUid: state.usuario.id, deQuemNome: state.usuario.nome });
+      await recalcularStatsVoluntario(vol.id);
+      showToast('💛 Elogio enviado pra ' + vol.nome + '!');
+      form.reset();
+    }
+    else if (tipo === 'novo-depto'){
+      const nome = fd.get('nome').trim();
+      if (nome && !state.config.departamentos.includes(nome)){
+        state.config.departamentos.push(nome);
+        await salvarConfig(state.config);
+      }
+      form.reset(); render();
+    }
+    else if (tipo === 'novo-evento-recorrente'){
+      const ev = { id: genId(), nome: fd.get('nome').trim(), dia: fd.get('dia'), horario: fd.get('horario'), horarioFim: fd.get('horarioFim')||'' };
+      state.config.eventos.push(ev);
+      await salvarConfig(state.config);
+      form.reset(); render();
+    }
+    else if (tipo === 'novo-evento-avulso'){
+      const obj = { nome: fd.get('nome').trim(), data: fd.get('data'), horario: fd.get('horario'), horarioFim: fd.get('horarioFim')||'', excluido:false };
+      const id = await colAdicionar('eventosEsporadicos', obj);
+      state.eventosEsporadicos.push({ id, ...obj });
+      form.reset(); render();
+    }
+    else if (tipo === 'config-igreja'){
+      const patch = { nomeIgreja: fd.get('nomeIgreja').trim(), lema: fd.get('lema').trim() };
+      Object.assign(state.config, patch);
+      await salvarConfig(state.config);
+      showToast('Configurações salvas.');
+      render();
+    }
+  }catch(err){
+    console.error(err);
+    showToast('Ops: ' + (err.message || 'algo deu errado.'));
+  }finally{
+    state.carregando = false;
+    render();
+  }
+}
+
+/* ============ 21) LEITOR DE QR (câmera + jsQR) ============ */
+async function iniciarLeitorQr(escalaId){
+  const video = document.getElementById('qr-leitor-video');
+  const canvas = document.getElementById('qr-leitor-canvas');
+  if (!video || !canvas) return;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+    state.qrStream = stream;
+    video.srcObject = stream;
+    await video.play();
+    const ctx = canvas.getContext('2d');
+    const tick = () => {
+      if (!state.qrStream) return;
+      if (video.readyState === video.HAVE_ENOUGH_DATA){
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const codigo = jsQR(img.data, img.width, img.height);
+        if (codigo){
+          try{
+            const payload = JSON.parse(codigo.data);
+            if (payload.app === 'voluntia-checkin' && payload.data === hojeISO()){
+              pararLeitorQr();
+              concluirCheckin(escalaId, 'qr');
+              return;
+            } else {
+              const status = document.getElementById('qr-leitor-status');
+              if (status) status.textContent = 'QR não corresponde a hoje — tente de novo.';
+            }
+          }catch(e){ /* não era um QR do Voluntia, ignora e segue lendo */ }
+        }
+      }
+      state.qrLoopId = requestAnimationFrame(tick);
+    };
+    state.qrLoopId = requestAnimationFrame(tick);
+  }catch(e){
+    console.error('Erro ao abrir câmera', e);
+    const status = document.getElementById('qr-leitor-status');
+    if (status) status.textContent = 'Não deu pra abrir a câmera. Use a confirmação manual abaixo.';
+  }
+}
+function pararLeitorQr(){
+  if (state.qrLoopId) cancelAnimationFrame(state.qrLoopId);
+  state.qrLoopId = null;
+  if (state.qrStream){ state.qrStream.getTracks().forEach(t => t.stop()); state.qrStream = null; }
+}
+
+function gerarQrPortaria(){
+  const alvo = document.getElementById('qr-exibicao');
+  if (!alvo || typeof QRCode === 'undefined') return;
+  alvo.innerHTML = '';
+  const payload = JSON.stringify({ app:'voluntia-checkin', data: hojeISO() });
+  new QRCode(alvo, { text: payload, width: 220, height: 220, colorDark:'#143F35', colorLight:'#ffffff' });
+}
+
+function aposRenderEfeitos(){
+  if (state.modal && state.modal.tipo === 'scanner-qr'){ iniciarLeitorQr(state.modal.escalaId); }
+  else { pararLeitorQr(); }
+  if (state.modal && state.modal.tipo === 'qr-portaria'){ gerarQrPortaria(); }
+}
+
+/* ============ 22) EXPORTAR (Excel / PDF) ============ */
+function linhasExportacao(){
+  const campoMes = document.getElementById('mes-exportar');
+  const idMes = (campoMes && campoMes.value) || state.mesEscala || hojeISO().slice(0,7);
+  return gerarDatasDoMes(idMes).map(ev => {
+    const gente = state.escalas.filter(i => !i.excluida && i.status==='confirmado' && i.eventoTipo===ev.tipo && i.eventoId===ev.eventoId && i.data===ev.data);
+    return gente.length ? gente.map(g => ({ Data: ev.data, Evento: ev.eventoNome, Horário: ev.horario||'', Departamento: g.departamento, Voluntário: g.voluntarioNome, 'Check-in': g.checkin ? g.checkin.horario : '' }))
+      : [{ Data: ev.data, Evento: ev.eventoNome, Horário: ev.horario||'', Departamento: '—', Voluntário: '(vazio)', 'Check-in':'' }];
+  }).flat();
+}
+function exportarEscalaXlsx(){
+  const linhas = linhasExportacao();
+  const ws = XLSX.utils.json_to_sheet(linhas);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Escala');
+  XLSX.writeFile(wb, 'voluntia-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.xlsx');
+}
+function exportarEscalaPdf(){
+  const linhas = linhasExportacao();
+  const doc = new jspdf.jsPDF();
+  doc.setFontSize(14);
+  doc.text('Voluntia · Escala de voluntários', 14, 16);
+  doc.autoTable({
+    startY: 22,
+    head: [['Data','Evento','Horário','Departamento','Voluntário']],
+    body: linhas.map(l => [l.Data, l.Evento, l['Horário'], l.Departamento, l['Voluntário']]),
+    styles: { fontSize: 8 },
+  });
+  doc.save('voluntia-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
+}
+
+/* ============ 23) BOOTSTRAP ============ */
+async function entrarComUid(uid){
+  const perfil = await carregarPerfilVoluntario(uid);
+  if (!perfil){
+    showToast('Não encontramos seu cadastro. Fale com a liderança.');
+    state.carregando = false; render();
+    return;
+  }
+  state.usuario = perfil;
+  await garantirConfigInicial();
+  await carregarTudo();
+  state.carregando = false;
+  state.aba = 'painel';
+  render();
+  registrarAuditoria('login', 'Entrou no Voluntia');
+}
+
+function iniciarApp(){
+  const app = document.getElementById('app');
+  app.addEventListener('click', handleClick);
+  app.addEventListener('submit', handleSubmit);
+  app.addEventListener('change', handleChange);
+  app.addEventListener('input', handleInput);
+
+  if (FIREBASE_CONFIGURADO && auth){
+    auth.onAuthStateChanged(async (user) => {
+      if (user){ await entrarComUid(user.uid); }
+      else { state.carregando = false; state.usuario = null; render(); }
+    });
+  } else {
+    const uidSalvo = demoSessaoLer();
+    if (uidSalvo){ entrarComUid(uidSalvo); }
+    else { state.carregando = false; render(); }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', iniciarApp);
+</script>
+</body>
+</html>
+
