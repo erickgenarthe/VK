@@ -19,7 +19,7 @@ export default async () => {
   try {
     const hojeStr = isoDataBrasil();
     const limiteStr = somarDias(hojeStr, 7);
-    const templateName = process.env.WHATSAPP_TEMPLATE_VAGA_ABERTA || 'voluntia_vaga_aberta';
+    const templateName = process.env.WHATSAPP_TEMPLATE_VAGA_ABERTA || 'videira_serve_vaga_aberta';
 
     const [configDoc, esporadicos, escalas, voluntarios] = await Promise.all([
       fsListCollection('dados').then((docs) => docs.find((d) => d._id === 'config')),

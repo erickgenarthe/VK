@@ -10,7 +10,7 @@ export default async () => {
   try {
     const idMes = mesIdBrasil(0);
     const hojeStr = isoDataBrasil();
-    const templateName = process.env.WHATSAPP_TEMPLATE_LEMBRETE || 'voluntia_lembrete';
+    const templateName = process.env.WHATSAPP_TEMPLATE_LEMBRETE || 'videira_serve_lembrete';
 
     const [configDoc, esporadicos, escalas, voluntarios] = await Promise.all([
       fsListCollection('dados').then((docs) => docs.find((d) => d._id === 'config')),

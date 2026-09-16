@@ -16,7 +16,7 @@ export default async () => {
     const hojeStr = isoDataBrasil(agora);
     const horaAgora = horaMinutoBrasil(agora);
     const diaSemanaHoje = diaSemanaBrasil(agora);
-    const templateName = process.env.WHATSAPP_TEMPLATE_AGRADECIMENTO || 'voluntia_agradecimento';
+    const templateName = process.env.WHATSAPP_TEMPLATE_AGRADECIMENTO || 'videira_serve_agradecimento';
 
     const [configDocs, esporadicos, escalas, voluntarios, marcadorEnvios] = await Promise.all([
       fsListCollection('dados'),

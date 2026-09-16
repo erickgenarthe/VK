@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Voluntia · Escalas e Check-in</title>
-<meta name="description" content="Voluntia: gestão de escalas de voluntários e check-in de presença para igrejas e organizações. Viver, amar e servir — na prática.">
+<title>Videira Serve · Escalas e Check-in</title>
+<meta name="description" content="Videira Serve: gestão de escalas de voluntários e check-in de presença para igrejas e organizações. Viver, amar e servir — na prática.">
 <meta name="theme-color" content="#1F6F5C">
-<meta property="og:title" content="Voluntia · Escalas e Check-in">
+<meta property="og:title" content="Videira Serve · Escalas e Check-in">
 <meta property="og:description" content="Gestão de escalas e check-in de voluntários. Viver, amar e servir.">
 <meta property="og:type" content="website">
 <link rel="manifest" href="manifest.json">
@@ -232,7 +232,7 @@
 </style>
 </head>
 <body>
-<div id="app"><div class="vazio" style="padding-top:60px;">Carregando o Voluntia…</div></div>
+<div id="app"><div class="vazio" style="padding-top:60px;">Carregando o Videira Serve…</div></div>
 <script>
 /* =====================================================================
    VOLUNTIA — escalas e check-in de voluntários
@@ -241,7 +241,7 @@
    ===================================================================== */
 
 /* ============ 1) FIREBASE (opcional — sem config, roda em modo local) ============
-   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o Voluntia
+   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o Videira Serve
    funciona em MODO DEMONSTRAÇÃO, salvando tudo no localStorage do próprio
    navegador — dá pra testar o app inteiro sem configurar nada. Assim que
    você colar as credenciais reais de um projeto Firebase (gratuito em
@@ -267,12 +267,12 @@ if (FIREBASE_CONFIGURADO){
     db.enablePersistence({synchronizeTabs:true}).catch(err => {
       console.warn('Persistência offline do Firestore não pôde ser ativada:', err.code);
     });
-    console.log('Voluntia: usando Firestore (Firebase) como banco de dados.');
+    console.log('Videira Serve: usando Firestore (Firebase) como banco de dados.');
   }catch(e){
     console.error('Erro ao iniciar o Firebase — verifique se o firebaseConfig está correto.', e);
   }
 } else {
-  console.log('Voluntia: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
+  console.log('Videira Serve: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
 }
 
 /* ============ 2) MARCA / DADOS-PADRÃO DA IGREJA ============
@@ -330,7 +330,7 @@ function versiculoDoDia(isoData){
 /* ============ 3) CAMADA DE DADOS (mesma "interface" pro resto do app,
    dois motores por baixo: Firestore de verdade, ou localStorage no modo
    demonstração — o resto do código nunca precisa saber qual dos dois). ============ */
-const LS_PREFIX = 'voluntia:';
+const LS_PREFIX = 'videira-serve:';
 function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 9); }
 
 function lsLista(nome){
@@ -700,7 +700,7 @@ function render(){
 function telaCarregando(){
   return `<div class="vazio" style="padding-top:70px;">
     <span class="vazio-emoji">🌿</span>
-    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro);">Voluntia</p>
+    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro);">Videira Serve</p>
     <p class="hint">Carregando…</p>
   </div>`;
 }
@@ -718,7 +718,7 @@ function telaLogin(){
   return `<div class="tela-auth">
     <div class="marca-central">
       <div class="marca-selo-grande">${marcaSeloSvg(64)}</div>
-      <h1 style="font-size:26px;">Voluntia</h1>
+      <h1 style="font-size:26px;">Videira Serve</h1>
       <p class="lema"><span class="l-viver">Viver</span>·<span class="l-amar">Amar</span>·<span class="l-servir">Servir</span></p>
       <p class="hint">Escalas e check-in de voluntários, sem complicação.</p>
     </div>
@@ -773,7 +773,7 @@ function tituloDaAba(){
     checkin: 'Check-in',
     impacto: 'Meu impacto',
     mais: 'Mais',
-  }[state.aba] || 'Voluntia';
+  }[state.aba] || 'Videira Serve';
 }
 function primeiroNome(nome){ return (nome||'').split(' ')[0]; }
 
@@ -782,7 +782,7 @@ function telaShell(){
       <div class="topbar-linha1">
         <div class="marca">
           <div class="marca-selo">${marcaSeloSvg(22)}</div>
-          <div><div class="marca-nome">Voluntia</div><div class="marca-sub">${esc((state.config&&state.config.nomeIgreja)||'')}</div></div>
+          <div><div class="marca-nome">Videira Serve</div><div class="marca-sub">${esc((state.config&&state.config.nomeIgreja)||'')}</div></div>
         </div>
         <div class="topbar-acoes">
           <button class="icon-btn" data-action="sair" title="Sair">⎋</button>
@@ -1122,7 +1122,7 @@ function telaMais(){
 
     <div class="cartao">
       <div class="cartao-titulo">Sobre</div>
-      <p class="hint">Voluntia — viver, amar e servir, na prática. Gestão de escalas e check-in de voluntários.</p>
+      <p class="hint">Videira Serve — viver, amar e servir, na prática. Gestão de escalas e check-in de voluntários.</p>
     </div>
     <button class="btn btn-danger btn-block" data-action="sair">Sair da minha conta</button>
   `;
@@ -1677,7 +1677,7 @@ async function iniciarLeitorQr(escalaId){
         if (codigo){
           try{
             const payload = JSON.parse(codigo.data);
-            if (payload.app === 'voluntia-checkin' && payload.data === hojeISO()){
+            if (payload.app === 'videira-serve-checkin' && payload.data === hojeISO()){
               pararLeitorQr();
               concluirCheckin(escalaId, 'qr');
               return;
@@ -1685,7 +1685,7 @@ async function iniciarLeitorQr(escalaId){
               const status = document.getElementById('qr-leitor-status');
               if (status) status.textContent = 'QR não corresponde a hoje — tente de novo.';
             }
-          }catch(e){ /* não era um QR do Voluntia, ignora e segue lendo */ }
+          }catch(e){ /* não era um QR do Videira Serve, ignora e segue lendo */ }
         }
       }
       state.qrLoopId = requestAnimationFrame(tick);
@@ -1707,7 +1707,7 @@ function gerarQrPortaria(){
   const alvo = document.getElementById('qr-exibicao');
   if (!alvo || typeof QRCode === 'undefined') return;
   alvo.innerHTML = '';
-  const payload = JSON.stringify({ app:'voluntia-checkin', data: hojeISO() });
+  const payload = JSON.stringify({ app:'videira-serve-checkin', data: hojeISO() });
   new QRCode(alvo, { text: payload, width: 220, height: 220, colorDark:'#143F35', colorLight:'#ffffff' });
 }
 
@@ -1732,20 +1732,20 @@ function exportarEscalaXlsx(){
   const ws = XLSX.utils.json_to_sheet(linhas);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Escala');
-  XLSX.writeFile(wb, 'voluntia-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.xlsx');
+  XLSX.writeFile(wb, 'videira-serve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.xlsx');
 }
 function exportarEscalaPdf(){
   const linhas = linhasExportacao();
   const doc = new jspdf.jsPDF();
   doc.setFontSize(14);
-  doc.text('Voluntia · Escala de voluntários', 14, 16);
+  doc.text('Videira Serve · Escala de voluntários', 14, 16);
   doc.autoTable({
     startY: 22,
     head: [['Data','Evento','Horário','Departamento','Voluntário']],
     body: linhas.map(l => [l.Data, l.Evento, l['Horário'], l.Departamento, l['Voluntário']]),
     styles: { fontSize: 8 },
   });
-  doc.save('voluntia-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
+  doc.save('videira-serve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
 }
 
 /* ============ 23) BOOTSTRAP ============ */
@@ -1762,7 +1762,7 @@ async function entrarComUid(uid){
   state.carregando = false;
   state.aba = 'painel';
   render();
-  registrarAuditoria('login', 'Entrou no Voluntia');
+  registrarAuditoria('login', 'Entrou no Videira Serve');
 }
 
 function iniciarApp(){

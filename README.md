@@ -1,16 +1,16 @@
-# Voluntia — escalas e check-in de voluntários
+# Videira Serve — escalas e check-in de voluntários
 
 **Viver. Amar. Servir.**
 
-Voluntia nasceu a partir do que já tínhamos aprendido construindo o Videira
+Videira Serve nasceu a partir do que já tínhamos aprendido construindo o Videira
 Kids: um app único, sem processo de build, fácil de publicar de graça no
 Netlify e fácil de qualquer pessoa da liderança entender e mexer. A diferença
 é o foco — aqui não existe cadastro de família nem check-in de criança. É só
 a escala do voluntário e o check-in da própria pessoa que serve.
 
 Guardamos o nome do repositório (`VK`) porque este projeto nasceu como uma
-continuação dele, mas o produto se chama **Voluntia** — pense num nome
-melhor a qualquer momento, é só trocar "Voluntia" pelo texto que você quiser
+continuação dele, mas o produto se chama **Videira Serve** — pense num nome
+melhor a qualquer momento, é só trocar "Videira Serve" pelo texto que você quiser
 no `index.html`, no `manifest.json` e nos arquivos da pasta `netlify/functions`.
 
 ## O que tem no app
@@ -101,8 +101,8 @@ No painel do Netlify, em "Site settings" → "Environment variables", adicione:
 Sem essas variáveis, o app inteiro continua funcionando normalmente — só os
 lembretes automáticos por WhatsApp ficam desativados. Os modelos de mensagem
 ("templates") precisam ser aprovados no Gerenciador do WhatsApp Business
-antes de usar; os nomes esperados por padrão são `voluntia_lembrete`,
-`voluntia_agradecimento`, `voluntia_status_lider` e `voluntia_vaga_aberta`
+antes de usar; os nomes esperados por padrão são `videira_serve_lembrete`,
+`videira_serve_agradecimento`, `videira_serve_status_lider` e `videira_serve_vaga_aberta`
 (dá pra trocar via variável de ambiente, veja o topo de cada arquivo em
 `netlify/functions/`).
 
@@ -121,14 +121,14 @@ antes de usar; os nomes esperados por padrão são `voluntia_lembrete`,
   `--coral` (amar), `--teal` (servir) e `--ouro` (viver) controlam a
   identidade visual inteira.
 - **Página de vendas**: `site/index.html` é uma landing page separada,
-  pensada pra apresentar o Voluntia pra outras igrejas — troque o e-mail de
+  pensada pra apresentar o Videira Serve pra outras igrejas — troque o e-mail de
   contato antes de publicar (procure por `contato@suaigreja.exemplo`).
 
 ## Estrutura do projeto
 
 ```
 index.html                        → o app (voluntários e liderança)
-site/index.html                   → landing page comercial do Voluntia
+site/index.html                   → landing page comercial do Videira Serve
 manifest.json, sw.js              → deixa o app instalável no celular (PWA)
 netlify.toml                      → configuração de publicação no Netlify
 netlify/functions/_lib.mjs        → funções compartilhadas (Firestore, datas, WhatsApp)
