@@ -1,4 +1,4 @@
-// Biblioteca compartilhada pelas funções agendadas do Videira Serve (lembretes,
+// Biblioteca compartilhada pelas funções agendadas do CCVServe (lembretes,
 // agradecimento e resumos por WhatsApp). De propósito sem NENHUMA dependência
 // do npm (nada de firebase-admin, nada de node-fetch) — assim dá pra publicar
 // essas funções só arrastando a pasta pro Netlify OU via GitHub, sem precisar

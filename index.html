@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Videira Serve · Escalas e Check-in</title>
-<meta name="description" content="Videira Serve: gestão de escalas de voluntários e check-in de presença para igrejas e organizações. Viver, amar e servir — na prática.">
+<title>CCVServe · Escalas e Check-in</title>
+<meta name="description" content="CCVServe: gestão de escalas de voluntários e check-in de presença para igrejas e organizações. Viver, amar e servir — na prática.">
 <meta name="theme-color" content="#1F6F5C">
-<meta property="og:title" content="Videira Serve · Escalas e Check-in">
+<meta property="og:title" content="CCVServe · Escalas e Check-in">
 <meta property="og:description" content="Gestão de escalas e check-in de voluntários. Viver, amar e servir.">
 <meta property="og:type" content="website">
 <link rel="manifest" href="manifest.json">
@@ -115,6 +115,34 @@
     box-shadow:0 2px 10px rgba(27,36,48,0.06); margin-bottom:14px;
   }
   .cartao-titulo{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:16px; color:var(--teal-escuro); margin-bottom:8px; }
+
+  /* Cabeçalho clicável dos cartões que dá pra encolher — mesma cara de um
+     cartao-titulo normal, só que é um botão de verdade (dá pra tocar em
+     qualquer lugar da linha, não só numa setinha pequena). */
+  .cartao-cabecalho-colapsavel{
+    width:100%; display:flex; align-items:center; justify-content:space-between; gap:10px;
+    border:none; background:none; padding:0; margin:0; cursor:pointer; text-align:left; font-family:inherit;
+  }
+  .colapso-seta{ font-size:12px; color:var(--grafite-suave); transition:transform .2s ease; display:inline-block; }
+  .colapso-seta.fechado{ transform:rotate(-90deg); }
+  .cartao-corpo-colapsavel{ margin-top:10px; }
+
+  /* ---------- Calendário do mês ---------- */
+  .icon-btn-mini{ width:26px; height:26px; border-radius:50%; border:none; background:var(--teal-suave); color:var(--teal-escuro); font-weight:800; cursor:pointer; flex-shrink:0; }
+  .cal-semana{ display:grid; grid-template-columns:repeat(7,1fr); text-align:center; font-size:10.5px; font-weight:800; color:var(--grafite-suave); margin-bottom:4px; }
+  .cal-grade{ display:grid; grid-template-columns:repeat(7,1fr); gap:3px; }
+  .cal-dia{
+    aspect-ratio:1; border:none; background:none; border-radius:10px; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:2px; font-size:12px; font-weight:700; color:var(--grafite);
+    padding:0; font-family:inherit;
+  }
+  .cal-dia.cal-vazio{ visibility:hidden; }
+  .cal-dia.cal-com-evento{ cursor:pointer; background:var(--superficie-2, #F1ECE0); }
+  .cal-dia.cal-com-evento:active{ background:var(--teal); color:#fff; }
+  .cal-dia.cal-meu{ background:var(--teal-suave); color:var(--teal-escuro); }
+  .cal-dia.cal-hoje{ box-shadow: inset 0 0 0 2px var(--coral); }
+  .cal-pontos{ display:flex; gap:2px; height:4px; }
+  .cal-pontos i{ width:4px; height:4px; border-radius:50%; background:var(--coral); display:block; font-style:normal; }
   .hint{ font-size:12.5px; color:var(--grafite-suave); line-height:1.5; }
   .linha{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
   .col{ display:flex; flex-direction:column; gap:10px; }
@@ -268,7 +296,7 @@
 </style>
 </head>
 <body>
-<div id="app"><div class="vazio" style="padding-top:60px;">Carregando o Videira Serve…</div></div>
+<div id="app"><div class="vazio" style="padding-top:60px;">Carregando o CCVServe…</div></div>
 <script>
 /* =====================================================================
    VOLUNTIA — escalas e check-in de voluntários
@@ -277,7 +305,7 @@
    ===================================================================== */
 
 /* ============ 1) FIREBASE (opcional — sem config, roda em modo local) ============
-   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o Videira Serve
+   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o CCVServe
    funciona em MODO DEMONSTRAÇÃO, salvando tudo no localStorage do próprio
    navegador — dá pra testar o app inteiro sem configurar nada. Assim que
    você colar as credenciais reais de um projeto Firebase (gratuito em
@@ -303,12 +331,12 @@ if (FIREBASE_CONFIGURADO){
     db.enablePersistence({synchronizeTabs:true}).catch(err => {
       console.warn('Persistência offline do Firestore não pôde ser ativada:', err.code);
     });
-    console.log('Videira Serve: usando Firestore (Firebase) como banco de dados.');
+    console.log('CCVServe: usando Firestore (Firebase) como banco de dados.');
   }catch(e){
     console.error('Erro ao iniciar o Firebase — verifique se o firebaseConfig está correto.', e);
   }
 } else {
-  console.log('Videira Serve: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
+  console.log('CCVServe: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
 }
 
 /* ============ 2) MARCA / DADOS-PADRÃO DA IGREJA ============
@@ -377,8 +405,17 @@ function versiculoDoDia(isoData){
 /* ============ 3) CAMADA DE DADOS (mesma "interface" pro resto do app,
    dois motores por baixo: Firestore de verdade, ou localStorage no modo
    demonstração — o resto do código nunca precisa saber qual dos dois). ============ */
-const LS_PREFIX = 'videira-serve:';
+const LS_PREFIX = 'ccvserve:';
 function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 9); }
+
+/* Lembra quais cartões a pessoa escondeu, só neste navegador — é uma
+   conveniência de quem está vendo, não dado que precisa ir pro servidor. */
+function lerColapsado(){
+  try{ return JSON.parse(localStorage.getItem(LS_PREFIX + 'colapsado') || '{}'); }catch(e){ return {}; }
+}
+function salvarColapsado(){
+  try{ localStorage.setItem(LS_PREFIX + 'colapsado', JSON.stringify(state.colapsado)); }catch(e){}
+}
 
 function lsLista(nome){
   try{ return JSON.parse(localStorage.getItem(LS_PREFIX + nome) || '[]'); }catch(e){ return []; }
@@ -565,6 +602,8 @@ const state = {
   filtroDeptoVagas: 'todos',
   novoEventoForm: null,
   novoDeptoNome: '',
+  calendarioMes: null, // 'YYYY-MM' — null usa o mês atual
+  colapsado: lerColapsado(), // { chaveDoCartao: true } — cartões que a pessoa escondeu
 };
 
 function esc(s){
@@ -751,7 +790,7 @@ function render(){
 function telaCarregando(){
   return `<div class="vazio" style="padding-top:70px;">
     <span class="vazio-emoji">🌿</span>
-    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro);">Videira Serve</p>
+    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro);">CCVServe</p>
     <p class="hint">Carregando…</p>
   </div>`;
 }
@@ -778,7 +817,7 @@ function telaLogin(){
   return `<div class="tela-auth">
     <div class="marca-central">
       <div class="marca-selo-grande">${marcaSeloSvg(64)}</div>
-      <h1 style="font-size:26px;">Videira Serve</h1>
+      <h1 style="font-size:26px;">CCVServe</h1>
       <p class="lema"><span class="l-viver">Viver</span>·<span class="l-amar">Amar</span>·<span class="l-servir">Servir</span></p>
       <p class="hint">Escalas e check-in de voluntários, sem complicação.</p>
     </div>
@@ -840,7 +879,7 @@ function tituloDaAba(){
     'admin-voluntarios': 'Voluntários',
     'admin-config': 'Configurações',
     'admin-auditoria': 'Auditoria',
-  }[state.aba] || 'Videira Serve';
+  }[state.aba] || 'CCVServe';
 }
 function primeiroNome(nome){ return (nome||'').split(' ')[0]; }
 
@@ -861,7 +900,7 @@ function telaShell(){
         ` : `
           <div class="marca">
             <div class="marca-selo">${marcaSeloSvg(22)}</div>
-            <div><div class="marca-nome">Videira Serve</div><div class="marca-sub">${esc((state.config&&state.config.nomeIgreja)||'')}</div></div>
+            <div><div class="marca-nome">CCVServe</div><div class="marca-sub">${esc((state.config&&state.config.nomeIgreja)||'')}</div></div>
           </div>
           <div class="topbar-acoes">
             <button class="icon-btn" data-action="sair" title="Sair">⎋</button>
@@ -913,6 +952,85 @@ function telaConteudo(){
 }
 
 /* ============ 12) TELA: PAINEL (início) ============ */
+/* Cartão que a própria pessoa pode encolher, pra deixar a tela do jeito que
+   ela quiser — a preferência fica só no aparelho dela (localStorage). */
+function cartaoColapsavel(chave, titulo, corpoHtml, opcoes){
+  opcoes = opcoes || {};
+  const colapsado = !!state.colapsado[chave];
+  const corTitulo = opcoes.claro ? 'color:var(--branco);' : '';
+  return `<div class="cartao" ${opcoes.estilo ? `style="${opcoes.estilo}"` : ''}>
+    <button type="button" class="cartao-cabecalho-colapsavel" data-action="toggle-colapso" data-chave="${chave}">
+      <span class="cartao-titulo" style="margin:0; ${corTitulo}">${titulo}</span>
+      <span class="row" style="gap:6px; align-items:center;">
+        ${opcoes.badge||''}
+        <span class="colapso-seta ${colapsado?'fechado':''}" style="${corTitulo}">▾</span>
+      </span>
+    </button>
+    ${!colapsado ? `<div class="cartao-corpo-colapsavel">${corpoHtml}</div>` : ''}
+  </div>`;
+}
+
+/* ---------- Calendário do mês (toque no dia pra ver os eventos) ---------- */
+function calendarioMesAtual(){ return state.calendarioMes || hojeISO().slice(0,7); }
+function mudarCalendarioMes(delta){
+  const [ano, mes] = calendarioMesAtual().split('-').map(Number);
+  const d = new Date(ano, mes - 1 + delta, 1);
+  state.calendarioMes = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+}
+function telaCalendario(){
+  const idMes = calendarioMesAtual();
+  const [ano, mesNum] = idMes.split('-').map(Number);
+  const linhas = gerarDatasDoMes(idMes);
+  const porDia = {};
+  linhas.forEach(l => { (porDia[l.data] = porDia[l.data] || []).push(l); });
+  const primeiroDiaSemana = new Date(ano, mesNum - 1, 1).getDay();
+  const diasNoMes = new Date(ano, mesNum, 0).getDate();
+  const hoje = hojeISO();
+  const celulas = [];
+  for (let i = 0; i < primeiroDiaSemana; i++) celulas.push('<div class="cal-dia cal-vazio"></div>');
+  for (let dia = 1; dia <= diasNoMes; dia++){
+    const iso = ano + '-' + String(mesNum).padStart(2,'0') + '-' + String(dia).padStart(2,'0');
+    const eventosNoDia = porDia[iso] || [];
+    const temEvento = eventosNoDia.length > 0;
+    const souEuNoDia = temEvento && (state.escalas||[]).some(i => !i.excluida && i.status==='confirmado' && i.voluntarioUid===state.usuario.id && i.data===iso);
+    celulas.push(`<button type="button" class="cal-dia ${iso===hoje?'cal-hoje':''} ${temEvento?'cal-com-evento':''} ${souEuNoDia?'cal-meu':''}"
+        ${temEvento ? `data-action="ver-dia-calendario" data-data="${iso}"` : 'disabled'}>
+      <span class="cal-num">${dia}</span>
+      ${temEvento ? `<span class="cal-pontos">${eventosNoDia.slice(0,3).map(()=>'<i></i>').join('')}</span>` : ''}
+    </button>`);
+  }
+  return `
+    <div class="linha" style="margin-bottom:10px;">
+      <button type="button" class="icon-btn-mini" data-action="calendario-mes" data-dir="-1">‹</button>
+      <strong style="font-family:'Baloo 2',sans-serif; color:var(--teal-escuro);">${formatarMesNome(idMes)}</strong>
+      <button type="button" class="icon-btn-mini" data-action="calendario-mes" data-dir="1">›</button>
+    </div>
+    <div class="cal-semana">${['D','S','T','Q','Q','S','S'].map(d => `<span>${d}</span>`).join('')}</div>
+    <div class="cal-grade">${celulas.join('')}</div>
+    <p class="hint" style="margin:10px 0 0 0;"><i style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--coral); margin-right:4px;"></i>tem evento — toque pra ver</p>
+  `;
+}
+function modalDiaCalendario(m){
+  const linhasDoDia = gerarDatasDoMes(m.data.slice(0,7)).filter(l => l.data === m.data);
+  const deptosParaMostrar = souLider() ? ((state.config && state.config.departamentos) || []) : (state.usuario.departamentos || []);
+  return `<h3 style="margin-bottom:4px;">${formatarDataBonita(m.data)}</h3>
+    <p class="hint" style="margin-bottom:14px;">${linhasDoDia.length} evento${linhasDoDia.length===1?'':'s'} nesse dia.</p>
+    ${linhasDoDia.map(ev => `
+      <div class="cartao" style="background:var(--teal-suave); margin-bottom:10px;">
+        <div class="linha"><strong>${esc(ev.eventoNome)}</strong><span class="hint">${esc(ev.horario||'')}</span></div>
+        <div class="col" style="margin-top:8px;">
+          ${deptosParaMostrar.length===0 ? `<p class="hint" style="margin:0;">Você ainda não tem uma área pra ver detalhes aqui.</p>` : deptosParaMostrar.map(dep => {
+            const escalados = (state.escalas||[]).filter(i => !i.excluida && i.status==='confirmado' && i.eventoTipo===ev.tipo && i.eventoId===ev.eventoId && i.data===ev.data && i.departamento===dep);
+            const souEu = escalados.some(e => e.voluntarioUid === state.usuario.id);
+            if (escalados.length){
+              return `<div class="lista-item"><div><strong>${esc(dep)}</strong><br><span class="hint">${escalados.map(e=>esc(e.voluntarioNome)).join(', ')}</span></div>${souEu?'<span class="badge badge-servir">Você</span>':''}</div>`;
+            }
+            return `<div class="lista-item"><div><strong>${esc(dep)}</strong><br><span class="hint">Vaga aberta</span></div><button class="btn btn-secondary btn-small" data-action="quero-servir" data-tipo="${ev.tipo}" data-evento="${esc(ev.eventoId)}" data-data="${ev.data}" data-depto="${esc(dep)}" data-nome="${esc(ev.eventoNome)}" data-horario="${esc(ev.horario||'')}">Quero servir</button></div>`;
+          }).join('')}
+        </div>
+      </div>`).join('')}`;
+}
+
 function meuProximoCompromisso(){
   return (state.escalas||[])
     .filter(i => !i.excluida && i.voluntarioUid === state.usuario.id && i.status === 'confirmado' && i.data >= hojeISO())
@@ -942,12 +1060,31 @@ function telaPainel(){
   const trocas = trocasAbertasParaMim();
   const v = versiculoDoDia(hojeISO());
   const hojeTemCompromisso = proximo && proximo.data === hojeISO();
+
+  const corpoVersiculo = `<p style="margin:0; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; line-height:1.4; color:var(--branco);">"${esc(v.texto)}"</p>
+    <p style="margin:6px 0 0 0; font-size:12px; color:var(--branco); opacity:0.85;">${esc(v.referencia)}</p>`;
+
+  const corpoProximo = proximo ? `
+        <div class="lista-item" style="border:none; padding:4px 0;">
+          <div>
+            <strong>${esc(proximo.eventoNome)}</strong><br>
+            <span class="hint">${formatarDataBonita(proximo.data)} · ${esc(proximo.horario||'')} · ${esc(proximo.departamento)}</span>
+          </div>
+          <span class="badge badge-servir">Confirmado</span>
+        </div>` : `<p class="hint" style="margin:0;">Nenhum compromisso à vista. Dá uma olhada nas <a href="#" data-action="ir-vagas">vagas abertas</a>?</p>`;
+
+  const corpoVagas = vagas.length===0 ? `<p class="hint" style="margin:0;">Tudo preenchido por enquanto. 🎉</p>` : `
+        <div class="col">
+          ${vagas.slice(0,3).map(v => `<div class="lista-item"><div><strong>${esc(v.eventoNome)}</strong><br><span class="hint">${formatarDataBonita(v.data)} · ${esc(v.departamento)}</span></div><button class="btn btn-secondary btn-small" data-action="quero-servir" data-tipo="${v.tipo}" data-evento="${esc(v.eventoId)}" data-data="${v.data}" data-depto="${esc(v.departamento)}" data-nome="${esc(v.eventoNome)}" data-horario="${esc(v.horario||'')}">Quero servir</button></div>`).join('')}
+        </div>
+        ${vagas.length>3 ? `<button class="btn btn-ghost btn-small btn-block" style="margin-top:8px;" data-action="ir-vagas">Ver todas (${vagas.length})</button>`:''}
+      `;
+
+  const corpoTrocas = `<p class="hint" style="margin:0;">Alguém da sua área não pode servir e está procurando substituto.</p>
+      <button class="btn btn-secondary btn-small btn-block" style="margin-top:10px;" data-action="ir-trocas">Ver pedidos →</button>`;
+
   return `
-    <div class="cartao" style="background:linear-gradient(135deg, var(--teal) 0%, var(--teal-escuro) 100%); color:#fff;">
-      <p style="margin:0; font-size:12.5px; opacity:0.85;">Versículo do dia</p>
-      <p style="margin:6px 0 0 0; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; line-height:1.4;">"${esc(v.texto)}"</p>
-      <p style="margin:6px 0 0 0; font-size:12px; opacity:0.85;">${esc(v.referencia)}</p>
-    </div>
+    ${cartaoColapsavel('versiculo', 'Versículo do dia', corpoVersiculo, { estilo: 'background:linear-gradient(135deg, var(--teal) 0%, var(--teal-escuro) 100%);', claro: true })}
 
     ${hojeTemCompromisso ? `
     <div class="cartao" style="background:var(--coral); color:#fff;">
@@ -956,17 +1093,9 @@ function telaPainel(){
       <button class="btn btn-block" style="background:#fff; color:var(--coral); margin-top:12px;" data-action="ir-aba" data-aba="checkin">Ir para o check-in →</button>
     </div>` : ''}
 
-    <div class="cartao">
-      <div class="cartao-titulo">Meu próximo compromisso</div>
-      ${proximo ? `
-        <div class="lista-item" style="border:none; padding:4px 0;">
-          <div>
-            <strong>${esc(proximo.eventoNome)}</strong><br>
-            <span class="hint">${formatarDataBonita(proximo.data)} · ${esc(proximo.horario||'')} · ${esc(proximo.departamento)}</span>
-          </div>
-          <span class="badge badge-servir">Confirmado</span>
-        </div>` : `<p class="hint" style="margin:0;">Nenhum compromisso à vista. Dá uma olhada nas <a href="#" data-action="ir-vagas">vagas abertas</a>?</p>`}
-    </div>
+    ${cartaoColapsavel('calendario', 'Calendário', telaCalendario())}
+
+    ${cartaoColapsavel('proximo', 'Meu próximo compromisso', corpoProximo)}
 
     <div class="grade-2">
       <div class="cartao" style="text-align:center;">
@@ -981,21 +1110,9 @@ function telaPainel(){
       </div>
     </div>
 
-    <div class="cartao">
-      <div class="linha"><div class="cartao-titulo" style="margin:0;">Vagas abertas na minha área</div><span class="badge badge-amar">${vagas.length}</span></div>
-      ${vagas.length===0 ? `<p class="hint" style="margin:6px 0 0 0;">Tudo preenchido por enquanto. 🎉</p>` : `
-        <div class="col" style="margin-top:8px;">
-          ${vagas.slice(0,3).map(v => `<div class="lista-item"><div><strong>${esc(v.eventoNome)}</strong><br><span class="hint">${formatarDataBonita(v.data)} · ${esc(v.departamento)}</span></div><button class="btn btn-secondary btn-small" data-action="quero-servir" data-tipo="${v.tipo}" data-evento="${esc(v.eventoId)}" data-data="${v.data}" data-depto="${esc(v.departamento)}" data-nome="${esc(v.eventoNome)}" data-horario="${esc(v.horario||'')}">Quero servir</button></div>`).join('')}
-        </div>
-        ${vagas.length>3 ? `<button class="btn btn-ghost btn-small btn-block" style="margin-top:8px;" data-action="ir-vagas">Ver todas (${vagas.length})</button>`:''}
-      `}
-    </div>
+    ${cartaoColapsavel('vagas', 'Vagas abertas na minha área', corpoVagas, { badge: `<span class="badge badge-amar">${vagas.length}</span>` })}
 
-    ${trocas.length ? `<div class="cartao">
-      <div class="linha"><div class="cartao-titulo" style="margin:0;">Pedidos de troca</div><span class="badge badge-alerta">${trocas.length}</span></div>
-      <p class="hint" style="margin:6px 0 0 0;">Alguém da sua área não pode servir e está procurando substituto.</p>
-      <button class="btn btn-secondary btn-small btn-block" style="margin-top:10px;" data-action="ir-trocas">Ver pedidos →</button>
-    </div>` : ''}
+    ${trocas.length ? cartaoColapsavel('trocas', 'Pedidos de troca', corpoTrocas, { badge: `<span class="badge badge-alerta">${trocas.length}</span>` }) : ''}
   `;
 }
 
@@ -1223,7 +1340,7 @@ function telaMais(){
 
     <div class="cartao">
       <div class="cartao-titulo">Sobre</div>
-      <p class="hint">Videira Serve — viver, amar e servir, na prática. Gestão de escalas e check-in de voluntários.</p>
+      <p class="hint">CCVServe — viver, amar e servir, na prática. Gestão de escalas e check-in de voluntários.</p>
     </div>
     <button class="btn btn-danger btn-block" data-action="sair">Sair da minha conta</button>
   `;
@@ -1382,7 +1499,19 @@ function montarModal(){
   else if (m.tipo === 'qr-portaria') corpo = modalQrPortaria(m);
   else if (m.tipo === 'scanner-qr') corpo = modalScannerQr(m);
   else if (m.tipo === 'editar-departamentos') corpo = modalEditarDepartamentos(m);
+  else if (m.tipo === 'dia-calendario') corpo = modalDiaCalendario(m);
+  else if (m.tipo === 'confirmar') corpo = modalConfirmar(m);
   return `<div class="overlay" data-action="fechar-modal-overlay"><div class="modal">${corpo}</div></div>`;
+}
+
+function modalConfirmar(m){
+  const atributos = Object.entries(m.dadosConfirmar||{}).map(([k,v]) => `data-${k}="${esc(v)}"`).join(' ');
+  return `<h3 style="margin-bottom:4px;">${esc(m.titulo)}</h3>
+    <p class="hint" style="margin-bottom:20px;">${esc(m.mensagem)}</p>
+    <div class="row">
+      <button type="button" class="btn btn-ghost" style="flex:1;" data-action="fechar-modal">Cancelar</button>
+      <button type="button" class="btn ${m.perigo===false?'btn-primary':'btn-danger'}" style="flex:1;" data-action="${esc(m.acaoConfirmar)}" ${atributos}>${esc(m.textoConfirmar||'Confirmar')}</button>
+    </div>`;
 }
 
 function modalPedirTroca(m){
@@ -1499,6 +1628,13 @@ async function handleClick(e){
   else if (a === 'toggle-dia-perfil'){ togglearray(state.usuario.disponibilidade = state.usuario.disponibilidade||[], d.dia); render(); }
   else if (a === 'sair'){ await fazerLogout(); }
   else if (a === 'voltar'){ state.aba = 'mais'; render(); }
+  else if (a === 'toggle-colapso'){
+    state.colapsado[d.chave] = !state.colapsado[d.chave];
+    salvarColapsado();
+    render();
+  }
+  else if (a === 'calendario-mes'){ mudarCalendarioMes(parseInt(d.dir, 10)); render(); }
+  else if (a === 'ver-dia-calendario'){ abrirModal({ tipo:'dia-calendario', data: d.data }); }
   else if (a === 'ir-aba'){ state.aba = d.aba; if (d.aba==='escala') state.escalaSubaba='meus'; render(); }
   else if (a === 'ir-vagas'){ e.preventDefault(); state.aba='escala'; state.escalaSubaba='vagas'; render(); }
   else if (a === 'ir-trocas'){ e.preventDefault(); state.aba='escala'; state.escalaSubaba='trocas'; render(); }
@@ -1581,10 +1717,12 @@ async function handleClick(e){
   else if (a === 'exportar-escala'){ exportarEscalaXlsx(); }
   else if (a === 'exportar-escala-pdf'){ exportarEscalaPdf(); }
   else if (a === 'remover-depto'){
-    if (!confirm('Remover "'+d.depto+'"? Isso não apaga escalas já feitas.')) return;
+    abrirModal({ tipo:'confirmar', titulo:'Remover departamento', mensagem:'Remover "'+d.depto+'"? Isso não apaga escalas já feitas.', acaoConfirmar:'confirmar-remover-depto', dadosConfirmar:{depto:d.depto}, textoConfirmar:'Remover' });
+  }
+  else if (a === 'confirmar-remover-depto'){
     state.config.departamentos = state.config.departamentos.filter(x => x !== d.depto);
     await salvarConfig(state.config);
-    render();
+    fecharModal();
   }
   else if (a === 'remover-evento-recorrente'){
     state.config.eventos = state.config.eventos.filter(x => x.id !== d.id);
@@ -1780,7 +1918,7 @@ async function iniciarLeitorQr(escalaId){
         if (codigo){
           try{
             const payload = JSON.parse(codigo.data);
-            if (payload.app === 'videira-serve-checkin' && payload.data === hojeISO()){
+            if (payload.app === 'ccvserve-checkin' && payload.data === hojeISO()){
               pararLeitorQr();
               concluirCheckin(escalaId, 'qr');
               return;
@@ -1788,7 +1926,7 @@ async function iniciarLeitorQr(escalaId){
               const status = document.getElementById('qr-leitor-status');
               if (status) status.textContent = 'QR não corresponde a hoje — tente de novo.';
             }
-          }catch(e){ /* não era um QR do Videira Serve, ignora e segue lendo */ }
+          }catch(e){ /* não era um QR do CCVServe, ignora e segue lendo */ }
         }
       }
       state.qrLoopId = requestAnimationFrame(tick);
@@ -1810,7 +1948,7 @@ function gerarQrPortaria(){
   const alvo = document.getElementById('qr-exibicao');
   if (!alvo || typeof QRCode === 'undefined') return;
   alvo.innerHTML = '';
-  const payload = JSON.stringify({ app:'videira-serve-checkin', data: hojeISO() });
+  const payload = JSON.stringify({ app:'ccvserve-checkin', data: hojeISO() });
   new QRCode(alvo, { text: payload, width: 220, height: 220, colorDark:'#143F35', colorLight:'#ffffff' });
 }
 
@@ -1835,20 +1973,20 @@ function exportarEscalaXlsx(){
   const ws = XLSX.utils.json_to_sheet(linhas);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Escala');
-  XLSX.writeFile(wb, 'videira-serve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.xlsx');
+  XLSX.writeFile(wb, 'ccvserve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.xlsx');
 }
 function exportarEscalaPdf(){
   const linhas = linhasExportacao();
   const doc = new jspdf.jsPDF();
   doc.setFontSize(14);
-  doc.text('Videira Serve · Escala de voluntários', 14, 16);
+  doc.text('CCVServe · Escala de voluntários', 14, 16);
   doc.autoTable({
     startY: 22,
     head: [['Data','Evento','Horário','Departamento','Voluntário']],
     body: linhas.map(l => [l.Data, l.Evento, l['Horário'], l.Departamento, l['Voluntário']]),
     styles: { fontSize: 8 },
   });
-  doc.save('videira-serve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
+  doc.save('ccvserve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
 }
 
 /* ============ 23) BOOTSTRAP ============ */
@@ -1865,7 +2003,7 @@ async function entrarComUid(uid){
   state.carregando = false;
   state.aba = 'painel';
   render();
-  registrarAuditoria('login', 'Entrou no Videira Serve');
+  registrarAuditoria('login', 'Entrou no CCVServe');
 }
 
 function iniciarApp(){
