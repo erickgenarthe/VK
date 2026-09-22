@@ -1,8 +1,8 @@
-// CCVServe — service worker mínimo: só cacheia o essencial pra abrir rápido
+// SERVE — service worker mínimo: só cacheia o essencial pra abrir rápido
 // e continuar utilizável (modo leitura) sem internet por alguns instantes.
 // De propósito simples: o app depende de dados ao vivo (Firestore), então
 // não tentamos cachear respostas dinâmicas — só o "casco" do app.
-const CACHE = 'ccvserve-shell-v1';
+const CACHE = 'serve-shell-v1';
 const SHELL = ['/', '/index.html', '/manifest.json'];
 
 self.addEventListener('install', (event) => {

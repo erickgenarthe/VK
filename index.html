@@ -4,15 +4,15 @@
 <meta charset="UTF-8">
 <meta name="google" content="notranslate">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>CCVServe · Escalas e Check-in</title>
-<meta name="description" content="CCVServe: gestão de escalas de voluntários e check-in de presença para igrejas e organizações. Viver, amar e servir — na prática.">
+<title>SERVE · Escalas e Check-in</title>
+<meta name="description" content="SERVE: gestão de escalas de voluntários e check-in de presença para igrejas e organizações. Viver, amar e servir — na prática.">
 <meta name="theme-color" content="#1F6F5C">
-<meta property="og:title" content="CCVServe · Escalas e Check-in">
+<meta property="og:title" content="SERVE · Escalas e Check-in">
 <meta property="og:description" content="Gestão de escalas e check-in de voluntários. Viver, amar e servir.">
 <meta property="og:type" content="website">
 <link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIi8+PHBhdGggZD0iTTYyLDE1MSBDNjYsMTY5IDgyLDE3OSAxMDAsMTc5IEMxMTgsMTc5IDEzNCwxNjkgMTM4LDE1MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTUzKSByb3RhdGUoLTI3KSBzY2FsZSgwLjgpIj48cGF0aCBkPSJNMCwwIEMtMjMsLTE5IC0yOSwtNTMgMCwtMTAwIEMyOSwtNTMgMjMsLTE5IDAsMCBaIiBmaWxsPSIjRjRCNzQwIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwMCAxNTMpIHJvdGF0ZSgyNykgc2NhbGUoMC44KSI+PHBhdGggZD0iTTAsMCBDLTIzLC0xOSAtMjksLTUzIDAsLTEwMCBDMjksLTUzIDIzLC0xOSAwLDAgWiIgZmlsbD0iI0U4NTQzQSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTUzKSI+PHBhdGggZD0iTTAsMCBDLTIzLC0xOSAtMjksLTUzIDAsLTEwMCBDMjksLTUzIDIzLC0xOSAwLDAgWiIgZmlsbD0iIzFGNkY1QyIvPjwvZz48L3N2Zz4=">
-<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIi8+PHBhdGggZD0iTTYyLDE1MSBDNjYsMTY5IDgyLDE3OSAxMDAsMTc5IEMxMTgsMTc5IDEzNCwxNjkgMTM4LDE1MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTUzKSByb3RhdGUoLTI3KSBzY2FsZSgwLjgpIj48cGF0aCBkPSJNMCwwIEMtMjMsLTE5IC0yOSwtNTMgMCwtMTAwIEMyOSwtNTMgMjMsLTE5IDAsMCBaIiBmaWxsPSIjRjRCNzQwIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwMCAxNTMpIHJvdGF0ZSgyNykgc2NhbGUoMC44KSI+PHBhdGggZD0iTTAsMCBDLTIzLC0xOSAtMjksLTUzIDAsLTEwMCBDMjksLTUzIDIzLC0xOSAwLDAgWiIgZmlsbD0iI0U4NTQzQSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTUzKSI+PHBhdGggZD0iTTAsMCBDLTIzLC0xOSAtMjksLTUzIDAsLTEwMCBDMjksLTUzIDIzLC0xOSAwLDAgWiIgZmlsbD0iIzFGNkY1QyIvPjwvZz48L3N2Zz4=">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIi8+PGcgZmlsbD0iIzFGNkY1QyI+PHJlY3QgeD0iNjYiIHk9IjEyMiIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQ2IiByeD0iMjAiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3NiAxMjQpIHJvdGF0ZSgtMTYpIj48cmVjdCB4PSItOC41IiB5PSItNjQiIHdpZHRoPSIxNyIgaGVpZ2h0PSI2NCIgcng9IjguNSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiAxMjQpIHJvdGF0ZSgtNSkiPjxyZWN0IHg9Ii05LjUiIHk9Ii04MCIgd2lkdGg9IjE5IiBoZWlnaHQ9IjgwIiByeD0iOS41Ii8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExMCAxMjQpIHJvdGF0ZSg1KSI+PHJlY3QgeD0iLTguNSIgeT0iLTc0IiB3aWR0aD0iMTciIGhlaWdodD0iNzQiIHJ4PSI4LjUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTI2IDEyNCkgcm90YXRlKDE3KSI+PHJlY3QgeD0iLTcuNSIgeT0iLTU2IiB3aWR0aD0iMTUiIGhlaWdodD0iNTYiIHJ4PSI3LjUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzYgMTQ4KSByb3RhdGUoLTU4KSI+PHJlY3QgeD0iLTExIiB5PSItNDYiIHdpZHRoPSIyMiIgaGVpZ2h0PSI0NiIgcng9IjExIi8+PC9nPjwvZz48L3N2Zz4=">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIi8+PGcgZmlsbD0iIzFGNkY1QyI+PHJlY3QgeD0iNjYiIHk9IjEyMiIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQ2IiByeD0iMjAiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3NiAxMjQpIHJvdGF0ZSgtMTYpIj48cmVjdCB4PSItOC41IiB5PSItNjQiIHdpZHRoPSIxNyIgaGVpZ2h0PSI2NCIgcng9IjguNSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiAxMjQpIHJvdGF0ZSgtNSkiPjxyZWN0IHg9Ii05LjUiIHk9Ii04MCIgd2lkdGg9IjE5IiBoZWlnaHQ9IjgwIiByeD0iOS41Ii8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExMCAxMjQpIHJvdGF0ZSg1KSI+PHJlY3QgeD0iLTguNSIgeT0iLTc0IiB3aWR0aD0iMTciIGhlaWdodD0iNzQiIHJ4PSI4LjUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTI2IDEyNCkgcm90YXRlKDE3KSI+PHJlY3QgeD0iLTcuNSIgeT0iLTU2IiB3aWR0aD0iMTUiIGhlaWdodD0iNTYiIHJ4PSI3LjUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzYgMTQ4KSByb3RhdGUoLTU4KSI+PHJlY3QgeD0iLTExIiB5PSItNDYiIHdpZHRoPSIyMiIgaGVpZ2h0PSI0NiIgcng9IjExIi8+PC9nPjwvZz48L3N2Zz4=">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -296,7 +296,7 @@
 </style>
 </head>
 <body>
-<div id="app"><div class="vazio" style="padding-top:60px;">Carregando o CCVServe…</div></div>
+<div id="app"><div class="vazio" style="padding-top:60px;">Carregando o SERVE…</div></div>
 <script>
 /* =====================================================================
    VOLUNTIA — escalas e check-in de voluntários
@@ -305,7 +305,7 @@
    ===================================================================== */
 
 /* ============ 1) FIREBASE (opcional — sem config, roda em modo local) ============
-   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o CCVServe
+   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o SERVE
    funciona em MODO DEMONSTRAÇÃO, salvando tudo no localStorage do próprio
    navegador — dá pra testar o app inteiro sem configurar nada. Assim que
    você colar as credenciais reais de um projeto Firebase (gratuito em
@@ -331,12 +331,12 @@ if (FIREBASE_CONFIGURADO){
     db.enablePersistence({synchronizeTabs:true}).catch(err => {
       console.warn('Persistência offline do Firestore não pôde ser ativada:', err.code);
     });
-    console.log('CCVServe: usando Firestore (Firebase) como banco de dados.');
+    console.log('SERVE: usando Firestore (Firebase) como banco de dados.');
   }catch(e){
     console.error('Erro ao iniciar o Firebase — verifique se o firebaseConfig está correto.', e);
   }
 } else {
-  console.log('CCVServe: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
+  console.log('SERVE: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
 }
 
 /* ============ 2) MARCA / DADOS-PADRÃO DA IGREJA ============
@@ -405,7 +405,7 @@ function versiculoDoDia(isoData){
 /* ============ 3) CAMADA DE DADOS (mesma "interface" pro resto do app,
    dois motores por baixo: Firestore de verdade, ou localStorage no modo
    demonstração — o resto do código nunca precisa saber qual dos dois). ============ */
-const LS_PREFIX = 'ccvserve:';
+const LS_PREFIX = 'serve:';
 function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 9); }
 
 /* Lembra quais cartões a pessoa escondeu, só neste navegador — é uma
@@ -790,21 +790,27 @@ function render(){
 function telaCarregando(){
   return `<div class="vazio" style="padding-top:70px;">
     <span class="vazio-emoji">🌿</span>
-    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro);">CCVServe</p>
+    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--teal-escuro);">SERVE</p>
     <p class="hint">Carregando…</p>
   </div>`;
 }
 
 /* O símbolo segue a mesma linguagem do selo original da igreja (círculo com
    traço grosso) — só que, em vez do nome escrito, uma mão erguida: o gesto
-   de "eu me ofereço", o coração do voluntariado. */
+   de "eu me ofereço", o coração do voluntariado. Desenhada como uma forma
+   sólida única (não traços finos), pra ficar robusta e legível até em
+   tamanho de ícone de app. */
 function marcaSeloSvg(tamanho){
   return `<svg width="${tamanho}" height="${tamanho}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <circle cx="100" cy="100" r="86" fill="none" stroke="#143F35" stroke-width="9"/>
-    <path d="M63,152 C67,169 82,178 100,178 C118,178 133,169 137,152" fill="none" stroke="#143F35" stroke-width="9" stroke-linecap="round"/>
-    <g transform="translate(100 154) rotate(-27) scale(0.8)"><path d="M0,0 C-23,-19 -29,-53 0,-100 C29,-53 23,-19 0,0 Z" fill="#F4B740"/></g>
-    <g transform="translate(100 154) rotate(27) scale(0.8)"><path d="M0,0 C-23,-19 -29,-53 0,-100 C29,-53 23,-19 0,0 Z" fill="#E8543A"/></g>
-    <g transform="translate(100 154)"><path d="M0,0 C-23,-19 -29,-53 0,-100 C29,-53 23,-19 0,0 Z" fill="#1F6F5C"/></g>
+    <g fill="#1F6F5C">
+      <rect x="66" y="122" width="68" height="46" rx="20"/>
+      <g transform="translate(76 124) rotate(-16)"><rect x="-8.5" y="-64" width="17" height="64" rx="8.5"/></g>
+      <g transform="translate(92 124) rotate(-5)"><rect x="-9.5" y="-80" width="19" height="80" rx="9.5"/></g>
+      <g transform="translate(110 124) rotate(5)"><rect x="-8.5" y="-74" width="17" height="74" rx="8.5"/></g>
+      <g transform="translate(126 124) rotate(17)"><rect x="-7.5" y="-56" width="15" height="56" rx="7.5"/></g>
+      <g transform="translate(76 148) rotate(-58)"><rect x="-11" y="-46" width="22" height="46" rx="11"/></g>
+    </g>
   </svg>`;
 }
 
@@ -813,7 +819,7 @@ function telaLogin(){
   return `<div class="tela-auth">
     <div class="marca-central">
       <div class="marca-selo-grande">${marcaSeloSvg(64)}</div>
-      <h1 style="font-size:26px;">CCVServe</h1>
+      <h1 style="font-size:26px;">SERVE</h1>
       <p class="lema"><span class="l-viver">Viver</span>·<span class="l-amar">Amar</span>·<span class="l-servir">Servir</span></p>
       <p class="hint">Escalas e check-in de voluntários, sem complicação.</p>
     </div>
@@ -875,7 +881,7 @@ function tituloDaAba(){
     'admin-voluntarios': 'Voluntários',
     'admin-config': 'Configurações',
     'admin-auditoria': 'Auditoria',
-  }[state.aba] || 'CCVServe';
+  }[state.aba] || 'SERVE';
 }
 function primeiroNome(nome){ return (nome||'').split(' ')[0]; }
 
@@ -896,7 +902,7 @@ function telaShell(){
         ` : `
           <div class="marca">
             <div class="marca-selo">${marcaSeloSvg(22)}</div>
-            <div><div class="marca-nome">CCVServe</div><div class="marca-sub">${esc((state.config&&state.config.nomeIgreja)||'')}</div></div>
+            <div><div class="marca-nome">SERVE</div><div class="marca-sub">${esc((state.config&&state.config.nomeIgreja)||'')}</div></div>
           </div>
           <div class="topbar-acoes">
             <button class="icon-btn" data-action="sair" title="Sair">⎋</button>
@@ -1336,7 +1342,7 @@ function telaMais(){
 
     <div class="cartao">
       <div class="cartao-titulo">Sobre</div>
-      <p class="hint">CCVServe — viver, amar e servir, na prática. Gestão de escalas e check-in de voluntários.</p>
+      <p class="hint">SERVE — viver, amar e servir, na prática. Gestão de escalas e check-in de voluntários.</p>
     </div>
     <button class="btn btn-danger btn-block" data-action="sair">Sair da minha conta</button>
   `;
@@ -1914,7 +1920,7 @@ async function iniciarLeitorQr(escalaId){
         if (codigo){
           try{
             const payload = JSON.parse(codigo.data);
-            if (payload.app === 'ccvserve-checkin' && payload.data === hojeISO()){
+            if (payload.app === 'serve-checkin' && payload.data === hojeISO()){
               pararLeitorQr();
               concluirCheckin(escalaId, 'qr');
               return;
@@ -1922,7 +1928,7 @@ async function iniciarLeitorQr(escalaId){
               const status = document.getElementById('qr-leitor-status');
               if (status) status.textContent = 'QR não corresponde a hoje — tente de novo.';
             }
-          }catch(e){ /* não era um QR do CCVServe, ignora e segue lendo */ }
+          }catch(e){ /* não era um QR do SERVE, ignora e segue lendo */ }
         }
       }
       state.qrLoopId = requestAnimationFrame(tick);
@@ -1944,7 +1950,7 @@ function gerarQrPortaria(){
   const alvo = document.getElementById('qr-exibicao');
   if (!alvo || typeof QRCode === 'undefined') return;
   alvo.innerHTML = '';
-  const payload = JSON.stringify({ app:'ccvserve-checkin', data: hojeISO() });
+  const payload = JSON.stringify({ app:'serve-checkin', data: hojeISO() });
   new QRCode(alvo, { text: payload, width: 220, height: 220, colorDark:'#143F35', colorLight:'#ffffff' });
 }
 
@@ -1969,20 +1975,20 @@ function exportarEscalaXlsx(){
   const ws = XLSX.utils.json_to_sheet(linhas);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Escala');
-  XLSX.writeFile(wb, 'ccvserve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.xlsx');
+  XLSX.writeFile(wb, 'serve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.xlsx');
 }
 function exportarEscalaPdf(){
   const linhas = linhasExportacao();
   const doc = new jspdf.jsPDF();
   doc.setFontSize(14);
-  doc.text('CCVServe · Escala de voluntários', 14, 16);
+  doc.text('SERVE · Escala de voluntários', 14, 16);
   doc.autoTable({
     startY: 22,
     head: [['Data','Evento','Horário','Departamento','Voluntário']],
     body: linhas.map(l => [l.Data, l.Evento, l['Horário'], l.Departamento, l['Voluntário']]),
     styles: { fontSize: 8 },
   });
-  doc.save('ccvserve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
+  doc.save('serve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
 }
 
 /* ============ 23) BOOTSTRAP ============ */
@@ -1999,7 +2005,7 @@ async function entrarComUid(uid){
   state.carregando = false;
   state.aba = 'painel';
   render();
-  registrarAuditoria('login', 'Entrou no CCVServe');
+  registrarAuditoria('login', 'Entrou no SERVE');
 }
 
 function iniciarApp(){

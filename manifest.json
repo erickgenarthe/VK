@@ -1,6 +1,6 @@
 {
-  "name": "CCVServe · Escalas e Check-in de Voluntários",
-  "short_name": "CCVServe",
+  "name": "SERVE · Escalas e Check-in de Voluntários",
+  "short_name": "SERVE",
   "description": "Viver, amar e servir — gestão de escalas e check-in para voluntários.",
   "start_url": "/index.html",
   "scope": "/",
@@ -11,7 +11,7 @@
   "lang": "pt-BR",
   "icons": [
     {
-      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIi8+PHBhdGggZD0iTTYyLDE1MSBDNjYsMTY5IDgyLDE3OSAxMDAsMTc5IEMxMTgsMTc5IDEzNCwxNjkgMTM4LDE1MSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTUzKSByb3RhdGUoLTI3KSBzY2FsZSgwLjgpIj48cGF0aCBkPSJNMCwwIEMtMjMsLTE5IC0yOSwtNTMgMCwtMTAwIEMyOSwtNTMgMjMsLTE5IDAsMCBaIiBmaWxsPSIjRjRCNzQwIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwMCAxNTMpIHJvdGF0ZSgyNykgc2NhbGUoMC44KSI+PHBhdGggZD0iTTAsMCBDLTIzLC0xOSAtMjksLTUzIDAsLTEwMCBDMjksLTUzIDIzLC0xOSAwLDAgWiIgZmlsbD0iI0U4NTQzQSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgxMDAgMTUzKSI+PHBhdGggZD0iTTAsMCBDLTIzLC0xOSAtMjksLTUzIDAsLTEwMCBDMjksLTUzIDIzLC0xOSAwLDAgWiIgZmlsbD0iIzFGNkY1QyIvPjwvZz48L3N2Zz4=",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMTQzRjM1IiBzdHJva2Utd2lkdGg9IjEwIi8+PGcgZmlsbD0iIzFGNkY1QyI+PHJlY3QgeD0iNjYiIHk9IjEyMiIgd2lkdGg9IjY4IiBoZWlnaHQ9IjQ2IiByeD0iMjAiLz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg3NiAxMjQpIHJvdGF0ZSgtMTYpIj48cmVjdCB4PSItOC41IiB5PSItNjQiIHdpZHRoPSIxNyIgaGVpZ2h0PSI2NCIgcng9IjguNSIvPjwvZz48ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSg5MiAxMjQpIHJvdGF0ZSgtNSkiPjxyZWN0IHg9Ii05LjUiIHk9Ii04MCIgd2lkdGg9IjE5IiBoZWlnaHQ9IjgwIiByeD0iOS41Ii8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDExMCAxMjQpIHJvdGF0ZSg1KSI+PHJlY3QgeD0iLTguNSIgeT0iLTc0IiB3aWR0aD0iMTciIGhlaWdodD0iNzQiIHJ4PSI4LjUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMTI2IDEyNCkgcm90YXRlKDE3KSI+PHJlY3QgeD0iLTcuNSIgeT0iLTU2IiB3aWR0aD0iMTUiIGhlaWdodD0iNTYiIHJ4PSI3LjUiLz48L2c+PGcgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoNzYgMTQ4KSByb3RhdGUoLTU4KSI+PHJlY3QgeD0iLTExIiB5PSItNDYiIHdpZHRoPSIyMiIgaGVpZ2h0PSI0NiIgcng9IjExIi8+PC9nPjwvZz48L3N2Zz4=",
       "sizes": "64x64",
       "type": "image/svg+xml",
       "purpose": "any maskable"
