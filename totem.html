@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Deixe seu contato</title>
+<meta name="description" content="Deixe seu nome e WhatsApp para a equipe entrar em contato com você.">
+<meta name="theme-color" content="#1F6F5C">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coral: #E8543A;
+    --coral-suave: #FDE7E1;
+    --teal: #1F6F5C;
+    --teal-escuro: #143F35;
+    --teal-suave: #E1F1EC;
+    --ouro: #F4B740;
+    --ouro-suave: #FDF1D6;
+    --creme: #FBF7F1;
+    --grafite: #1B2430;
+    --grafite-suave: #6B6459;
+    --branco: #FFFFFF;
+    --vermelho: #D64545;
+    --radius: 20px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color: transparent; user-select:none;}
+  html,body{margin:0;padding:0; height:100%; overflow:hidden;}
+  body{
+    font-family:'Nunito', sans-serif;
+    background: linear-gradient(160deg, var(--teal-escuro), var(--teal));
+    color: var(--grafite);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  h1,h2,h3{ font-family:'Baloo 2', sans-serif; margin:0; }
+  .tela{
+    width:100%;
+    max-width:640px;
+    height:100vh;
+    max-height:900px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:32px 28px;
+    gap:22px;
+  }
+  .cartao{
+    background: var(--creme);
+    border-radius: 28px;
+    padding: 36px 28px;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25);
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+  }
+  .centro{ text-align:center; }
+  .selo{ font-size:56px; line-height:1; }
+  .titulo-boas-vindas{ font-size:34px; color:var(--teal-escuro); line-height:1.15; }
+  .subtitulo{ font-size:19px; color:var(--grafite-suave); line-height:1.4; }
+  .btn{
+    font-family:'Baloo 2', sans-serif;
+    font-size:22px;
+    font-weight:700;
+    border:none;
+    border-radius: var(--radius);
+    padding:22px 24px;
+    cursor:pointer;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    transition: transform .1s ease, opacity .15s ease;
+  }
+  .btn:active{ transform: scale(0.97); }
+  .btn-principal{ background: var(--coral); color: var(--branco); }
+  .btn-secundario{ background: var(--teal); color: var(--branco); }
+  .btn-fantasma{ background: var(--branco); color: var(--teal-escuro); border:2px solid var(--teal-suave); }
+  .btn:disabled{ opacity:.55; cursor:default; }
+  label{ font-weight:700; font-size:15px; color:var(--teal-escuro); display:block; margin-bottom:8px; }
+  input[type=text], input[type=tel], textarea{
+    width:100%;
+    font-family:'Nunito', sans-serif;
+    font-size:19px;
+    padding:16px 16px;
+    border-radius:14px;
+    border:2px solid var(--teal-suave);
+    background: var(--branco);
+    color: var(--grafite);
+  }
+  input:focus, textarea:focus{ outline:2px solid var(--coral); border-color: var(--coral); }
+  textarea{ resize:none; font-family:'Nunito', sans-serif; }
+  .campo{ margin-bottom:16px; }
+  .interesses{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chip{
+    font-family:'Nunito', sans-serif;
+    font-weight:700;
+    font-size:16px;
+    padding:14px 18px;
+    border-radius:999px;
+    border:2px solid var(--teal-suave);
+    background: var(--branco);
+    color: var(--teal-escuro);
+    cursor:pointer;
+    min-height:52px;
+  }
+  .chip.ativo{ background: var(--teal); border-color: var(--teal); color: var(--branco); }
+  .erro{ color: var(--vermelho); font-weight:700; text-align:center; }
+  .oculto{ display:none !important; }
+  .check-ok{ font-size:64px; }
+  .contagem{ font-size:15px; color:var(--grafite-suave); text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="tela" id="tela-boas-vindas">
+  <div class="cartao centro">
+    <div class="selo">💛</div>
+    <h1 class="titulo-boas-vindas">Foi bom ter você aqui hoje!</h1>
+    <p class="subtitulo">Toque no botão abaixo e deixe seu contato. A gente adoraria falar com você.</p>
+    <button class="btn btn-principal" data-acao="iniciar">Toque para começar</button>
+  </div>
+</div>
+
+<div class="tela oculto" id="tela-formulario">
+  <div class="cartao">
+    <div class="centro">
+      <h2 style="color:var(--teal-escuro); font-size:26px;">Deixe seu contato</h2>
+      <p class="subtitulo" style="font-size:16px;">Leva só um minutinho 💛</p>
+    </div>
+    <div>
+      <div class="campo">
+        <label for="campo-nome">Seu nome</label>
+        <input type="text" id="campo-nome" placeholder="Como você se chama?" maxlength="120" autocomplete="off">
+      </div>
+      <div class="campo">
+        <label for="campo-whatsapp">Seu WhatsApp</label>
+        <input type="tel" id="campo-whatsapp" placeholder="(11) 91234-5678" maxlength="20" autocomplete="off" inputmode="tel">
+      </div>
+      <div class="campo">
+        <label>O que despertou seu interesse?</label>
+        <div class="interesses" id="lista-interesses"></div>
+      </div>
+      <div class="campo">
+        <label for="campo-mensagem">Quer deixar uma mensagem? (opcional)</label>
+        <textarea id="campo-mensagem" rows="3" maxlength="500" placeholder="Fique à vontade..."></textarea>
+      </div>
+    </div>
+    <p class="erro oculto" id="texto-erro"></p>
+    <button class="btn btn-principal" id="botao-enviar" data-acao="enviar">Enviar</button>
+    <button class="btn btn-fantasma" data-acao="voltar">Voltar</button>
+  </div>
+</div>
+
+<div class="tela oculto" id="tela-obrigado">
+  <div class="cartao centro">
+    <div class="check-ok">✅</div>
+    <h2 style="color:var(--teal-escuro); font-size:28px;">Recebemos seu contato!</h2>
+    <p class="subtitulo">Em breve alguém da nossa equipe vai falar com você. Muito obrigado por compartilhar isso com a gente 💛</p>
+    <button class="btn btn-secundario" data-acao="novo-cadastro">Novo cadastro</button>
+    <p class="contagem" id="texto-contagem"></p>
+  </div>
+</div>
+
+<script>
+  // Lista de interesses do apelo — edite aqui se sua igreja usa outras
+  // opções (precisa bater com INTERESSES_VALIDOS em
+  // netlify/functions/totem-contato.mjs).
+  const INTERESSES = ['Quero conhecer a igreja', 'Grupo de crescimento', 'Oração', 'Outro'];
+  const SEGUNDOS_ATE_REINICIAR = 12;
+
+  const telas = {
+    boasVindas: document.getElementById('tela-boas-vindas'),
+    formulario: document.getElementById('tela-formulario'),
+    obrigado: document.getElementById('tela-obrigado'),
+  };
+  const campoNome = document.getElementById('campo-nome');
+  const campoWhatsapp = document.getElementById('campo-whatsapp');
+  const campoMensagem = document.getElementById('campo-mensagem');
+  const listaInteresses = document.getElementById('lista-interesses');
+  const textoErro = document.getElementById('texto-erro');
+  const botaoEnviar = document.getElementById('botao-enviar');
+  const textoContagem = document.getElementById('texto-contagem');
+
+  let interessesSelecionados = new Set();
+  let timerReinicio = null;
+
+  INTERESSES.forEach((interesse) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip';
+    chip.textContent = interesse;
+    chip.addEventListener('click', () => {
+      if (interessesSelecionados.has(interesse)) {
+        interessesSelecionados.delete(interesse);
+        chip.classList.remove('ativo');
+      } else {
+        interessesSelecionados.add(interesse);
+        chip.classList.add('ativo');
+      }
+    });
+    listaInteresses.appendChild(chip);
+  });
+
+  function mostrarTela(nome) {
+    Object.values(telas).forEach((t) => t.classList.add('oculto'));
+    telas[nome].classList.remove('oculto');
+  }
+
+  function limparFormulario() {
+    campoNome.value = '';
+    campoWhatsapp.value = '';
+    campoMensagem.value = '';
+    interessesSelecionados.clear();
+    listaInteresses.querySelectorAll('.chip').forEach((c) => c.classList.remove('ativo'));
+    textoErro.classList.add('oculto');
+    textoErro.textContent = '';
+    botaoEnviar.disabled = false;
+    botaoEnviar.textContent = 'Enviar';
+  }
+
+  function irParaBoasVindas() {
+    if (timerReinicio) { clearInterval(timerReinicio); timerReinicio = null; }
+    limparFormulario();
+    mostrarTela('boasVindas');
+  }
+
+  function mostrarErro(msg) {
+    textoErro.textContent = msg;
+    textoErro.classList.remove('oculto');
+  }
+
+  async function enviarFormulario() {
+    const nome = campoNome.value.trim();
+    const whatsapp = campoWhatsapp.value.trim();
+    if (!nome || !whatsapp) {
+      mostrarErro('Preencha nome e WhatsApp pra gente conseguir te chamar 💛');
+      return;
+    }
+    textoErro.classList.add('oculto');
+    botaoEnviar.disabled = true;
+    botaoEnviar.textContent = 'Enviando...';
+    try {
+      const resp = await fetch('/.netlify/functions/totem-contato', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          nome,
+          whatsapp,
+          interesses: Array.from(interessesSelecionados),
+          mensagem: campoMensagem.value.trim(),
+        }),
+      });
+      const dados = await resp.json().catch(() => ({}));
+      if (!resp.ok || !dados.ok) throw new Error(dados.erro || 'Não deu pra enviar agora.');
+      mostrarTela('obrigado');
+      iniciarContagemReinicio();
+    } catch (e) {
+      mostrarErro('Não conseguimos enviar agora. Tente de novo, por favor.');
+      botaoEnviar.disabled = false;
+      botaoEnviar.textContent = 'Enviar';
+    }
+  }
+
+  function iniciarContagemReinicio() {
+    let restante = SEGUNDOS_ATE_REINICIAR;
+    textoContagem.textContent = `Voltando em ${restante}s…`;
+    timerReinicio = setInterval(() => {
+      restante--;
+      if (restante <= 0) { irParaBoasVindas(); return; }
+      textoContagem.textContent = `Voltando em ${restante}s…`;
+    }, 1000);
+  }
+
+  document.body.addEventListener('click', (ev) => {
+    const acao = ev.target.closest('[data-acao]')?.dataset.acao;
+    if (!acao) return;
+    if (acao === 'iniciar') mostrarTela('formulario');
+    else if (acao === 'voltar') irParaBoasVindas();
+    else if (acao === 'enviar') enviarFormulario();
+    else if (acao === 'novo-cadastro') irParaBoasVindas();
+  });
+
+  irParaBoasVindas();
+</script>
+</body>
+</html>

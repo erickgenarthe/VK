@@ -351,6 +351,7 @@ const DEPARTAMENTOS_PADRAO = [
 const CONFIG_PADRAO = {
   nomeIgreja: 'Minha Igreja',
   lema: 'Viver, amar e servir pessoas.',
+  equipeTotemTelefones: [], // WhatsApp de quem acompanha os contatos do totem pós-apelo
   departamentos: DEPARTAMENTOS_PADRAO.slice(),
   eventos: [
     { id: 'culto-dom-manha', nome: 'Culto de Domingo · Manhã', dia: 'domingo', horario: '09:00', horarioFim: '11:00' },
@@ -589,6 +590,7 @@ const state = {
   elogios: [],
   trocas: [],
   auditoria: [],
+  totemContatos: [],
   aba: 'painel', // painel | escala | vagas | trocas | checkin | impacto | mais | admin-*
   toast: null,
   modal: null,
@@ -766,6 +768,9 @@ async function carregarTudo(){
 async function carregarAuditoria(){
   state.auditoria = (await colLista('auditoria')).sort((a,b)=> (b.criadoEm||'').localeCompare(a.criadoEm||''));
 }
+async function carregarTotemContatos(){
+  state.totemContatos = (await colLista('contatosTotem')).sort((a,b)=> (b.criadoEm||'').localeCompare(a.criadoEm||''));
+}
 
 /* ============ 10) RENDER — loop principal ============ */
 function render(){
@@ -879,6 +884,7 @@ function tituloDaAba(){
     'admin-voluntarios': 'Voluntários',
     'admin-config': 'Configurações',
     'admin-auditoria': 'Auditoria',
+    'admin-totem': 'Totem · Contatos',
   }[state.aba] || 'CCVServe';
 }
 function primeiroNome(nome){ return (nome||'').split(' ')[0]; }
@@ -945,6 +951,7 @@ function telaConteudo(){
     case 'admin-voluntarios': return telaAdminVoluntarios();
     case 'admin-config': return telaAdminConfig();
     case 'admin-auditoria': return telaAdminAuditoria();
+    case 'admin-totem': return telaTotemContatos();
     case 'elogiar': return telaElogiar();
     case 'perfil': return telaPerfil();
     default: return telaPainel();
@@ -1324,6 +1331,7 @@ function telaMais(){
       <div class="col">
         <button class="btn btn-ghost" data-action="ir-elogiar">💛 Elogiar um voluntário</button>
         <button class="btn btn-ghost" data-action="exportar-escala">⬇️ Exportar escala do mês</button>
+        <button class="btn btn-ghost" data-action="ir-admin-totem">🛎️ Totem · Contatos</button>
       </div>
     </div>` : ''}
 
@@ -1470,6 +1478,10 @@ function telaAdminConfig(){
     <div class="cartao">
       <div class="campo"><label>Nome da igreja/organização</label><input type="text" name="nomeIgreja" value="${esc(c.nomeIgreja)}" required></div>
       <div class="campo"><label>Lema</label><input type="text" name="lema" value="${esc(c.lema||'')}"></div>
+      <div class="campo"><label>WhatsApp da equipe de acompanhamento (um por linha)</label>
+        <textarea name="equipeTotemTelefones" rows="3" placeholder="11999999999">${esc((c.equipeTotemTelefones||[]).join('\n'))}</textarea>
+        <span class="hint">Avisados por WhatsApp sempre que alguém preencher o totem pós-apelo.</span>
+      </div>
       <button type="submit" class="btn btn-primary btn-block">Salvar</button>
     </div>
   </form>
@@ -1486,6 +1498,31 @@ function telaAdminConfig(){
 function telaAdminAuditoria(){
   return `<div class="cartao">${state.auditoria.slice(0,80).map(a => `
     <div class="lista-item"><div><strong>${esc(a.usuarioNome)}</strong> — ${esc(a.acao)}<br><span class="hint">${esc(a.detalhes||'')}</span></div><span class="hint">${esc(new Date(a.criadoEm).toLocaleString('pt-BR'))}</span></div>`).join('') || '<p class="hint">Nada registrado ainda.</p>'}
+  </div>`;
+}
+
+const STATUS_TOTEM_LABEL = { pendente: 'Pendente', 'em-contato': 'Em contato', concluido: 'Concluído' };
+const STATUS_TOTEM_BADGE = { pendente: 'badge-alerta', 'em-contato': 'badge-amar', concluido: 'badge-servir' };
+function telaTotemContatos(){
+  const lista = state.totemContatos || [];
+  return `<div class="cartao">${lista.map(c => `
+    <div class="lista-item" style="align-items:flex-start;">
+      <div>
+        <strong>${esc(c.nome)}</strong> <span class="badge ${STATUS_TOTEM_BADGE[c.status]||'badge-alerta'}">${esc(STATUS_TOTEM_LABEL[c.status]||c.status)}</span><br>
+        <span class="hint">📱 ${esc(c.telefone)}</span><br>
+        <span class="hint">${esc((c.interesses||[]).join(', ') || 'sem interesse marcado')}</span>
+        ${c.mensagem ? `<br><span class="hint">"${esc(c.mensagem)}"</span>` : ''}
+        <br><span class="hint">${c.criadoEm ? esc(new Date(c.criadoEm).toLocaleString('pt-BR')) : ''}</span>
+      </div>
+      <div class="col" style="align-items:flex-end;">
+        <a class="btn btn-secondary btn-small" style="text-decoration:none;" target="_blank" rel="noopener" href="https://wa.me/${esc(c.telefone)}?text=${encodeURIComponent('Olá ' + c.nome + '! Tudo bem? Vimos que você nos visitou e ficaríamos felizes em conversar 💛')}">💬 WhatsApp</a>
+        <select data-action="mudar-status-totem" data-id="${esc(c.id)}" style="width:auto; padding:6px 10px; font-size:12px;">
+          <option value="pendente" ${c.status==='pendente'?'selected':''}>Pendente</option>
+          <option value="em-contato" ${c.status==='em-contato'?'selected':''}>Em contato</option>
+          <option value="concluido" ${c.status==='concluido'?'selected':''}>Concluído</option>
+        </select>
+      </div>
+    </div>`).join('') || '<p class="hint">Ninguém preencheu o totem ainda.</p>'}
   </div>`;
 }
 
@@ -1646,6 +1683,7 @@ async function handleClick(e){
   else if (a === 'ir-admin-voluntarios'){ state.aba='admin-voluntarios'; render(); }
   else if (a === 'ir-admin-config'){ state.aba='admin-config'; render(); }
   else if (a === 'ir-admin-auditoria'){ state.aba='admin-auditoria'; await carregarAuditoria(); render(); }
+  else if (a === 'ir-admin-totem'){ state.aba='admin-totem'; await carregarTotemContatos(); render(); }
   else if (a === 'fechar-modal-overlay' || a === 'fechar-modal'){ fecharModal(); }
 
   else if (a === 'quero-servir'){
@@ -1788,6 +1826,13 @@ async function handleChange(e){
     showToast(vol.nome + ' agora é ' + el.value + '.');
     render();
   }
+  else if (a === 'mudar-status-totem'){
+    const c = state.totemContatos.find(x => x.id === el.dataset.id);
+    if (c) c.status = el.value;
+    await colAtualizar('contatosTotem', el.dataset.id, { status: el.value });
+    showToast('Status atualizado.');
+    render();
+  }
 }
 
 async function handleSubmit(e){
@@ -1882,7 +1927,10 @@ async function handleSubmit(e){
       form.reset(); render();
     }
     else if (tipo === 'config-igreja'){
-      const patch = { nomeIgreja: fd.get('nomeIgreja').trim(), lema: fd.get('lema').trim() };
+      const patch = {
+        nomeIgreja: fd.get('nomeIgreja').trim(), lema: fd.get('lema').trim(),
+        equipeTotemTelefones: fd.get('equipeTotemTelefones').split('\n').map(s=>s.trim()).filter(Boolean),
+      };
       Object.assign(state.config, patch);
       await salvarConfig(state.config);
       showToast('Configurações salvas.');

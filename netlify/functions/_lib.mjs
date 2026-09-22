@@ -120,6 +120,13 @@ export async function fsSetDoc(path, obj) {
   return data;
 }
 
+// Gera um ID de documento novo pro lado do servidor — mesmo formato do
+// genId() usado no navegador (index.html), pra criar documentos com ID
+// automático via fsSetDoc (que exige um path/ID explícito).
+export function fsNovoId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
+}
+
 // "dados" guarda cada chave como um doc {value: <qualquer coisa>} — mesmo
 // formato que o app usa no navegador em loadData()/saveData().
 export async function lerDados(chave, padrao) {

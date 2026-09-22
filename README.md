@@ -37,6 +37,9 @@ no `index.html`, no `manifest.json` e nos arquivos da pasta `netlify/functions`.
 - **Modo demonstração**: sem configurar nada, o app já funciona salvando os
   dados no navegador (`localStorage`) — dá pra testar tudo antes de publicar
   de verdade.
+- **Totem pós-apelo** (`totem.html`, opcional): tela pra tablet, sem login,
+  onde visitantes deixam nome, WhatsApp e o que têm interesse — a equipe de
+  acompanhamento é avisada e vê tudo em "Mais" → "Totem · Contatos".
 
 ## Como testar agora mesmo (sem configurar nada)
 
@@ -106,6 +109,44 @@ antes de usar; os nomes esperados por padrão são `ccvserve_lembrete`,
 (dá pra trocar via variável de ambiente, veja o topo de cada arquivo em
 `netlify/functions/`).
 
+### 4. Totem pós-apelo (opcional)
+
+`totem.html` é uma página pública, sem login, pensada pra rodar sozinha num
+tablet perto da saída: quem visitou a igreja e não subiu no apelo pode
+deixar nome, WhatsApp e o que despertou interesse (conhecer a igreja, grupo
+de crescimento, oração...), com uma mensagem opcional.
+
+Diferente das 4 funções acima, `netlify/functions/totem-contato.mjs` **não é
+agendada** — é a única função deste projeto acionada sob demanda, chamada
+pelo próprio `totem.html` a cada envio (`/.netlify/functions/totem-contato`).
+Ela grava o contato na coleção `contatosTotem` do Firestore e, se houver
+números cadastrados em "Mais" → "Configurações" → "WhatsApp da equipe de
+acompanhamento", avisa a equipe por WhatsApp usando o template
+`ccvserve_totem_contato` (nome configurável pela variável de ambiente
+`WHATSAPP_TEMPLATE_TOTEM`).
+
+**O contato do totem é sempre salvo no Firestore mesmo sem nenhuma variável
+de WhatsApp configurada** — só o aviso automático pra equipe fica
+desativado, igual aos outros recursos de WhatsApp do app. Depois de salvo,
+qualquer líder ou admin vê a lista completa em "Mais" → "Totem · Contatos",
+com um botão que já abre uma conversa no WhatsApp com o visitante.
+
+### Montando o totem físico (hardware)
+
+- **Tablet**: um Android 10"+ com boa base/suporte e sempre na tomada — não
+  precisa ser topo de linha, a página é um formulário simples.
+- **Travar no modo totem**: **Fully Kiosk Browser** (Android, versão grátis
+  já serve) apontado pra URL publicada do `totem.html` — bloqueia os botões
+  de início/voltar, evita a tela apagar e recarrega a página sozinho de
+  tempos em tempos. Com iPad, dá pra usar **Acesso Guiado** (Ajustes →
+  Acessibilidade) travando o Safari na página, mas é mais manual (sem
+  monitoramento remoto) — por isso Android + Fully Kiosk é a recomendação.
+- **Suporte/antifurto**: um suporte de mesa ou parede com trava simples perto
+  da saída, só pra evitar que alguém leve o tablet sem querer na correria do
+  culto.
+- **Energia**: deixe sempre na tomada, com o cabo protegido pelo suporte —
+  bateria descarregada no meio do culto é a principal causa de falha.
+
 ## Personalizando pra sua igreja (ou pra vender pra outra)
 
 - **Nome e lema**: depois de logar como admin, vá em "Mais" → "Configurações"
@@ -120,6 +161,10 @@ antes de usar; os nomes esperados por padrão são `ccvserve_lembrete`,
 - **Cores da marca**: no `index.html`, dentro de `<style>`, as variáveis
   `--coral` (amar), `--teal` (servir) e `--ouro` (viver) controlam a
   identidade visual inteira.
+- **Interesses do totem**: em `totem.html`, a constante `INTERESSES` no
+  `<script>` tem as opções mostradas no formulário — edite ali se sua igreja
+  usa outras (e mantenha igual à lista `INTERESSES_VALIDOS` em
+  `netlify/functions/totem-contato.mjs`).
 - **Página de vendas**: `site/index.html` é uma landing page separada,
   pensada pra apresentar o CCVServe pra outras igrejas — troque o e-mail de
   contato antes de publicar (procure por `contato@suaigreja.exemplo`).
@@ -128,6 +173,7 @@ antes de usar; os nomes esperados por padrão são `ccvserve_lembrete`,
 
 ```
 index.html                        → o app (voluntários e liderança)
+totem.html                        → totem físico pós-apelo (sem login)
 site/index.html                   → landing page comercial do CCVServe
 manifest.json, sw.js              → deixa o app instalável no celular (PWA)
 netlify.toml                      → configuração de publicação no Netlify
@@ -136,6 +182,7 @@ netlify/functions/lembrete-escala.mjs        → lembrete de compromisso (seg/qu
 netlify/functions/agradecimento-servico.mjs  → agradecimento pós-culto
 netlify/functions/status-lideres.mjs         → resumo pros líderes (ter/sáb)
 netlify/functions/vagas-abertas.mjs          → aviso automático de vaga aberta (qua)
+netlify/functions/totem-contato.mjs          → recebe o formulário do totem (sob demanda, não agendada)
 ```
 
 ## Limitações conhecidas (é um MVP, não um produto de 5 anos de estrada)
@@ -148,3 +195,6 @@ netlify/functions/vagas-abertas.mjs          → aviso automático de vaga abert
 - As regras de segurança do Firestore sugeridas acima são o ponto de
   partida mais simples (qualquer pessoa autenticada lê/escreve tudo); pra
   uma operação maior, vale restringir por papel/coleção.
+- O endpoint do totem (`totem-contato.mjs`) é público por natureza — não
+  exige login, já que é pra visitantes usarem — e não tem proteção contra
+  spam além da validação básica dos campos.
