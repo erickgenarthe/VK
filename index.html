@@ -1505,7 +1505,10 @@ const STATUS_TOTEM_LABEL = { pendente: 'Pendente', 'em-contato': 'Em contato', c
 const STATUS_TOTEM_BADGE = { pendente: 'badge-alerta', 'em-contato': 'badge-amar', concluido: 'badge-servir' };
 function telaTotemContatos(){
   const lista = state.totemContatos || [];
-  return `<div class="cartao">${lista.map(c => `
+  return `<div class="cartao">
+    <button class="btn btn-ghost btn-block" data-action="exportar-totem-pdf">⬇️ Exportar PDF de hoje</button>
+  </div>
+  <div class="cartao">${lista.map(c => `
     <div class="lista-item" style="align-items:flex-start;">
       <div>
         <strong>${esc(c.nome)}</strong> <span class="badge ${STATUS_TOTEM_BADGE[c.status]||'badge-alerta'}">${esc(STATUS_TOTEM_LABEL[c.status]||c.status)}</span><br>
@@ -1684,6 +1687,7 @@ async function handleClick(e){
   else if (a === 'ir-admin-config'){ state.aba='admin-config'; render(); }
   else if (a === 'ir-admin-auditoria'){ state.aba='admin-auditoria'; await carregarAuditoria(); render(); }
   else if (a === 'ir-admin-totem'){ state.aba='admin-totem'; await carregarTotemContatos(); render(); }
+  else if (a === 'exportar-totem-pdf'){ exportarTotemPdf(); }
   else if (a === 'fechar-modal-overlay' || a === 'fechar-modal'){ fecharModal(); }
 
   else if (a === 'quero-servir'){
@@ -2035,6 +2039,24 @@ function exportarEscalaPdf(){
     styles: { fontSize: 8 },
   });
   doc.save('ccvserve-escala-' + (state.mesEscala||hojeISO().slice(0,7)) + '.pdf');
+}
+function exportarTotemPdf(){
+  const hoje = hojeISO();
+  const linhas = (state.totemContatos || []).filter(c => (c.criadoEm||'').slice(0,10) === hoje);
+  if (!linhas.length){ showToast('Ninguém preencheu o totem hoje ainda.'); return; }
+  const doc = new jspdf.jsPDF();
+  doc.setFontSize(14);
+  doc.text('CCVServe · Totem pós-apelo — ' + formatarDataBonita(hoje), 14, 16);
+  doc.autoTable({
+    startY: 22,
+    head: [['Nome','WhatsApp','Interesses','Status','Mensagem','Hora']],
+    body: linhas.map(c => [
+      c.nome, c.telefone, (c.interesses||[]).join(', '), STATUS_TOTEM_LABEL[c.status]||c.status, c.mensagem||'',
+      c.criadoEm ? new Date(c.criadoEm).toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' }) : '',
+    ]),
+    styles: { fontSize: 8 },
+  });
+  doc.save('ccvserve-totem-' + hoje + '.pdf');
 }
 
 /* ============ 23) BOOTSTRAP ============ */

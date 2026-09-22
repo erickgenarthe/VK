@@ -129,7 +129,9 @@ acompanhamento", avisa a equipe por WhatsApp usando o template
 de WhatsApp configurada** — só o aviso automático pra equipe fica
 desativado, igual aos outros recursos de WhatsApp do app. Depois de salvo,
 qualquer líder ou admin vê a lista completa em "Mais" → "Totem · Contatos",
-com um botão que já abre uma conversa no WhatsApp com o visitante.
+com um botão que já abre uma conversa no WhatsApp com o visitante e outro
+("⬇️ Exportar PDF de hoje") que gera, na hora, um PDF com todos os contatos
+do dia — pra imprimir ou arquivar ao final do culto.
 
 ### Montando o totem físico (hardware)
 
