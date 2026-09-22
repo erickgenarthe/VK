@@ -844,6 +844,13 @@ function telaLogin(){
     </form>
     <p style="text-align:center; margin-top:16px; font-size:13.5px;">Ainda não tem conta? <a href="#" data-action="ir-cadastro">Cadastre-se</a></p>
     ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:18px; background:var(--ouro-suave);"><p class="hint" style="margin:0;">🧪 <strong>Modo demonstração</strong> — os dados ficam salvos só neste navegador (localStorage). Configure o Firebase no arquivo <code>index.html</code> pra publicar de verdade. Veja o README.</p></div>` : ''}
+    <!-- TESTE-RAPIDO-REMOVER: bloco temporário de entrada rápida pra testar o app sem
+         cadastrar/logar toda hora. Apague este <div> (e o handler "entrar-teste-rapido"
+         no handleClick) antes de divulgar o link pra igreja de verdade. -->
+    <div class="cartao" style="margin-top:18px; background:var(--teal-suave);">
+      <p class="hint" style="margin:0 0 10px 0;">🧪 <strong>Entrada rápida de teste</strong> — entra direto numa conta de teste (cria na primeira vez), sem precisar preencher cadastro ou login toda hora.</p>
+      <button type="button" class="btn btn-secondary btn-block btn-small" data-action="entrar-teste-rapido">Entrar direto (conta de teste) →</button>
+    </div>
   </div>`;
 }
 
@@ -1755,6 +1762,21 @@ async function handleClick(e){
 
   if (a === 'ir-cadastro'){ e.preventDefault(); state.telaAuth='cadastro'; render(); }
   else if (a === 'ir-login'){ e.preventDefault(); state.telaAuth='login'; render(); }
+  else if (a === 'entrar-teste-rapido'){
+    e.preventDefault();
+    state.carregando = true; render();
+    const email = 'teste@serve.app', senha = 'teste1234';
+    let uid;
+    try{ uid = await fazerLogin(email, senha); }
+    catch(erroLogin){
+      uid = await fazerCadastro({
+        nome: 'Conta de Teste', email, senha, telefone: '',
+        departamentos: DEPARTAMENTOS_PADRAO.slice(),
+        disponibilidade: DIAS_SEMANA_ID.slice(),
+      });
+    }
+    await entrarComUid(uid);
+  }
   else if (a === 'toggle-depto-cadastro'){ togglearray(state.cadastroForm.departamentos, d.depto); render(); }
   else if (a === 'toggle-dia-cadastro'){ togglearray(state.cadastroForm.disponibilidade, d.dia); render(); }
   else if (a === 'toggle-depto-perfil'){ togglearray(state.usuario.departamentos = state.usuario.departamentos||[], d.depto); render(); }
