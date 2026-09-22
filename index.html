@@ -465,6 +465,13 @@ async function colAtualizar(nome, id, patch){
     lsAtualizar(nome, id, patch);
   }
 }
+async function colRemover(nome, id){
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).delete();
+  } else {
+    lsSalvarLista(nome, lsLista(nome).filter(x => x.id !== id));
+  }
+}
 
 async function lerConfig(){
   if (FIREBASE_CONFIGURADO && db){
@@ -588,8 +595,11 @@ const state = {
   eventosEsporadicos: [],
   elogios: [],
   trocas: [],
+  equipes: [],
   auditoria: [],
   aba: 'painel', // painel | escala | vagas | trocas | checkin | impacto | mais | admin-*
+  departamentoAtual: null, // nome do depto aberto em "Gerenciar departamento"
+  subTelaVoltarPara: 'mais', // pra onde a seta de voltar leva, quando não é 'mais'
   toast: null,
   modal: null,
   cadastroForm: { nome:'', email:'', telefone:'', senha:'', departamentos:[], disponibilidade:[] },
@@ -695,8 +705,11 @@ function meusDepartamentosLiderados(){
   if (state.usuario.role === 'lider') return state.usuario.departamentos || [];
   return [];
 }
+function lideresDe(departamento){
+  return (state.voluntarios||[]).filter(v => (v.role === 'lider'||v.role==='admin') && (v.departamentos||[]).includes(departamento));
+}
 function existeLiderPara(departamento){
-  return (state.voluntarios||[]).some(v => (v.role === 'lider'||v.role==='admin') && (v.departamentos||[]).includes(departamento));
+  return lideresDe(departamento).length > 0;
 }
 
 /* ============ 8) GAMIFICAÇÃO: pontos, sequência e conquistas ============ */
@@ -751,15 +764,16 @@ async function recalcularStatsVoluntario(uid){
 
 /* ============ 9) CARREGAMENTO DE DADOS ============ */
 async function carregarTudo(){
-  const [voluntarios, escalas, eventosEsporadicos, elogios, trocas] = await Promise.all([
+  const [voluntarios, escalas, eventosEsporadicos, elogios, trocas, equipes] = await Promise.all([
     colLista('voluntarios'), colLista('escalas'), colLista('eventosEsporadicos'),
-    colLista('elogios'), colLista('trocas'),
+    colLista('elogios'), colLista('trocas'), colLista('equipes'),
   ]);
   state.voluntarios = voluntarios;
   state.escalas = escalas;
   state.eventosEsporadicos = eventosEsporadicos.sort((a,b)=>(a.data||'').localeCompare(b.data||''));
   state.elogios = elogios;
   state.trocas = trocas;
+  state.equipes = equipes;
   const eu = voluntarios.find(v => v.id === state.usuario.id);
   if (eu) state.usuario = eu;
 }
@@ -868,6 +882,7 @@ function telaCadastro(){
 
 /* ============ 11) CASCA (topbar + navegação) ============ */
 function tituloDaAba(){
+  if (state.aba === 'admin-departamento-detalhe') return state.departamentoAtual || 'Departamento';
   return {
     painel: 'Olá, ' + primeiroNome(state.usuario.nome),
     escala: 'Escala',
@@ -881,6 +896,7 @@ function tituloDaAba(){
     'admin-voluntarios': 'Voluntários',
     'admin-config': 'Configurações',
     'admin-auditoria': 'Auditoria',
+    'minhas-equipes': 'Minhas equipes',
   }[state.aba] || 'SERVE';
 }
 function primeiroNome(nome){ return (nome||'').split(' ')[0]; }
@@ -896,7 +912,7 @@ function telaShell(){
   return `<div class="topbar">
       <div class="topbar-linha1">
         ${subTela ? `
-          <button class="icon-btn" data-action="voltar" title="Voltar">←</button>
+          <button class="icon-btn" data-action="voltar" data-destino="${esc(state.subTelaVoltarPara||'mais')}" title="Voltar">←</button>
           <div class="marca-nome" style="font-size:17px;">${esc(tituloDaAba())}</div>
           <div class="topbar-acoes"><button class="icon-btn" data-action="sair" title="Sair">⎋</button></div>
         ` : `
@@ -942,6 +958,8 @@ function telaConteudo(){
     case 'impacto': return telaImpacto();
     case 'mais': return telaMais();
     case 'admin-departamentos': return telaAdminDepartamentos();
+    case 'admin-departamento-detalhe': return telaAdminDepartamentoDetalhe();
+    case 'minhas-equipes': return telaMinhasEquipes();
     case 'admin-eventos': return telaAdminEventos();
     case 'admin-escala': return telaAdminEscala();
     case 'admin-voluntarios': return telaAdminVoluntarios();
@@ -1211,7 +1229,10 @@ function telaEscalaMontar(){
           const escaladosDep = (state.escalas||[]).filter(i => !i.excluida && i.status==='confirmado' && i.eventoTipo===ev.tipo && i.eventoId===ev.eventoId && i.data===ev.data && i.departamento===dep);
           return `<div class="lista-item">
             <div><strong>${esc(dep)}</strong><br><span class="hint">${escaladosDep.length ? escaladosDep.map(e=>esc(e.voluntarioNome)).join(', ') : 'Ninguém escalado ainda'}</span></div>
-            <button class="btn btn-secondary btn-small" data-action="abrir-escalar-alguem" data-tipo="${ev.tipo}" data-evento="${esc(ev.eventoId)}" data-data="${ev.data}" data-depto="${esc(dep)}" data-nome="${esc(ev.eventoNome)}" data-horario="${esc(ev.horario||'')}">+ Escalar</button>
+            <div class="row">
+              ${escaladosDep.length ? `<button class="btn btn-ghost btn-small" data-action="abrir-lembrete-whatsapp" data-tipo="${ev.tipo}" data-evento="${esc(ev.eventoId)}" data-data="${ev.data}" data-depto="${esc(dep)}" data-nome="${esc(ev.eventoNome)}" data-horario="${esc(ev.horario||'')}">📲 Lembrar</button>` : ''}
+              <button class="btn btn-secondary btn-small" data-action="abrir-escalar-alguem" data-tipo="${ev.tipo}" data-evento="${esc(ev.eventoId)}" data-data="${ev.data}" data-depto="${esc(dep)}" data-nome="${esc(ev.eventoNome)}" data-horario="${esc(ev.horario||'')}">+ Escalar</button>
+            </div>
           </div>`;
         }).join('')}
       </div>`).join('')}
@@ -1324,6 +1345,7 @@ function telaMais(){
     ${souLider() ? `<div class="cartao">
       <div class="cartao-titulo">Liderança</div>
       <div class="col">
+        <button class="btn btn-ghost" data-action="ir-minhas-equipes">👥 Minhas equipes</button>
         <button class="btn btn-ghost" data-action="ir-elogiar">💛 Elogiar um voluntário</button>
         <button class="btn btn-ghost" data-action="exportar-escala">⬇️ Exportar escala do mês</button>
       </div>
@@ -1407,9 +1429,81 @@ function telaAdminDepartamentos(){
     </div>
     <div class="cartao">
       <div class="cartao-titulo">Departamentos (${deps.length})</div>
-      ${deps.map(d => `<div class="lista-item"><div><strong>${esc(d)}</strong><br><span class="hint">${existeLiderPara(d)?'Tem líder':'Sem líder — aprovações ficam automáticas'}</span></div><button class="btn btn-danger btn-small" data-action="remover-depto" data-depto="${esc(d)}">Remover</button></div>`).join('')}
+      ${deps.map(d => {
+        const lideres = lideresDe(d);
+        const subtitulo = lideres.length ? 'Líder: ' + lideres.map(l=>l.nome).join(', ') : 'Sem líder — aprovações ficam automáticas';
+        return `<div class="lista-item">
+          <div><strong>${esc(d)}</strong><br><span class="hint">${esc(subtitulo)}</span></div>
+          <div class="row">
+            <button class="btn btn-secondary btn-small" data-action="abrir-departamento-detalhe" data-depto="${esc(d)}" data-voltar="admin-departamentos">Gerenciar</button>
+            <button class="btn btn-danger btn-small" data-action="remover-depto" data-depto="${esc(d)}">Remover</button>
+          </div>
+        </div>`;
+      }).join('')}
     </div>
   `;
+}
+
+/* Tela de detalhe de um departamento: só admin define/troca o líder, mas
+   admin e líder do próprio departamento montam as equipes por horário. */
+function telaAdminDepartamentoDetalhe(){
+  const depto = state.departamentoAtual;
+  const lideres = lideresDe(depto);
+  const membrosDepto = eventualLideradosOrdenados(depto);
+  const equipesDepto = (state.equipes||[]).filter(eq => eq.departamento === depto);
+  const candidatosLider = state.voluntarios.filter(v => v.ativo!==false && !lideres.some(l=>l.id===v.id)).sort((a,b)=>a.nome.localeCompare(b.nome));
+  return `
+    ${souAdmin() ? `<div class="cartao">
+      <div class="cartao-titulo">Líder do departamento</div>
+      ${lideres.length ? lideres.map(l => `<div class="lista-item">
+        <div><strong>${esc(l.nome)}</strong><br><span class="hint">${esc(l.email)}</span></div>
+        <button class="btn btn-ghost btn-small" data-action="remover-lider-depto" data-uid="${l.id}" data-depto="${esc(depto)}">Remover</button>
+      </div>`).join('') : `<p class="hint">Nenhum líder definido — pedidos de escala ficam confirmados automaticamente.</p>`}
+      <form data-form="definir-lider" data-depto="${esc(depto)}" class="row" style="margin-top:10px; align-items:flex-end;">
+        <div style="flex:1;">
+          <select name="uid" required>
+            <option value="">Escolher voluntário…</option>
+            ${candidatosLider.map(v => `<option value="${v.id}">${esc(v.nome)}</option>`).join('')}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-small">Tornar líder</button>
+      </form>
+    </div>` : ''}
+
+    <div class="cartao">
+      <div class="cartao-titulo">Nova equipe por horário</div>
+      <p class="hint" style="margin-top:-4px;">Agrupe os voluntários da área por horário de culto — na hora de escalar, o time certo aparece primeiro.</p>
+      <form data-form="nova-equipe" data-depto="${esc(depto)}" class="col" style="margin-top:8px;">
+        <div class="row">
+          <div class="campo" style="flex:1;"><label>Nome</label><input type="text" name="nome" placeholder="Equipe das 9h" required></div>
+          <div class="campo" style="width:120px;"><label>Horário</label><input type="time" name="horario"></div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Criar equipe</button>
+      </form>
+    </div>
+
+    ${equipesDepto.length ? equipesDepto.map(eq => `
+      <div class="cartao">
+        <div class="linha">
+          <div class="cartao-titulo" style="margin:0;">${esc(eq.nome)}${eq.horario?` · ${esc(eq.horario)}`:''}</div>
+          <button class="btn btn-ghost btn-small" data-action="remover-equipe" data-id="${eq.id}">Remover</button>
+        </div>
+        <p class="hint">Toque pra incluir ou tirar alguém da equipe.</p>
+        <div class="row" style="margin-top:6px;">
+          ${membrosDepto.length ? membrosDepto.map(v => `<button type="button" class="chip ${(eq.membros||[]).includes(v.id)?'ativo':''}" data-action="toggle-membro-equipe" data-id="${eq.id}" data-uid="${v.id}">${esc(v.nome)}</button>`).join('') : '<p class="hint">Ninguém cadastrado nessa área ainda.</p>'}
+        </div>
+      </div>`).join('') : `<div class="cartao"><p class="hint">Nenhuma equipe criada ainda. Sem equipes, todo mundo da área aparece junto na hora de escalar.</p></div>`}
+  `;
+}
+
+/* Atalho pra líderes (não-admin): pula a lista completa de departamentos e
+   vai direto pras áreas que a pessoa lidera. */
+function telaMinhasEquipes(){
+  const deps = meusDepartamentosLiderados();
+  return `<div class="cartao">
+    <div class="cartao-titulo">Suas áreas de liderança</div>
+    ${deps.length ? deps.map(d => `<div class="lista-item"><div><strong>${esc(d)}</strong></div><button class="btn btn-secondary btn-small" data-action="abrir-departamento-detalhe" data-depto="${esc(d)}" data-voltar="minhas-equipes">Gerenciar →</button></div>`).join('') : '<p class="hint">Você ainda não lidera nenhuma área.</p>'}
+  </div>`;
 }
 
 function telaAdminEventos(){
@@ -1503,6 +1597,7 @@ function montarModal(){
   else if (m.tipo === 'editar-departamentos') corpo = modalEditarDepartamentos(m);
   else if (m.tipo === 'dia-calendario') corpo = modalDiaCalendario(m);
   else if (m.tipo === 'confirmar') corpo = modalConfirmar(m);
+  else if (m.tipo === 'lembrete-whatsapp') corpo = modalLembreteWhatsapp(m);
   return `<div class="overlay" data-action="fechar-modal-overlay"><div class="modal">${corpo}</div></div>`;
 }
 
@@ -1540,14 +1635,50 @@ function modalDesmarcar(m){
 }
 
 function modalEscalarAlguem(m){
-  const candidatos = eventualLideradosOrdenados(m.depto);
+  const todos = eventualLideradosOrdenados(m.depto);
+  const equipe = (state.equipes||[]).find(eq => eq.departamento === m.depto && eq.horario && m.horario && eq.horario === m.horario);
+  let daEquipe = todos, outros = [];
+  if (equipe){
+    const membrosSet = new Set(equipe.membros||[]);
+    daEquipe = todos.filter(v => membrosSet.has(v.id));
+    outros = todos.filter(v => !membrosSet.has(v.id));
+  }
+  const linha = v => `<div class="lista-item">
+      <div><strong>${esc(v.nome)}</strong><br><span class="hint">${v.ultimaVezServiu ? 'serviu por último em '+formatarDataBonita(v.ultimaVezServiu) : 'ainda não serviu'}</span></div>
+      <button class="btn btn-secondary btn-small" data-action="escalar-confirmar" data-uid="${v.id}" data-tipo="${m.eventoTipo}" data-evento="${esc(m.eventoId)}" data-data="${m.data}" data-depto="${esc(m.depto)}" data-nome="${esc(m.nome)}" data-horario="${esc(m.horario||'')}">Escalar</button>
+    </div>`;
   return `<h3 style="margin-bottom:4px;">Escalar em ${esc(m.depto)}</h3>
     <p class="hint" style="margin-bottom:14px;">${esc(m.nome)} · ${formatarDataBonita(m.data)}</p>
-    ${candidatos.length ? candidatos.map(v => `
-      <div class="lista-item">
-        <div><strong>${esc(v.nome)}</strong><br><span class="hint">${v.ultimaVezServiu ? 'serviu por último em '+formatarDataBonita(v.ultimaVezServiu) : 'ainda não serviu'}</span></div>
-        <button class="btn btn-secondary btn-small" data-action="escalar-confirmar" data-uid="${v.id}" data-tipo="${m.eventoTipo}" data-evento="${esc(m.eventoId)}" data-data="${m.data}" data-depto="${esc(m.depto)}" data-nome="${esc(m.nome)}" data-horario="${esc(m.horario||'')}">Escalar</button>
-      </div>`).join('') : `<p class="hint">Ninguém cadastrado nessa área ainda.</p>`}`;
+    ${equipe ? `<div class="cartao-titulo" style="margin:0 0 6px 0; font-size:14px;">👥 ${esc(equipe.nome)}</div>
+      ${daEquipe.length ? daEquipe.map(linha).join('') : '<p class="hint" style="margin-bottom:10px;">Ninguém dessa equipe cadastrado ainda.</p>'}
+      ${outros.length ? `<div class="cartao-titulo" style="margin:14px 0 6px 0; font-size:14px;">Outros da área</div>${outros.map(linha).join('')}` : ''}
+    ` : (todos.length ? todos.map(linha).join('') : `<p class="hint">Ninguém cadastrado nessa área ainda.</p>`)}`;
+}
+
+/* Sem API do WhatsApp Business configurada, cada mensagem sai por um link
+   wa.me — o texto é lido do textarea na hora do clique, pra refletir o que
+   a pessoa editou, em vez de ficar preso à mensagem-padrão. */
+function telefoneParaWhatsapp(tel){
+  let d = (tel||'').replace(/\D/g,'');
+  if (!d) return '';
+  if (d.length <= 11) d = '55' + d;
+  return d;
+}
+function modalLembreteWhatsapp(m){
+  const escalados = (state.escalas||[]).filter(i => !i.excluida && i.status==='confirmado' && i.eventoTipo===m.eventoTipo && i.eventoId===m.eventoId && i.data===m.data && i.departamento===m.depto);
+  const mensagemPadrao = `Oi! Passando pra lembrar que você está escalado(a) em ${m.depto} no ${m.nome}, dia ${formatarDataBonita(m.data)}${m.horario?' às '+m.horario:''}. Contamos com você! 🙏`;
+  return `<h3 style="margin-bottom:4px;">Lembrar escalados</h3>
+    <p class="hint" style="margin-bottom:14px;">${esc(m.nome)} · ${esc(m.depto)} · ${formatarDataBonita(m.data)}</p>
+    <div class="campo"><label>Mensagem</label><textarea id="lembrete-msg-texto" rows="4">${esc(mensagemPadrao)}</textarea></div>
+    <button type="button" class="btn btn-ghost btn-block" data-action="copiar-lembrete-msg" style="margin-bottom:14px;">📋 Copiar mensagem</button>
+    ${escalados.length ? escalados.map(i => {
+      const vol = state.voluntarios.find(v => v.id === i.voluntarioUid);
+      const tel = telefoneParaWhatsapp(vol && vol.telefone);
+      return `<div class="lista-item">
+        <div><strong>${esc(i.voluntarioNome)}</strong><br><span class="hint">${vol && vol.telefone ? esc(vol.telefone) : 'sem WhatsApp cadastrado'}</span></div>
+        ${tel ? `<button type="button" class="btn btn-secondary btn-small" data-action="enviar-lembrete-individual" data-tel="${tel}">Enviar →</button>` : ''}
+      </div>`;
+    }).join('') : '<p class="hint">Ninguém escalado ainda.</p>'}`;
 }
 
 function modalQrPortaria(m){
@@ -1629,7 +1760,7 @@ async function handleClick(e){
   else if (a === 'toggle-depto-perfil'){ togglearray(state.usuario.departamentos = state.usuario.departamentos||[], d.depto); render(); }
   else if (a === 'toggle-dia-perfil'){ togglearray(state.usuario.disponibilidade = state.usuario.disponibilidade||[], d.dia); render(); }
   else if (a === 'sair'){ await fazerLogout(); }
-  else if (a === 'voltar'){ state.aba = 'mais'; render(); }
+  else if (a === 'voltar'){ state.aba = d.destino || 'mais'; state.subTelaVoltarPara = 'mais'; render(); }
   else if (a === 'toggle-colapso'){
     state.colapsado[d.chave] = !state.colapsado[d.chave];
     salvarColapsado();
@@ -1644,6 +1775,8 @@ async function handleClick(e){
   else if (a === 'ir-perfil'){ state.aba='perfil'; render(); }
   else if (a === 'ir-elogiar'){ state.aba='elogiar'; render(); }
   else if (a === 'ir-admin-departamentos'){ state.aba='admin-departamentos'; render(); }
+  else if (a === 'ir-minhas-equipes'){ state.aba='minhas-equipes'; render(); }
+  else if (a === 'abrir-departamento-detalhe'){ state.departamentoAtual = d.depto; state.subTelaVoltarPara = d.voltar || 'admin-departamentos'; state.aba = 'admin-departamento-detalhe'; render(); }
   else if (a === 'ir-admin-eventos'){ state.aba='admin-eventos'; render(); }
   else if (a === 'ir-admin-voluntarios'){ state.aba='admin-voluntarios'; render(); }
   else if (a === 'ir-admin-config'){ state.aba='admin-config'; render(); }
@@ -1725,6 +1858,47 @@ async function handleClick(e){
     state.config.departamentos = state.config.departamentos.filter(x => x !== d.depto);
     await salvarConfig(state.config);
     fecharModal();
+  }
+  else if (a === 'remover-lider-depto'){
+    const vol = state.voluntarios.find(v => v.id === d.uid);
+    if (vol){
+      const novos = (vol.departamentos||[]).filter(x => x !== d.depto);
+      Object.assign(vol, { departamentos: novos });
+      await colAtualizar('voluntarios', vol.id, { departamentos: novos });
+      await registrarAuditoria('removeu liderança', vol.nome + ' de ' + d.depto);
+      showToast('Liderança removida.');
+      render();
+    }
+  }
+  else if (a === 'toggle-membro-equipe'){
+    const eq = state.equipes.find(x => x.id === d.id);
+    if (!eq) return;
+    eq.membros = eq.membros || [];
+    togglearray(eq.membros, d.uid);
+    await colAtualizar('equipes', eq.id, { membros: eq.membros });
+    render();
+  }
+  else if (a === 'remover-equipe'){
+    abrirModal({ tipo:'confirmar', titulo:'Remover equipe', mensagem:'Remover essa equipe? Isso não desmarca ninguém das escalas já feitas.', acaoConfirmar:'confirmar-remover-equipe', dadosConfirmar:{id:d.id}, textoConfirmar:'Remover' });
+  }
+  else if (a === 'confirmar-remover-equipe'){
+    await colRemover('equipes', d.id);
+    state.equipes = state.equipes.filter(eq => eq.id !== d.id);
+    fecharModal();
+    showToast('Equipe removida.');
+  }
+  else if (a === 'abrir-lembrete-whatsapp'){ abrirModal({ tipo:'lembrete-whatsapp', eventoTipo:d.tipo, eventoId:d.evento, data:d.data, depto:d.depto, nome:d.nome, horario:d.horario }); }
+  else if (a === 'copiar-lembrete-msg'){
+    const txt = document.getElementById('lembrete-msg-texto');
+    if (txt){
+      try{ await navigator.clipboard.writeText(txt.value); showToast('Mensagem copiada!'); }
+      catch(err2){ showToast('Não deu pra copiar — selecione o texto manualmente.'); }
+    }
+  }
+  else if (a === 'enviar-lembrete-individual'){
+    const txt = document.getElementById('lembrete-msg-texto');
+    const msg = txt ? txt.value : '';
+    window.open('https://wa.me/' + d.tel + '?text=' + encodeURIComponent(msg), '_blank');
   }
   else if (a === 'remover-evento-recorrente'){
     state.config.eventos = state.config.eventos.filter(x => x.id !== d.id);
@@ -1862,6 +2036,28 @@ async function handleSubmit(e){
       await recalcularStatsVoluntario(vol.id);
       showToast('💛 Elogio enviado pra ' + vol.nome + '!');
       form.reset();
+    }
+    else if (tipo === 'definir-lider'){
+      const uid = fd.get('uid');
+      const depto = form.dataset.depto;
+      const vol = state.voluntarios.find(v => v.id === uid);
+      if (vol){
+        const deps = new Set(vol.departamentos||[]); deps.add(depto);
+        const patch = { departamentos: [...deps] };
+        if (vol.role === 'voluntario') patch.role = 'lider';
+        Object.assign(vol, patch);
+        await colAtualizar('voluntarios', vol.id, patch);
+        await registrarAuditoria('definiu líder', vol.nome + ' em ' + depto);
+        showToast(vol.nome + ' agora lidera ' + depto + '.');
+      }
+      form.reset(); render();
+    }
+    else if (tipo === 'nova-equipe'){
+      const depto = form.dataset.depto;
+      const obj = { departamento: depto, nome: fd.get('nome').trim(), horario: fd.get('horario')||'', membros: [], criadoEm: new Date().toISOString() };
+      const id = await colAdicionar('equipes', obj);
+      state.equipes.push({ id, ...obj });
+      form.reset(); render();
     }
     else if (tipo === 'novo-depto'){
       const nome = fd.get('nome').trim();
