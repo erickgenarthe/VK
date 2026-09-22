@@ -545,15 +545,8 @@ async function fazerLogin(email, senha){
   return demoLogin(email, senha);
 }
 
-async function fazerCadastro(dados){
-  const { email, senha, nome, telefone, departamentos, disponibilidade } = dados;
-  let uid;
-  if (FIREBASE_CONFIGURADO && auth){
-    const cred = await auth.createUserWithEmailAndPassword(email, senha);
-    uid = cred.user.uid;
-  } else {
-    uid = demoCriarConta(email, senha);
-  }
+async function criarPerfilVoluntario(uid, dados){
+  const { email, nome, telefone, departamentos, disponibilidade } = dados;
   const todos = await colLista('voluntarios');
   const ehPrimeiro = todos.length === 0; // primeira pessoa a se cadastrar vira admin automaticamente
   const perfil = {
@@ -569,6 +562,19 @@ async function fazerCadastro(dados){
     criadoEm: new Date().toISOString(),
   };
   await colDefinir('voluntarios', uid, perfil);
+  return perfil;
+}
+
+async function fazerCadastro(dados){
+  const { email, senha } = dados;
+  let uid;
+  if (FIREBASE_CONFIGURADO && auth){
+    const cred = await auth.createUserWithEmailAndPassword(email, senha);
+    uid = cred.user.uid;
+  } else {
+    uid = demoCriarConta(email, senha);
+  }
+  await criarPerfilVoluntario(uid, dados);
   if (!FIREBASE_CONFIGURADO) demoSessaoSalvar(uid);
   return uid;
 }
@@ -1767,14 +1773,20 @@ async function handleClick(e){
     e.preventDefault();
     state.carregando = true; render();
     const email = 'teste@serve.app', senha = 'teste1234';
+    const dadosTeste = {
+      nome: 'Conta de Teste', email, senha, telefone: '',
+      departamentos: DEPARTAMENTOS_PADRAO.slice(),
+      disponibilidade: DIAS_SEMANA_ID.slice(),
+    };
     let uid;
     try{ uid = await fazerLogin(email, senha); }
-    catch(erroLogin){
-      uid = await fazerCadastro({
-        nome: 'Conta de Teste', email, senha, telefone: '',
-        departamentos: DEPARTAMENTOS_PADRAO.slice(),
-        disponibilidade: DIAS_SEMANA_ID.slice(),
-      });
+    catch(erroLogin){ uid = await fazerCadastro(dadosTeste); }
+    // a conta pode já existir na autenticação mas sem perfil no Firestore
+    // (ex.: uma tentativa anterior que falhou no meio do caminho) — repara
+    // isso criando o perfil que falta, em vez de travar em "não encontramos
+    // seu cadastro".
+    if (!(await carregarPerfilVoluntario(uid))){
+      await criarPerfilVoluntario(uid, dadosTeste);
     }
     await entrarComUid(uid);
   }
