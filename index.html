@@ -328,9 +328,6 @@ if (FIREBASE_CONFIGURADO){
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
     auth = firebase.auth();
-    db.enablePersistence({synchronizeTabs:true}).catch(err => {
-      console.warn('Persistência offline do Firestore não pôde ser ativada:', err.code);
-    });
     console.log('SERVE: usando Firestore (Firebase) como banco de dados.');
   }catch(e){
     console.error('Erro ao iniciar o Firebase — verifique se o firebaseConfig está correto.', e);
@@ -660,6 +657,10 @@ function showToast(msg){
 }
 function abrirModal(modal){ state.modal = modal; render(); }
 function fecharModal(){ pararLeitorQr(); state.modal = null; render(); }
+function mensagemErro(err, padrao){
+  const codigo = err && err.code ? '[' + err.code + '] ' : '';
+  return codigo + (err && err.message ? err.message : (padrao || 'algo deu errado.'));
+}
 
 /* ============ 6) GERAR DATAS DO MÊS (cruza recorrentes + avulsos) ============ */
 function gerarDatasDoMes(idMes){
@@ -1953,7 +1954,7 @@ async function handleClick(e){
   }catch(err){
     console.error(err);
     state.carregando = false;
-    showToast('Ops: ' + (err.message || 'algo deu errado.'));
+    showToast('Ops: ' + mensagemErro(err));
   }
 }
 function togglearray(arr, valor){
@@ -2111,7 +2112,7 @@ async function handleSubmit(e){
     }
   }catch(err){
     console.error(err);
-    showToast('Ops: ' + (err.message || 'algo deu errado.'));
+    showToast('Ops: ' + mensagemErro(err));
   }finally{
     state.carregando = false;
     render();
@@ -2231,7 +2232,7 @@ async function entrarComUid(uid){
     state.carregando = false;
     state.usuario = null;
     render();
-    showToast('Ops: ' + (err.message || 'não deu pra carregar seus dados — confira se o Firestore está criado e as regras liberam leitura/escrita.'));
+    showToast('Ops: ' + mensagemErro(err, 'não deu pra carregar seus dados — confira se o Firestore está criado e as regras liberam leitura/escrita.'));
   }
 }
 
