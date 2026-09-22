@@ -1952,6 +1952,7 @@ async function handleClick(e){
 
   }catch(err){
     console.error(err);
+    state.carregando = false;
     showToast('Ops: ' + (err.message || 'algo deu errado.'));
   }
 }
@@ -2211,19 +2212,27 @@ function exportarEscalaPdf(){
 
 /* ============ 23) BOOTSTRAP ============ */
 async function entrarComUid(uid){
-  const perfil = await carregarPerfilVoluntario(uid);
-  if (!perfil){
-    showToast('Não encontramos seu cadastro. Fale com a liderança.');
-    state.carregando = false; render();
-    return;
+  try{
+    const perfil = await carregarPerfilVoluntario(uid);
+    if (!perfil){
+      state.carregando = false; render();
+      showToast('Não encontramos seu cadastro. Fale com a liderança.');
+      return;
+    }
+    state.usuario = perfil;
+    await garantirConfigInicial();
+    await carregarTudo();
+    state.carregando = false;
+    state.aba = 'painel';
+    render();
+    registrarAuditoria('login', 'Entrou no SERVE');
+  }catch(err){
+    console.error(err);
+    state.carregando = false;
+    state.usuario = null;
+    render();
+    showToast('Ops: ' + (err.message || 'não deu pra carregar seus dados — confira se o Firestore está criado e as regras liberam leitura/escrita.'));
   }
-  state.usuario = perfil;
-  await garantirConfigInicial();
-  await carregarTudo();
-  state.carregando = false;
-  state.aba = 'painel';
-  render();
-  registrarAuditoria('login', 'Entrou no SERVE');
 }
 
 function iniciarApp(){
