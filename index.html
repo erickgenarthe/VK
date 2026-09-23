@@ -769,6 +769,7 @@ async function carregarAuditoria(){
 }
 async function carregarTotemContatos(){
   state.totemContatos = (await colLista('contatosTotem')).sort((a,b)=> (b.criadoEm||'').localeCompare(a.criadoEm||''));
+  if (state.colapsado['totem-exportar'] === undefined){ state.colapsado['totem-exportar'] = true; salvarColapsado(); }
 }
 
 /* ============ 10) RENDER — loop principal ============ */
@@ -1500,12 +1501,13 @@ const STATUS_TOTEM_LABEL = { pendente: 'Pendente', 'em-contato': 'Em contato', c
 const STATUS_TOTEM_BADGE = { pendente: 'badge-alerta', 'em-contato': 'badge-amar', concluido: 'badge-servir' };
 function telaTotemContatos(){
   const lista = state.totemContatos || [];
-  return `<div class="cartao">
+  const corpoExportar = `<div class="col">
     <button class="btn btn-ghost btn-block" data-action="exportar-totem-pdf">⬇️ Exportar PDF de hoje</button>
     <button class="btn btn-ghost btn-block" data-action="exportar-totem-vcf">📇 Exportar lista de transmissão (WhatsApp)</button>
     <span class="hint">Baixa um arquivo de contatos com quem preencheu o totem hoje. Importe nos contatos do seu celular e, no WhatsApp, crie uma "Nova transmissão" selecionando esses contatos — a mensagem você escreve na hora, do seu jeito.</span>
-  </div>
-  <div class="cartao">${lista.map(c => `
+  </div>`;
+  return cartaoColapsavel('totem-exportar', '⬇️ Exportar', corpoExportar)
+  + `<div class="cartao">${lista.map(c => `
     <div class="lista-item" style="align-items:flex-start;">
       <div>
         <strong>${esc(c.nome)}</strong> <span class="badge ${STATUS_TOTEM_BADGE[c.status]||'badge-alerta'}">${esc(STATUS_TOTEM_LABEL[c.status]||c.status)}</span><br>
