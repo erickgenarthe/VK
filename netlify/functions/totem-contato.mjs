@@ -1,11 +1,12 @@
 // Recebe o formulário do totem físico (sem login) e salva o contato pra
-// equipe de acompanhamento. É a ÚNICA função HTTP sob demanda deste
-// projeto — as outras 4 são agendadas — por isso não exporta
-// "config.schedule": sem essa configuração, o Netlify já expõe essa função
-// como um endpoint HTTP comum em /.netlify/functions/totem-contato.
-import { fsSetDoc, fsGetDoc, fsNovoId, enviarWhatsAppTemplate, normalizarTelefoneBR } from './_lib.mjs';
+// a equipe consultar depois em "Mais" → "Totem · Contatos". É a ÚNICA
+// função HTTP sob demanda deste projeto — as outras 4 são agendadas — por
+// isso não exporta "config.schedule": sem essa configuração, o Netlify já
+// expõe essa função como um endpoint HTTP comum em
+// /.netlify/functions/totem-contato.
+import { fsSetDoc, fsNovoId, normalizarTelefoneBR } from './_lib.mjs';
 
-const INTERESSES_VALIDOS = ['Quero conhecer a igreja', 'Grupo de crescimento', 'Oração', 'Outro'];
+const INTERESSES_VALIDOS = ['Quero aceitar Jesus', 'Quero conhecer a igreja', 'Grupo de crescimento', 'Oração', 'Quero falar sobre a mensagem de hoje'];
 
 export default async (req) => {
   if (req.method !== 'POST') {
@@ -39,23 +40,6 @@ export default async (req) => {
       origem: 'totem',
       criadoEm: new Date().toISOString(),
     });
-
-    // Avisa a equipe de acompanhamento — se não tiver telefones
-    // configurados em "Mais" → "Configurações" ou faltar variável de
-    // ambiente do WhatsApp, só pula o aviso: o contato já foi salvo.
-    try {
-      const configDoc = await fsGetDoc('dados/config');
-      const telefonesEquipe = (configDoc && configDoc.equipeTotemTelefones) || [];
-      if (telefonesEquipe.length) {
-        const templateName = process.env.WHATSAPP_TEMPLATE_TOTEM || 'ccvserve_totem_contato';
-        const resumo = interesses.length ? interesses.join(', ') : 'não especificado';
-        await Promise.all(
-          telefonesEquipe.map((tel) => enviarWhatsAppTemplate(normalizarTelefoneBR(tel), templateName, [nome, resumo, telefone]))
-        );
-      }
-    } catch (notifyErr) {
-      console.error('Totem: contato salvo, mas aviso à equipe falhou:', notifyErr);
-    }
 
     return new Response(JSON.stringify({ ok: true, id }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   } catch (e) {

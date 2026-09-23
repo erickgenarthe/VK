@@ -113,25 +113,29 @@ antes de usar; os nomes esperados por padrão são `ccvserve_lembrete`,
 
 `totem.html` é uma página pública, sem login, pensada pra rodar sozinha num
 tablet perto da saída: quem visitou a igreja e não subiu no apelo pode
-deixar nome, WhatsApp e o que despertou interesse (conhecer a igreja, grupo
-de crescimento, oração...), com uma mensagem opcional.
+deixar nome, WhatsApp e o que despertou interesse (aceitar Jesus, conhecer
+a igreja, grupo de crescimento, oração, falar sobre a mensagem do dia...),
+com uma mensagem opcional.
 
 Diferente das 4 funções acima, `netlify/functions/totem-contato.mjs` **não é
 agendada** — é a única função deste projeto acionada sob demanda, chamada
 pelo próprio `totem.html` a cada envio (`/.netlify/functions/totem-contato`).
-Ela grava o contato na coleção `contatosTotem` do Firestore e, se houver
-números cadastrados em "Mais" → "Configurações" → "WhatsApp da equipe de
-acompanhamento", avisa a equipe por WhatsApp usando o template
-`ccvserve_totem_contato` (nome configurável pela variável de ambiente
-`WHATSAPP_TEMPLATE_TOTEM`).
+Ela só valida os dados e grava o contato na coleção `contatosTotem` do
+Firestore — **de propósito, o totem não manda nada automático por
+WhatsApp**: quem acompanha os visitantes prefere escrever a mensagem na
+hora, do jeito da própria pessoa, em vez de um envio automático via API.
 
-**O contato do totem é sempre salvo no Firestore mesmo sem nenhuma variável
-de WhatsApp configurada** — só o aviso automático pra equipe fica
-desativado, igual aos outros recursos de WhatsApp do app. Depois de salvo,
-qualquer líder ou admin vê a lista completa em "Mais" → "Totem · Contatos",
-com um botão que já abre uma conversa no WhatsApp com o visitante e outro
-("⬇️ Exportar PDF de hoje") que gera, na hora, um PDF com todos os contatos
-do dia — pra imprimir ou arquivar ao final do culto.
+Todo contato salvo aparece em "Mais" → "Totem · Contatos" pra qualquer
+líder ou admin, com:
+- Um botão que já abre uma conversa no WhatsApp com aquele visitante
+  específico (link direto, sem precisar de nenhuma API);
+- **"⬇️ Exportar PDF de hoje"** — gera um PDF com todos os contatos do dia,
+  pra imprimir ou arquivar;
+- **"📇 Exportar lista de transmissão (WhatsApp)"** — baixa um arquivo
+  `.vcf` com todo mundo que preencheu o totem naquele dia. É só importar
+  esse arquivo nos contatos do celular e, no WhatsApp, criar uma "Nova
+  transmissão" selecionando esses contatos — a mensagem em si você escreve
+  na hora, pra toda a turma do dia de uma vez.
 
 ### Montando o totem físico (hardware)
 

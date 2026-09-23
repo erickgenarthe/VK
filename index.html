@@ -351,7 +351,6 @@ const DEPARTAMENTOS_PADRAO = [
 const CONFIG_PADRAO = {
   nomeIgreja: 'Minha Igreja',
   lema: 'Viver, amar e servir pessoas.',
-  equipeTotemTelefones: [], // WhatsApp de quem acompanha os contatos do totem pós-apelo
   departamentos: DEPARTAMENTOS_PADRAO.slice(),
   eventos: [
     { id: 'culto-dom-manha', nome: 'Culto de Domingo · Manhã', dia: 'domingo', horario: '09:00', horarioFim: '11:00' },
@@ -1478,10 +1477,6 @@ function telaAdminConfig(){
     <div class="cartao">
       <div class="campo"><label>Nome da igreja/organização</label><input type="text" name="nomeIgreja" value="${esc(c.nomeIgreja)}" required></div>
       <div class="campo"><label>Lema</label><input type="text" name="lema" value="${esc(c.lema||'')}"></div>
-      <div class="campo"><label>WhatsApp da equipe de acompanhamento (um por linha)</label>
-        <textarea name="equipeTotemTelefones" rows="3" placeholder="11999999999">${esc((c.equipeTotemTelefones||[]).join('\n'))}</textarea>
-        <span class="hint">Avisados por WhatsApp sempre que alguém preencher o totem pós-apelo.</span>
-      </div>
       <button type="submit" class="btn btn-primary btn-block">Salvar</button>
     </div>
   </form>
@@ -1507,6 +1502,8 @@ function telaTotemContatos(){
   const lista = state.totemContatos || [];
   return `<div class="cartao">
     <button class="btn btn-ghost btn-block" data-action="exportar-totem-pdf">⬇️ Exportar PDF de hoje</button>
+    <button class="btn btn-ghost btn-block" data-action="exportar-totem-vcf">📇 Exportar lista de transmissão (WhatsApp)</button>
+    <span class="hint">Baixa um arquivo de contatos com quem preencheu o totem hoje. Importe nos contatos do seu celular e, no WhatsApp, crie uma "Nova transmissão" selecionando esses contatos — a mensagem você escreve na hora, do seu jeito.</span>
   </div>
   <div class="cartao">${lista.map(c => `
     <div class="lista-item" style="align-items:flex-start;">
@@ -1688,6 +1685,7 @@ async function handleClick(e){
   else if (a === 'ir-admin-auditoria'){ state.aba='admin-auditoria'; await carregarAuditoria(); render(); }
   else if (a === 'ir-admin-totem'){ state.aba='admin-totem'; await carregarTotemContatos(); render(); }
   else if (a === 'exportar-totem-pdf'){ exportarTotemPdf(); }
+  else if (a === 'exportar-totem-vcf'){ exportarTotemVcf(); }
   else if (a === 'fechar-modal-overlay' || a === 'fechar-modal'){ fecharModal(); }
 
   else if (a === 'quero-servir'){
@@ -1931,10 +1929,7 @@ async function handleSubmit(e){
       form.reset(); render();
     }
     else if (tipo === 'config-igreja'){
-      const patch = {
-        nomeIgreja: fd.get('nomeIgreja').trim(), lema: fd.get('lema').trim(),
-        equipeTotemTelefones: fd.get('equipeTotemTelefones').split('\n').map(s=>s.trim()).filter(Boolean),
-      };
+      const patch = { nomeIgreja: fd.get('nomeIgreja').trim(), lema: fd.get('lema').trim() };
       Object.assign(state.config, patch);
       await salvarConfig(state.config);
       showToast('Configurações salvas.');
@@ -2057,6 +2052,32 @@ function exportarTotemPdf(){
     styles: { fontSize: 8 },
   });
   doc.save('ccvserve-totem-' + hoje + '.pdf');
+}
+function escVcf(s){
+  return String(s||'').replace(/\\/g,'\\\\').replace(/\n/g,'\\n').replace(/,/g,'\\,').replace(/;/g,'\\;');
+}
+function exportarTotemVcf(){
+  const hoje = hojeISO();
+  const linhas = (state.totemContatos || []).filter(c => (c.criadoEm||'').slice(0,10) === hoje);
+  if (!linhas.length){ showToast('Ninguém preencheu o totem hoje ainda.'); return; }
+  const vcards = linhas.map(c => {
+    const tel = (c.telefone||'').replace(/[^\d+]/g,'');
+    return ['BEGIN:VCARD','VERSION:3.0',
+      'FN:' + escVcf(c.nome),
+      'N:' + escVcf(c.nome) + ';;;;',
+      'TEL;TYPE=CELL:' + (tel.startsWith('+') ? tel : '+' + tel),
+      'NOTE:' + escVcf((c.interesses||[]).join(', ')),
+      'END:VCARD'].join('\r\n');
+  }).join('\r\n');
+  const blob = new Blob([vcards], { type: 'text/vcard;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'ccvserve-totem-' + hoje + '.vcf';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }
 
 /* ============ 23) BOOTSTRAP ============ */
