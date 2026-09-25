@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Despertas · Devocional do Grupo de Crescimento</title>
+<meta name="description" content="Despertas: devocional semanal (segunda a sexta) pro seu grupo de crescimento, gerado a partir do estudo do domingo, com check-in diário e comentários — no estilo do plano de leitura da Bíblia.">
+<meta name="theme-color" content="#5B3E96">
+<meta property="og:title" content="Despertas · Devocional do Grupo de Crescimento">
+<meta property="og:description" content="Devocional semanal com check-in e comentários pro seu grupo de crescimento.">
+<meta property="og:type" content="website">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM0EyODYxIiBzdHJva2Utd2lkdGg9IjEwIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEyIiByPSIzNCIgZmlsbD0iI0Y0Qjc0MCIvPjxwYXRoIGQ9Ik0xMDAgNDB2MjBNMTAwIDE1MnYyME00MCAxMDBoMjBNMTQwIDEwMGgyME02MCA2MGwxNCAxNE0xMjYgMTI2bDE0IDE0TTE0MCA2MGwtMTQgMTRNNzQgMTI2bC0xNCAxNCIgc3Ryb2tlPSIjRTg2MThDIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM0EyODYxIiBzdHJva2Utd2lkdGg9IjEwIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEyIiByPSIzNCIgZmlsbD0iI0Y0Qjc0MCIvPjxwYXRoIGQ9Ik0xMDAgNDB2MjBNMTAwIDE1MnYyME00MCAxMDBoMjBNMTQwIDEwMGgyME02MCA2MGwxNCAxNE0xMjYgMTI2bDE0IDE0TTE0MCA2MGwtMTQgMTRNNzQgMTI2bC0xNCAxNCIgc3Ryb2tlPSIjRTg2MThDIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<style>
+  :root{
+    /* Paleta do "amanhecer": roxo do céu antes do sol nascer, rosa do
+       nascer do sol e dourado do próprio sol — remete a "despertar" com
+       Deus todo dia, antes de o dia começar de verdade. */
+    --roxo: #5B3E96;
+    --roxo-escuro: #3A2861;
+    --roxo-suave: #EFE9FA;
+    --rosa: #E8618C;
+    --rosa-suave: #FDE7EE;
+    --dourado: #F4B740;
+    --dourado-suave: #FDF1D6;
+    --creme: #FBF7F1;
+    --grafite: #1B2430;
+    --grafite-suave: #6B6459;
+    --branco: #FFFFFF;
+    --vermelho: #D64545;
+    --radius: 20px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito', sans-serif;
+    background: var(--creme);
+    color: var(--grafite);
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.display{
+    font-family:'Baloo 2', sans-serif;
+    margin:0;
+    color: var(--roxo-escuro);
+  }
+  a{ color: var(--roxo); }
+  #app{
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background: var(--creme);
+    position:relative;
+    padding-bottom:86px;
+  }
+  #app.sem-nav{ padding-bottom:24px; }
+
+  @media (min-width: 860px){
+    body{
+      background: linear-gradient(160deg, #FFF3E4 0%, var(--creme) 45%, #F1ECFB 100%);
+      padding: 32px 16px;
+    }
+    #app{
+      min-height: auto;
+      border-radius: 28px;
+      box-shadow: 0 24px 60px rgba(27,36,48,0.14);
+      overflow: hidden;
+    }
+  }
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    background: linear-gradient(135deg, var(--roxo-escuro) 0%, var(--roxo) 55%, var(--rosa) 130%);
+    padding:22px 20px 26px 20px;
+    position:relative;
+    color:var(--branco);
+  }
+  .topbar-linha1{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .marca{ display:flex; align-items:center; gap:10px; }
+  .marca-selo{
+    width:38px; height:38px; border-radius:12px; background:var(--branco);
+    display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.18);
+    flex-shrink:0;
+  }
+  .marca-nome{ font-family:'Baloo 2', sans-serif; font-weight:800; font-size:20px; letter-spacing:0.2px; }
+  .marca-sub{ font-size:11px; opacity:0.85; margin-top:-2px; }
+  .topbar-acoes{ display:flex; gap:8px; align-items:center; }
+  .icon-btn{
+    width:36px; height:36px; border-radius:50%; border:none; background:rgba(255,255,255,0.18);
+    color:var(--branco); font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer;
+  }
+  .icon-btn:active{ background:rgba(255,255,255,0.32); }
+  .topbar-titulo{ margin-top:16px; font-size:22px; font-weight:800; }
+
+  /* ---------- Componentes básicos ---------- */
+  .conteudo{ padding:18px 18px 8px 18px; }
+  .cartao{
+    background:var(--branco); border-radius:var(--radius); padding:16px;
+    box-shadow:0 2px 10px rgba(27,36,48,0.06); margin-bottom:14px;
+  }
+  .cartao-titulo{ font-family:'Baloo 2', sans-serif; font-weight:700; font-size:16px; color:var(--roxo-escuro); margin-bottom:8px; }
+  .hint{ font-size:12.5px; color:var(--grafite-suave); line-height:1.5; }
+  .linha{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .col{ display:flex; flex-direction:column; gap:10px; }
+  .row{ display:flex; gap:8px; flex-wrap:wrap; }
+
+  label{ font-size:12.5px; font-weight:700; color:var(--roxo-escuro); display:block; margin-bottom:4px; }
+  input, select, textarea{
+    width:100%; padding:11px 13px; border-radius:14px; border:1.5px solid #E7E0D4;
+    font-family:inherit; font-size:14.5px; background:var(--branco); color:var(--grafite);
+  }
+  input:focus, select:focus, textarea:focus{ outline:none; border-color: var(--roxo); }
+  .campo{ margin-bottom:12px; }
+
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    padding:12px 18px; border-radius:16px; border:none; font-family:'Nunito', sans-serif;
+    font-weight:800; font-size:14.5px; cursor:pointer; text-align:center;
+  }
+  .btn-block{ width:100%; }
+  .btn-primary{ background: var(--roxo); color:var(--branco); }
+  .btn-primary:active{ background: var(--roxo-escuro); }
+  .btn-secondary{ background: var(--roxo-suave); color: var(--roxo-escuro); }
+  .btn-ghost{ background: #F1ECE0; color: var(--grafite); }
+  .btn-danger{ background: #FBE4E4; color: var(--vermelho); }
+  .btn-small{ padding:8px 12px; font-size:12.5px; border-radius:12px; }
+  .btn[disabled]{ opacity:0.5; pointer-events:none; }
+
+  .badge{ display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:100px; font-size:11.5px; font-weight:800; background:#F1ECE0; color:var(--grafite-suave); }
+  .badge-tema{ background: var(--roxo-suave); color: var(--roxo-escuro); }
+  .badge-lider{ background: var(--dourado-suave); color:#8C6300; }
+  .badge-membro{ background:#F1ECE0; color:var(--grafite-suave); }
+
+  .lista-item{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 0; border-bottom:1px solid #F1ECE0;
+  }
+  .lista-item:last-child{ border-bottom:none; }
+
+  .toast{
+    position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:200;
+    background: var(--grafite); color:var(--branco); padding:12px 18px; border-radius:14px;
+    font-size:13.5px; font-weight:700; box-shadow:0 10px 24px rgba(0,0,0,0.25); max-width:88%; text-align:center;
+  }
+
+  /* ---------- Navegação inferior ---------- */
+  .nav-inferior{
+    position:fixed; left:0; right:0; bottom:0; max-width:480px; margin:0 auto;
+    background:var(--branco); border-top:1px solid #F1ECE0; display:flex;
+    box-shadow:0 -4px 14px rgba(27,36,48,0.08); z-index:80;
+  }
+  @media (min-width:860px){ .nav-inferior{ max-width:760px; border-radius:0 0 24px 24px; } }
+  .nav-item{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;
+    padding:9px 4px 8px 4px; border:none; background:none; cursor:pointer; color:var(--grafite-suave);
+    font-family:inherit; font-size:10.5px; font-weight:800;
+  }
+  .nav-item:active{ transform: scale(0.9); }
+  .nav-item .nav-icone-bolha{
+    width:38px; height:25px; border-radius:13px; display:flex; align-items:center; justify-content:center;
+    transition: background-color .2s ease;
+  }
+  .nav-item.ativo .nav-icone-bolha{ background: var(--roxo-suave); }
+  .nav-item .nav-icone{ font-size:17px; }
+  .nav-item.ativo{ color: var(--roxo); }
+
+  /* ---------- Telas de autenticação ---------- */
+  .tela-auth{ padding:36px 26px 26px 26px; }
+  .tela-auth .marca-central{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; margin-bottom:28px; }
+  .tela-auth .marca-selo-grande{ width:64px; height:64px; border-radius:20px; box-shadow:0 8px 20px rgba(27,36,48,0.14); }
+  .lema{ font-family:'Baloo 2', sans-serif; font-weight:800; color:var(--roxo-escuro); font-size:14px; }
+
+  /* ---------- Utilidades de estado vazio ---------- */
+  .vazio{ text-align:center; padding:30px 10px; color:var(--grafite-suave); }
+  .vazio .vazio-emoji{ font-size:34px; display:block; margin-bottom:8px; }
+
+  /* ---------- Seletor de dias (Seg a Sex) ---------- */
+  .seletor-dias{ display:grid; grid-template-columns:repeat(5,1fr); gap:6px; margin-bottom:14px; }
+  .dia-pill{
+    position:relative; border:1.5px solid #E7E0D4; background:var(--branco); border-radius:14px;
+    padding:8px 4px; display:flex; flex-direction:column; align-items:center; gap:2px; cursor:pointer;
+    font-family:inherit;
+  }
+  .dia-pill-nome{ font-size:10.5px; font-weight:800; color:var(--grafite-suave); }
+  .dia-pill-data{ font-size:12px; font-weight:800; color:var(--grafite); }
+  .dia-pill.ativo{ background: var(--roxo); border-color: var(--roxo); }
+  .dia-pill.ativo .dia-pill-nome, .dia-pill.ativo .dia-pill-data{ color: var(--branco); }
+  .dia-pill-check{
+    position:absolute; top:-6px; right:-4px; background:var(--dourado); color:var(--roxo-escuro);
+    border-radius:50%; width:16px; height:16px; font-size:10px; display:flex; align-items:center;
+    justify-content:center; font-weight:800;
+  }
+
+  .versiculo-cartao{ background: linear-gradient(135deg, var(--roxo) 0%, var(--roxo-escuro) 100%); color:var(--branco); }
+  .versiculo-texto{ font-family:'Baloo 2', sans-serif; font-size:17px; line-height:1.5; margin:0; }
+  .versiculo-ref{ margin:10px 0 0 0; font-size:12.5px; font-weight:800; opacity:0.85; }
+  .pergunta-cartao{ background: var(--rosa-suave); }
+  .oracao-cartao{ background: var(--dourado-suave); }
+  .estudo-titulo-cartao{ background: var(--roxo-suave); }
+
+  .grupo-dots{ display:flex; gap:5px; margin-top:6px; }
+  .dot{ width:10px; height:10px; border-radius:50%; background:#E7E0D4; display:inline-block; }
+  .dot.ok{ background: var(--roxo); }
+
+  ::-webkit-scrollbar{ width:0; height:0; }
+</style>
+</head>
+<body>
+<div id="app"><div class="vazio" style="padding-top:60px;">Carregando…</div></div>
+<script>
+/* =====================================================================
+   DESPERTAS — devocional semanal do grupo de crescimento
+   Arquivo único, sem build (mesmo espírito do SERVE/FORJA): abre e roda.
+   O líder adiciona o estudo de domingo, uma função do Netlify chama a IA
+   (Claude, API da Anthropic) pra escrever os 5 devocionais (segunda a
+   sexta), o líder revisa e publica, e o grupo faz check-in e comenta em
+   cada dia — no estilo do plano de leitura do app Bíblia (YouVersion).
+   ===================================================================== */
+
+/* ============ 1) FIREBASE (opcional — sem config, roda em modo local) ============
+   Enquanto os campos abaixo continuarem com "COLE_AQUI...", o Despertas
+   funciona em MODO DEMONSTRAÇÃO, salvando tudo no localStorage do próprio
+   navegador — dá pra testar o app inteiro sem configurar nada. Assim que
+   você colar as credenciais reais de um projeto Firebase (gratuito em
+   firebase.google.com), o app troca sozinho pra usar o Firestore de
+   verdade, e o grupo inteiro passa a ver os mesmos dados. Veja o README.md. */
+const firebaseConfig = {
+  apiKey: "COLE_AQUI_SUA_API_KEY",
+  authDomain: "COLE_AQUI.firebaseapp.com",
+  projectId: "COLE_AQUI",
+  storageBucket: "COLE_AQUI.firebasestorage.app",
+  messagingSenderId: "COLE_AQUI",
+  appId: "COLE_AQUI",
+};
+const FIREBASE_CONFIGURADO = firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('COLE_AQUI');
+let db = null;
+let auth = null;
+if (FIREBASE_CONFIGURADO){
+  try{
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    auth = firebase.auth();
+    console.log('Despertas: usando Firestore (Firebase) como banco de dados.');
+  }catch(e){
+    console.error('Erro ao iniciar o Firebase — verifique se o firebaseConfig está correto.', e);
+  }
+} else {
+  console.log('Despertas: firebaseConfig ainda não preenchido — rodando em modo demonstração (localStorage).');
+}
+
+/* ============ 2) CONFIGURAÇÃO PADRÃO DO GRUPO ============ */
+const CONFIG_PADRAO = {
+  nomeGrupo: 'Meu Grupo de Crescimento',
+  lema: 'Um devocional por dia, juntos.',
+};
+
+/* ============ 3) DATAS ============ */
+function hojeISO(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function isoDeDate(d){
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function somarDiasIso(iso, n){
+  const [a,m,d] = iso.split('-').map(Number);
+  const dt = new Date(a, m-1, d);
+  dt.setDate(dt.getDate() + n);
+  return isoDeDate(dt);
+}
+/* Segunda-feira da semana daquela data — no fim de semana, mostra a semana
+   que acabou de passar (a última que teve devocional de seg a sex). */
+function segundaDaSemana(iso){
+  const [a,m,d] = iso.split('-').map(Number);
+  const dt = new Date(a, m-1, d);
+  const offset = (dt.getDay() + 6) % 7; // segunda=0 ... domingo=6
+  dt.setDate(dt.getDate() - offset);
+  return isoDeDate(dt);
+}
+function datasDaSemana(segundaIso){
+  return [0,1,2,3,4].map(i => somarDiasIso(segundaIso, i));
+}
+function formatarDataCurta(iso){
+  const [,m,d] = iso.split('-');
+  return d + '/' + m;
+}
+
+/* ============ 4) CAMADA DE DADOS (Firestore de verdade, ou localStorage
+   no modo demonstração — o resto do código nunca precisa saber qual dos
+   dois está usando por baixo). ============ */
+const LS_PREFIX = 'despertas:';
+function genId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 9); }
+
+function lsLista(nome){
+  try{ return JSON.parse(localStorage.getItem(LS_PREFIX + nome) || '[]'); }catch(e){ return []; }
+}
+function lsSalvarLista(nome, lista){ localStorage.setItem(LS_PREFIX + nome, JSON.stringify(lista)); }
+function lsUpsert(nome, item){
+  const lista = lsLista(nome);
+  const idx = lista.findIndex(x => x.id === item.id);
+  if (idx >= 0) lista[idx] = item; else lista.push(item);
+  lsSalvarLista(nome, lista);
+}
+function lsAtualizar(nome, id, patch){
+  const lista = lsLista(nome);
+  const idx = lista.findIndex(x => x.id === id);
+  if (idx >= 0){ lista[idx] = { ...lista[idx], ...patch }; lsSalvarLista(nome, lista); }
+}
+
+async function colLista(nome){
+  if (FIREBASE_CONFIGURADO && db){
+    const snap = await db.collection(nome).get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  return lsLista(nome);
+}
+async function colListaFiltrada(nome, campo, valor){
+  if (FIREBASE_CONFIGURADO && db){
+    const snap = await db.collection(nome).where(campo, '==', valor).get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  return lsLista(nome).filter(x => x[campo] === valor);
+}
+async function colListaEmValores(nome, campo, valores){
+  if (!valores.length) return [];
+  if (FIREBASE_CONFIGURADO && db){
+    const snap = await db.collection(nome).where(campo, 'in', valores).get();
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  }
+  return lsLista(nome).filter(x => valores.includes(x[campo]));
+}
+async function colGetDoc(nome, id){
+  if (FIREBASE_CONFIGURADO && db){
+    const doc = await db.collection(nome).doc(id).get();
+    return doc.exists ? { id, ...doc.data() } : null;
+  }
+  return lsLista(nome).find(x => x.id === id) || null;
+}
+async function colAdicionar(nome, obj){
+  const id = genId();
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).set(obj);
+  } else {
+    lsUpsert(nome, { id, ...obj });
+  }
+  return id;
+}
+async function colDefinir(nome, id, obj){
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).set(obj, { merge: true });
+  } else {
+    const atual = lsLista(nome).find(x => x.id === id) || {};
+    lsUpsert(nome, { ...atual, ...obj, id });
+  }
+}
+async function colAtualizar(nome, id, patch){
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).update(patch);
+  } else {
+    lsAtualizar(nome, id, patch);
+  }
+}
+async function colRemover(nome, id){
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection(nome).doc(id).delete();
+  } else {
+    lsSalvarLista(nome, lsLista(nome).filter(x => x.id !== id));
+  }
+}
+
+async function lerConfig(){
+  if (FIREBASE_CONFIGURADO && db){
+    const doc = await db.collection('dados').doc('config').get();
+    return doc.exists ? { ...CONFIG_PADRAO, ...doc.data() } : null;
+  }
+  try{
+    const salvo = JSON.parse(localStorage.getItem(LS_PREFIX + 'config') || 'null');
+    return salvo ? { ...CONFIG_PADRAO, ...salvo } : null;
+  }catch(e){ return null; }
+}
+async function salvarConfig(cfg){
+  state.config = cfg;
+  if (FIREBASE_CONFIGURADO && db){
+    await db.collection('dados').doc('config').set(cfg, { merge: true });
+  } else {
+    localStorage.setItem(LS_PREFIX + 'config', JSON.stringify(cfg));
+  }
+}
+async function garantirConfigInicial(){
+  let cfg = await lerConfig();
+  if (!cfg){ cfg = { ...CONFIG_PADRAO }; await salvarConfig(cfg); }
+  state.config = cfg;
+}
+
+/* ============ 5) AUTENTICAÇÃO ============
+   Com Firebase configurado, usa e-mail/senha de verdade (firebase.auth()).
+   Sem Firebase, o "modo demonstração" guarda contas no localStorage. */
+function demoContas(){ return lsLista('contas'); }
+function demoCriarConta(email, senha){
+  const contas = demoContas();
+  if (contas.some(c => c.email.toLowerCase() === email.toLowerCase())) throw new Error('Já existe uma conta com esse e-mail.');
+  const uid = 'demo-' + genId();
+  contas.push({ id: uid, email, senha });
+  lsSalvarLista('contas', contas);
+  return uid;
+}
+function demoLogin(email, senha){
+  const conta = demoContas().find(c => c.email.toLowerCase() === email.toLowerCase());
+  if (!conta || conta.senha !== senha) throw new Error('E-mail ou senha incorretos.');
+  return conta.id;
+}
+function demoSessaoSalvar(uid){ localStorage.setItem(LS_PREFIX + 'sessao', uid); }
+function demoSessaoLer(){ return localStorage.getItem(LS_PREFIX + 'sessao'); }
+function demoSessaoLimpar(){ localStorage.removeItem(LS_PREFIX + 'sessao'); }
+
+async function carregarPerfilMembro(uid){ return colGetDoc('membros', uid); }
+
+async function fazerLogin(email, senha){
+  if (FIREBASE_CONFIGURADO && auth){
+    const cred = await auth.signInWithEmailAndPassword(email, senha);
+    return cred.user.uid;
+  }
+  return demoLogin(email, senha);
+}
+async function criarPerfilMembro(uid, dados){
+  const { email, nome } = dados;
+  const todos = await colLista('membros');
+  const ehPrimeiro = todos.length === 0; // primeira pessoa a se cadastrar vira líder automaticamente
+  const perfil = { nome, email, role: ehPrimeiro ? 'lider' : 'membro', criadoEm: new Date().toISOString() };
+  await colDefinir('membros', uid, perfil);
+  return perfil;
+}
+async function fazerCadastro(dados){
+  const { email, senha } = dados;
+  let uid;
+  if (FIREBASE_CONFIGURADO && auth){
+    const cred = await auth.createUserWithEmailAndPassword(email, senha);
+    uid = cred.user.uid;
+  } else {
+    uid = demoCriarConta(email, senha);
+  }
+  await criarPerfilMembro(uid, dados);
+  if (!FIREBASE_CONFIGURADO) demoSessaoSalvar(uid);
+  return uid;
+}
+async function fazerLogout(){
+  if (FIREBASE_CONFIGURADO && auth){ await auth.signOut(); }
+  else { demoSessaoLimpar(); }
+  state.usuario = null;
+  state.aba = 'hoje';
+  render();
+}
+
+/* ============ 6) ESTADO GLOBAL ============ */
+const state = {
+  carregando: true,
+  telaAuth: 'login', // 'login' | 'cadastro'
+  usuario: null,
+  config: null,
+  membros: [],
+  aba: 'hoje', // hoje | grupo | mais | estudos | estudo-form | config-grupo
+  subTelaVoltarPara: 'mais',
+  semanaBase: null,
+  semanaAtual: null,
+  datasSemana: [],
+  diaSelecionado: null,
+  checkinsDoDia: [],
+  comentariosDoDia: [],
+  meusCheckinsSemana: new Set(),
+  estudosLista: [],
+  estudoForm: null,
+  grupoDatas: [],
+  grupoProgresso: [],
+  toast: null,
+  loginForm: { email:'', senha:'' },
+  cadastroForm: { nome:'', email:'', senha:'' },
+};
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function showToast(msg){
+  state.toast = msg;
+  render();
+  clearTimeout(state._toastTimer);
+  state._toastTimer = setTimeout(() => { state.toast = null; render(); }, 2800);
+}
+function mensagemErro(err, padrao){
+  const codigo = err && err.code ? '[' + err.code + '] ' : '';
+  return codigo + (err && err.message ? err.message : (padrao || 'algo deu errado.'));
+}
+function paragrafos(texto){
+  const partes = (texto || '').split(/\n+/).map(p => p.trim()).filter(Boolean);
+  if (!partes.length) return '<p class="hint">—</p>';
+  return partes.map(p => `<p style="margin:0 0 10px 0; line-height:1.6;">${esc(p)}</p>`).join('');
+}
+
+/* ============ 7) FLUXO "HOJE" (semana + dia selecionado) ============ */
+async function irParaHoje(){
+  state.aba = 'hoje';
+  const hoje = hojeISO();
+  const base = segundaDaSemana(hoje);
+  state.semanaBase = base;
+  state.semanaAtual = await colGetDoc('semanas', base);
+  state.datasSemana = datasDaSemana(base);
+
+  if (state.semanaAtual){
+    const checkinsSemana = await colListaEmValores('checkins', 'data', state.datasSemana);
+    state.meusCheckinsSemana = new Set(checkinsSemana.filter(c => c.uid === state.usuario.id).map(c => c.data));
+    const alvo = state.datasSemana.includes(hoje) ? hoje : state.datasSemana[4];
+    await selecionarDia(alvo);
+  } else {
+    state.diaSelecionado = null;
+    state.checkinsDoDia = [];
+    state.comentariosDoDia = [];
+    render();
+  }
+}
+async function selecionarDia(iso){
+  state.diaSelecionado = iso;
+  const [checkins, comentarios] = await Promise.all([
+    colListaFiltrada('checkins', 'data', iso),
+    colListaFiltrada('comentarios', 'data', iso),
+  ]);
+  state.checkinsDoDia = checkins;
+  state.comentariosDoDia = comentarios.slice().sort((a,b) => (a.criadoEm||'').localeCompare(b.criadoEm||''));
+  render();
+}
+async function toggleCheckin(){
+  const iso = state.diaSelecionado;
+  if (!iso || !state.usuario) return;
+  const uid = state.usuario.id;
+  const id = iso + '_' + uid;
+  const jaFez = state.checkinsDoDia.some(c => c.uid === uid);
+  if (jaFez){
+    await colRemover('checkins', id);
+    state.checkinsDoDia = state.checkinsDoDia.filter(c => c.uid !== uid);
+    state.meusCheckinsSemana.delete(iso);
+    showToast('Check-in desfeito.');
+  } else {
+    const criadoEm = new Date().toISOString();
+    await colDefinir('checkins', id, { data: iso, uid, nome: state.usuario.nome, criadoEm });
+    state.checkinsDoDia.push({ id, data: iso, uid, nome: state.usuario.nome, criadoEm });
+    state.meusCheckinsSemana.add(iso);
+    showToast('✅ Check-in feito! Continue firme.');
+  }
+  render();
+}
+
+/* ============ 8) FLUXO "GRUPO" ============ */
+async function abrirGrupo(){
+  const base = segundaDaSemana(hojeISO());
+  const datas = datasDaSemana(base);
+  const checkins = await colListaEmValores('checkins', 'data', datas);
+  state.grupoDatas = datas;
+  state.grupoProgresso = state.membros
+    .map(m => ({ membro: m, checks: datas.map(iso => checkins.some(c => c.data === iso && c.uid === m.id)) }))
+    .sort((a,b) => a.membro.nome.localeCompare(b.membro.nome));
+  state.aba = 'grupo';
+  render();
+}
+
+/* ============ 9) FLUXO "ESTUDOS" (líder) ============ */
+async function abrirEstudos(){
+  const lista = await colLista('semanas');
+  state.estudosLista = lista.sort((a,b) => (b.id||'').localeCompare(a.id||''));
+  state.aba = 'estudos';
+  render();
+}
+function proximaSegundaLivre(lista){
+  const ids = new Set(lista.map(s => s.id));
+  let base = segundaDaSemana(hojeISO());
+  while (ids.has(base)) base = somarDiasIso(base, 7);
+  return base;
+}
+function novoDiaVazio(iso){
+  return { data: iso, titulo:'', referencia:'', versiculo:'', texto:'', pergunta:'', oracao:'' };
+}
+async function gerarDevocionalIA(){
+  const ef = state.estudoForm;
+  if (!ef.titulo.trim() || !ef.texto.trim()){ showToast('Preencha o título e o conteúdo do estudo primeiro.'); return; }
+  ef.gerando = true; render();
+  try{
+    const resp = await fetch('/.netlify/functions/gerar-devocional', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ titulo: ef.titulo.trim(), texto: ef.texto.trim(), dataInicioISO: ef.segunda }),
+    });
+    let data;
+    try{ data = await resp.json(); }catch(e){ throw new Error('resposta inválida do servidor'); }
+    if (!resp.ok || data.erro) throw new Error(data.erro || ('erro ' + resp.status));
+    ef.dias = data.dias;
+    showToast('✨ Devocional gerado! Revise os versículos e o texto antes de publicar.');
+  }catch(err){
+    console.error(err);
+    showToast('Não deu pra gerar automaticamente (' + err.message + '). Escreva os 5 dias manualmente abaixo.');
+    if (!ef.dias) ef.dias = datasDaSemana(ef.segunda).map(novoDiaVazio);
+  }
+  ef.gerando = false;
+  render();
+}
+async function publicarEstudo(){
+  const ef = state.estudoForm;
+  if (!ef.titulo.trim()){ showToast('Dê um título pro estudo.'); return; }
+  if (!ef.dias || ef.dias.length !== 5){ showToast('Gere ou escreva os 5 dias antes de publicar.'); return; }
+  if (ef.dias.some(dd => !dd.titulo.trim() || !dd.texto.trim())){ showToast('Preencha pelo menos o título e o texto de cada dia.'); return; }
+  const datas = datasDaSemana(ef.segunda);
+  const obj = {
+    titulo: ef.titulo.trim(),
+    temaTexto: ef.texto.trim(),
+    criadoPorUid: state.usuario.id,
+    criadoPorNome: state.usuario.nome,
+    atualizadoEm: new Date().toISOString(),
+    dias: ef.dias.map((dd, i) => ({ ...dd, data: datas[i] })),
+  };
+  await colDefinir('semanas', ef.segunda, obj);
+  showToast('📅 Semana publicada!');
+  const voltar = state.subTelaVoltarPara || 'estudos';
+  state.estudoForm = null;
+  if (voltar === 'hoje') await irParaHoje(); else await abrirEstudos();
+}
+
+/* ============ 10) RENDER ============ */
+const SUBTELAS = new Set(['estudos', 'estudo-form', 'config-grupo']);
+function ehSubTela(){ return SUBTELAS.has(state.aba); }
+function tituloDaAba(){
+  const titulos = {
+    hoje: 'Hoje', grupo: 'Grupo', mais: 'Mais',
+    estudos: 'Estudos da semana',
+    'estudo-form': (state.estudoForm && state.estudoForm.titulo) ? 'Editar semana' : 'Novo estudo',
+    'config-grupo': 'Configurações do grupo',
+  };
+  return titulos[state.aba] || '';
+}
+
+function render(){
+  const app = document.getElementById('app');
+  if (state.carregando){
+    app.className = 'sem-nav';
+    app.innerHTML = telaCarregando();
+  } else if (!state.usuario){
+    app.className = 'sem-nav';
+    app.innerHTML = state.telaAuth === 'cadastro' ? telaCadastro() : telaLogin();
+  } else {
+    app.className = '';
+    app.innerHTML = telaShell();
+  }
+  if (state.toast) app.insertAdjacentHTML('beforeend', `<div class="toast">${esc(state.toast)}</div>`);
+}
+
+function marcaSol(tamanho){
+  return `<svg width="${tamanho}" height="${tamanho}" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="100" cy="112" r="34" fill="#F4B740"/>
+    <path d="M100 40v20M100 152v20M40 100h20M140 100h20M60 60l14 14M126 126l14 14M140 60l-14 14M74 126l-14 14" stroke="#E8618C" stroke-width="10" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function telaCarregando(){
+  return `<div class="vazio" style="padding-top:70px;">
+    <span class="vazio-emoji">☀️</span>
+    <p style="font-family:'Baloo 2',sans-serif; font-weight:800; color:var(--roxo-escuro);">Despertas</p>
+    <p class="hint">Carregando…</p>
+  </div>`;
+}
+
+function telaLogin(){
+  const f = state.loginForm;
+  return `<div class="tela-auth">
+    <div class="marca-central">
+      <div class="marca-selo-grande">${marcaSol(64)}</div>
+      <h1 style="font-size:26px;">Despertas</h1>
+      <p class="lema">Um devocional por dia, juntos.</p>
+      <p class="hint">Devocional semanal do seu grupo de crescimento.</p>
+    </div>
+    <form data-form="login">
+      <div class="campo"><label>E-mail</label><input type="email" name="email" required value="${esc(f.email)}" placeholder="voce@email.com"></div>
+      <div class="campo"><label>Senha</label><input type="password" name="senha" required minlength="6" placeholder="••••••" value="${esc(f.senha)}"></div>
+      <button type="submit" class="btn btn-primary btn-block">Entrar</button>
+    </form>
+    <p style="text-align:center; margin-top:16px; font-size:13.5px;">Ainda não tem conta? <a href="#" data-action="ir-cadastro">Cadastre-se</a></p>
+    ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:18px; background:var(--dourado-suave);"><p class="hint" style="margin:0;">🧪 <strong>Modo demonstração</strong> — os dados ficam salvos só neste navegador (localStorage). Configure o Firebase no início do <code>index.html</code> pra publicar de verdade. Veja o README.</p></div>` : ''}
+  </div>`;
+}
+
+function telaCadastro(){
+  const f = state.cadastroForm;
+  return `<div class="tela-auth">
+    <div class="marca-central">
+      <div class="marca-selo-grande">${marcaSol(64)}</div>
+      <h1 style="font-size:22px;">Criar conta</h1>
+      <p class="hint">A primeira pessoa a se cadastrar vira líder do grupo automaticamente.</p>
+    </div>
+    <form data-form="cadastro">
+      <div class="campo"><label>Nome</label><input type="text" name="nome" required value="${esc(f.nome)}"></div>
+      <div class="campo"><label>E-mail</label><input type="email" name="email" required value="${esc(f.email)}"></div>
+      <div class="campo"><label>Senha</label><input type="password" name="senha" required minlength="6" value="${esc(f.senha)}"></div>
+      <button type="submit" class="btn btn-primary btn-block">Criar conta</button>
+    </form>
+    <p style="text-align:center; margin-top:16px; font-size:13.5px;">Já tem conta? <a href="#" data-action="ir-login">Entrar</a></p>
+  </div>`;
+}
+
+function telaShell(){
+  const subTela = ehSubTela();
+  return `<div class="topbar">
+      <div class="topbar-linha1">
+        ${subTela ? `
+          <button class="icon-btn" data-action="voltar" data-destino="${esc(state.subTelaVoltarPara||'mais')}" title="Voltar">←</button>
+          <div class="marca-nome" style="font-size:17px;">${esc(tituloDaAba())}</div>
+          <div class="topbar-acoes"><button class="icon-btn" data-action="sair" title="Sair">⎋</button></div>
+        ` : `
+          <div class="marca">
+            <div class="marca-selo">${marcaSol(22)}</div>
+            <div><div class="marca-nome">Despertas</div><div class="marca-sub">${esc((state.config&&state.config.nomeGrupo)||'')}</div></div>
+          </div>
+          <div class="topbar-acoes">
+            <button class="icon-btn" data-action="sair" title="Sair">⎋</button>
+          </div>
+        `}
+      </div>
+      ${!subTela ? `<div class="topbar-titulo">${esc(tituloDaAba())}</div>` : ''}
+    </div>
+    <div class="conteudo">${telaConteudo()}</div>
+    ${navInferior()}`;
+}
+
+function navInferior(){
+  const itens = [
+    { id:'hoje', icone:'☀️', nome:'Hoje' },
+    { id:'grupo', icone:'👥', nome:'Grupo' },
+    { id:'mais', icone:'☰', nome:'Mais' },
+  ];
+  return `<div class="nav-inferior">${itens.map(it => `<button class="nav-item ${state.aba===it.id?'ativo':''}" data-action="ir-aba" data-aba="${it.id}"><span class="nav-icone-bolha"><span class="nav-icone">${it.icone}</span></span>${it.nome}</button>`).join('')}</div>`;
+}
+
+function telaConteudo(){
+  switch(state.aba){
+    case 'grupo': return telaGrupo();
+    case 'mais': return telaMais();
+    case 'estudos': return telaEstudos();
+    case 'estudo-form': return telaEstudoForm();
+    case 'config-grupo': return telaConfigGrupo();
+    default: return telaHoje();
+  }
+}
+
+/* ---------- Tela: Hoje ---------- */
+function telaHoje(){
+  if (!state.semanaAtual){
+    const podeAdicionar = state.usuario.role === 'lider';
+    return `<div class="cartao" style="text-align:center; padding:30px 16px;">
+      <span style="font-size:34px; display:block; margin-bottom:10px;">🌅</span>
+      <h3 style="margin-bottom:6px;">Ainda não tem devocional essa semana</h3>
+      <p class="hint">${podeAdicionar ? 'Adicione o estudo de domingo e o Despertas escreve os 5 devocionais pra você revisar e publicar.' : 'Peça pra liderança adicionar o estudo dessa semana — assim que publicar, os devocionais aparecem aqui.'}</p>
+      ${podeAdicionar ? `<button type="button" class="btn btn-primary" style="margin-top:14px;" data-action="criar-estudo-semana" data-segunda="${state.semanaBase}">+ Adicionar estudo desta semana</button>` : ''}
+    </div>`;
+  }
+
+  const NOMES = ['Seg','Ter','Qua','Qui','Sex'];
+  const seletor = `<div class="seletor-dias">${state.datasSemana.map((iso, i) => `
+    <button type="button" class="dia-pill ${state.diaSelecionado===iso?'ativo':''}" data-action="selecionar-dia" data-data="${iso}">
+      <span class="dia-pill-nome">${NOMES[i]}</span>
+      <span class="dia-pill-data">${formatarDataCurta(iso)}</span>
+      ${state.meusCheckinsSemana.has(iso) ? '<span class="dia-pill-check">✓</span>' : ''}
+    </button>`).join('')}</div>`;
+
+  const diaAtual = state.semanaAtual.dias.find(d => d.data === state.diaSelecionado) || state.semanaAtual.dias[0];
+  const jaFezHoje = state.checkinsDoDia.some(c => c.uid === state.usuario.id);
+  const outros = state.checkinsDoDia.filter(c => c.uid !== state.usuario.id);
+
+  return seletor + `
+    <div class="cartao estudo-titulo-cartao">
+      <span class="badge badge-tema">${esc(state.semanaAtual.titulo)}</span>
+      <h2 style="margin-top:10px; font-size:20px;">${esc(diaAtual.titulo||'')}</h2>
+    </div>
+    <div class="cartao versiculo-cartao">
+      <p class="versiculo-texto">“${esc(diaAtual.versiculo||'')}”</p>
+      <p class="versiculo-ref">${esc(diaAtual.referencia||'')}</p>
+    </div>
+    <div class="cartao">${paragrafos(diaAtual.texto)}</div>
+    ${diaAtual.pergunta ? `<div class="cartao pergunta-cartao"><strong>💬 Pra compartilhar no grupo</strong><p style="margin:6px 0 0 0;">${esc(diaAtual.pergunta)}</p></div>` : ''}
+    ${diaAtual.oracao ? `<div class="cartao oracao-cartao"><strong>🙏 Oração</strong><p style="margin:6px 0 0 0; font-style:italic;">${esc(diaAtual.oracao)}</p></div>` : ''}
+    <div class="cartao">
+      <button type="button" class="btn ${jaFezHoje?'btn-secondary':'btn-primary'} btn-block" data-action="toggle-checkin">${jaFezHoje ? '✓ Você já fez check-in' : 'Marcar como concluído'}</button>
+      ${outros.length ? `<p class="hint" style="margin-top:10px;">Também já fizeram: ${outros.map(c=>esc(c.nome)).join(', ')}</p>` : ''}
+    </div>
+    <div class="cartao">
+      <div class="cartao-titulo">Comentários</div>
+      ${state.comentariosDoDia.length ? state.comentariosDoDia.map(c => `
+        <div class="lista-item" style="display:block;">
+          <strong>${esc(c.nome)}</strong>
+          <p style="margin:2px 0 0 0;">${esc(c.texto)}</p>
+        </div>`).join('') : '<p class="hint">Nenhum comentário ainda — seja a primeira pessoa a compartilhar!</p>'}
+      <form data-form="comentario" style="margin-top:10px;">
+        <textarea name="texto" rows="2" placeholder="Escreva o que esse devocional falou com você…" required></textarea>
+        <button type="submit" class="btn btn-secondary btn-small" style="margin-top:8px;">Comentar</button>
+      </form>
+    </div>`;
+}
+
+/* ---------- Tela: Grupo ---------- */
+function telaGrupo(){
+  const NOMES = ['S','T','Q','Q','S'];
+  const linhas = state.grupoProgresso.map(g => `
+    <div class="lista-item">
+      <div>
+        <strong>${esc(g.membro.nome)}</strong>
+        <span class="badge ${g.membro.role==='lider'?'badge-lider':'badge-membro'}" style="margin-left:6px;">${g.membro.role==='lider'?'líder':'membro'}</span>
+        <div class="grupo-dots">${g.checks.map((ok,i) => `<span class="dot ${ok?'ok':''}" title="${NOMES[i]}"></span>`).join('')}</div>
+      </div>
+      ${(state.usuario.role==='lider' && g.membro.id!==state.usuario.id) ? `
+        <select data-action="mudar-role-membro" data-uid="${g.membro.id}" style="width:auto; padding:6px 10px; font-size:12px;">
+          <option value="membro" ${g.membro.role==='membro'?'selected':''}>membro</option>
+          <option value="lider" ${g.membro.role==='lider'?'selected':''}>líder</option>
+        </select>` : ''}
+    </div>`).join('');
+  return `<div class="cartao">
+    <div class="cartao-titulo">Quem já fez o devocional essa semana</div>
+    ${linhas || '<p class="hint">Ninguém no grupo ainda.</p>'}
+  </div>`;
+}
+
+/* ---------- Tela: Mais ---------- */
+function telaMais(){
+  const u = state.usuario;
+  return `<div class="cartao">
+    <div class="cartao-titulo">Minha conta</div>
+    <p style="margin:0;"><strong>${esc(u.nome)}</strong><br><span class="hint">${esc(u.email)} · ${u.role==='lider'?'líder do grupo':'membro'}</span></p>
+  </div>
+  ${u.role==='lider' ? `
+  <div class="cartao">
+    <div class="cartao-titulo">Liderança</div>
+    <div class="col">
+      <button type="button" class="btn btn-ghost btn-block" data-action="ir-estudos">📖 Estudos da semana</button>
+      <button type="button" class="btn btn-ghost btn-block" data-action="ir-config-grupo">⚙️ Configurações do grupo</button>
+    </div>
+  </div>` : ''}
+  <button type="button" class="btn btn-danger btn-block" data-action="sair">Sair da minha conta</button>
+  ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:14px; background:var(--dourado-suave);"><p class="hint" style="margin:0;">🧪 Modo demonstração — os dados ficam salvos só neste navegador.</p></div>` : ''}`;
+}
+
+/* ---------- Tela: Estudos (líder) ---------- */
+function telaEstudos(){
+  const lista = state.estudosLista || [];
+  return `<button type="button" class="btn btn-primary btn-block" style="margin-bottom:14px;" data-action="novo-estudo">+ Nova semana</button>
+  ${lista.length ? lista.map(s => `
+    <div class="cartao">
+      <div class="linha">
+        <div>
+          <strong>${esc(s.titulo||'(sem título)')}</strong><br>
+          <span class="hint">${formatarDataCurta(s.id)} – ${formatarDataCurta(datasDaSemana(s.id)[4])}</span>
+        </div>
+        <button type="button" class="btn btn-secondary btn-small" data-action="editar-estudo" data-id="${esc(s.id)}">Editar</button>
+      </div>
+    </div>`).join('') : '<div class="vazio"><span class="vazio-emoji">📖</span>Nenhum estudo publicado ainda.</div>'}`;
+}
+
+/* ---------- Tela: Novo estudo / Editar estudo (líder) ---------- */
+function telaEstudoForm(){
+  const ef = state.estudoForm;
+  if (!ef) return '<div class="vazio">Nada por aqui.</div>';
+  const dias = ef.dias;
+  return `<form data-form="estudo" onsubmit="return false">
+    <div class="cartao">
+      <div class="campo"><label>Semana (segunda-feira)</label><input type="date" value="${ef.segunda}" data-action="mudar-segunda-estudo"></div>
+      <div class="campo"><label>Título do estudo</label><input type="text" name="titulo" value="${esc(ef.titulo)}" placeholder="Ex.: Confiança em tempos de espera"></div>
+      <div class="campo"><label>Do que você ensinou / anotações do estudo</label><textarea name="texto" rows="6" placeholder="Cole aqui os principais pontos do que você ensinou — o Despertas usa isso pra escrever os 5 devocionais da semana.">${esc(ef.texto)}</textarea></div>
+      ${!dias ? `<div class="row">
+        <button type="button" class="btn btn-primary" style="flex:1;" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Escrevendo…':'✨ Gerar com IA'}</button>
+        <button type="button" class="btn btn-ghost" style="flex:1;" data-action="escrever-manual">✍️ Escrever manualmente</button>
+      </div>` : `<button type="button" class="btn btn-ghost btn-small" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Gerando de novo…':'🔄 Gerar de novo com IA'}</button>`}
+    </div>
+    ${dias ? dias.map((dd,i) => diaFormCartao(dd,i)).join('') : ''}
+    ${dias ? `<button type="button" class="btn btn-primary btn-block" data-action="publicar-estudo">📅 Publicar semana</button>
+      <p class="hint" style="text-align:center; margin-top:8px;">Revise os versículos e o texto antes de publicar — a IA pode errar referências.</p>` : ''}
+  </form>`;
+}
+function diaFormCartao(dd, i){
+  const NOMES = ['Segunda','Terça','Quarta','Quinta','Sexta'];
+  return `<div class="cartao">
+    <div class="cartao-titulo">${NOMES[i]} · ${formatarDataCurta(dd.data)}</div>
+    <div class="campo"><label>Título do dia</label><input type="text" name="dia${i}_titulo" value="${esc(dd.titulo)}"></div>
+    <div class="campo"><label>Referência bíblica</label><input type="text" name="dia${i}_referencia" value="${esc(dd.referencia)}" placeholder="Ex.: Salmos 27:14"></div>
+    <div class="campo"><label>Versículo</label><textarea name="dia${i}_versiculo" rows="2">${esc(dd.versiculo)}</textarea></div>
+    <div class="campo"><label>Reflexão</label><textarea name="dia${i}_texto" rows="5">${esc(dd.texto)}</textarea></div>
+    <div class="campo"><label>Pergunta pra compartilhar</label><textarea name="dia${i}_pergunta" rows="2">${esc(dd.pergunta)}</textarea></div>
+    <div class="campo"><label>Oração</label><textarea name="dia${i}_oracao" rows="2">${esc(dd.oracao)}</textarea></div>
+  </div>`;
+}
+
+/* ---------- Tela: Configurações do grupo (líder) ---------- */
+function telaConfigGrupo(){
+  const c = state.config || {};
+  return `<form data-form="config-grupo">
+    <div class="cartao">
+      <div class="campo"><label>Nome do grupo</label><input type="text" name="nomeGrupo" value="${esc(c.nomeGrupo||'')}" required></div>
+      <div class="campo"><label>Lema (opcional)</label><input type="text" name="lema" value="${esc(c.lema||'')}"></div>
+      <button type="submit" class="btn btn-primary btn-block">Salvar</button>
+    </div>
+  </form>`;
+}
+
+/* ============ 11) EVENTOS (delegação num único listener por tipo) ============ */
+async function entrarComUid(uid){
+  try{
+    const perfil = await carregarPerfilMembro(uid);
+    if (!perfil){
+      state.carregando = false; state.usuario = null; render();
+      showToast('Não encontramos seu cadastro nesse grupo. Fale com a liderança.');
+      return;
+    }
+    state.usuario = perfil;
+    await garantirConfigInicial();
+    state.membros = await colLista('membros');
+    state.carregando = false;
+    await irParaHoje();
+  }catch(err){
+    console.error(err);
+    state.carregando = false;
+    state.usuario = null;
+    render();
+    showToast('Ops: ' + mensagemErro(err, 'não deu pra carregar seus dados — confira se o Firestore está criado e as regras liberam leitura/escrita.'));
+  }
+}
+
+async function handleClick(e){
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const a = el.dataset.action;
+  const d = el.dataset;
+  try{
+    if (a === 'ir-cadastro'){ e.preventDefault(); state.telaAuth='cadastro'; render(); }
+    else if (a === 'ir-login'){ e.preventDefault(); state.telaAuth='login'; render(); }
+    else if (a === 'sair'){ await fazerLogout(); }
+    else if (a === 'voltar'){ state.aba = d.destino || 'mais'; render(); }
+    else if (a === 'ir-aba'){
+      if (d.aba === 'hoje') await irParaHoje();
+      else if (d.aba === 'grupo') await abrirGrupo();
+      else { state.aba = d.aba; render(); }
+    }
+    else if (a === 'selecionar-dia'){ await selecionarDia(d.data); }
+    else if (a === 'toggle-checkin'){ await toggleCheckin(); }
+    else if (a === 'ir-estudos'){ await abrirEstudos(); }
+    else if (a === 'ir-config-grupo'){ state.aba = 'config-grupo'; state.subTelaVoltarPara = 'mais'; render(); }
+    else if (a === 'criar-estudo-semana'){
+      state.estudoForm = { segunda: d.segunda, titulo:'', texto:'', dias:null, gerando:false };
+      state.subTelaVoltarPara = 'hoje';
+      state.aba = 'estudo-form';
+      render();
+    }
+    else if (a === 'novo-estudo'){
+      const livre = proximaSegundaLivre(state.estudosLista||[]);
+      state.estudoForm = { segunda: livre, titulo:'', texto:'', dias:null, gerando:false };
+      state.subTelaVoltarPara = 'estudos';
+      state.aba = 'estudo-form';
+      render();
+    }
+    else if (a === 'editar-estudo'){
+      const s = (state.estudosLista||[]).find(x => x.id === d.id);
+      if (!s) return;
+      state.estudoForm = { segunda: s.id, titulo: s.titulo||'', texto: s.temaTexto||'', dias: (s.dias||[]).map(x => ({...x})), gerando:false };
+      state.subTelaVoltarPara = 'estudos';
+      state.aba = 'estudo-form';
+      render();
+    }
+    else if (a === 'gerar-devocional'){ await gerarDevocionalIA(); }
+    else if (a === 'escrever-manual'){
+      state.estudoForm.dias = datasDaSemana(state.estudoForm.segunda).map(novoDiaVazio);
+      render();
+    }
+    else if (a === 'publicar-estudo'){ await publicarEstudo(); }
+  }catch(err){
+    console.error(err);
+    showToast('Ops: ' + mensagemErro(err));
+    render();
+  }
+}
+
+function handleInput(e){
+  const el = e.target;
+  const form = el.closest('form');
+  if (!form || !el.name) return;
+  const tipo = form.dataset.form;
+  if (tipo === 'cadastro' && (el.name in state.cadastroForm)) state.cadastroForm[el.name] = el.value;
+  else if (tipo === 'login' && (el.name in state.loginForm)) state.loginForm[el.name] = el.value;
+  else if (tipo === 'estudo' && state.estudoForm){
+    const ef = state.estudoForm;
+    if (el.name === 'titulo' || el.name === 'texto') ef[el.name] = el.value;
+    else {
+      const m = el.name.match(/^dia(\d)_(\w+)$/);
+      if (m && ef.dias) ef.dias[Number(m[1])][m[2]] = el.value;
+    }
+  }
+}
+
+async function handleChange(e){
+  const el = e.target.closest('[data-action]');
+  if (!el) return;
+  const a = el.dataset.action;
+  if (a === 'mudar-segunda-estudo'){
+    const ef = state.estudoForm;
+    ef.segunda = segundaDaSemana(el.value);
+    if (ef.dias){
+      const novasDatas = datasDaSemana(ef.segunda);
+      ef.dias = ef.dias.map((dd,i) => ({ ...dd, data: novasDatas[i] }));
+    }
+    render();
+  }
+  else if (a === 'mudar-role-membro'){
+    const uid = el.dataset.uid;
+    const novoRole = el.value;
+    const m = state.membros.find(x => x.id === uid);
+    if (m){
+      m.role = novoRole;
+      await colAtualizar('membros', uid, { role: novoRole });
+      showToast(m.nome + ' agora é ' + (novoRole==='lider' ? 'líder' : 'membro') + '.');
+    }
+  }
+}
+
+async function handleSubmit(e){
+  e.preventDefault();
+  const form = e.target.closest('form');
+  if (!form) return;
+  const tipo = form.dataset.form;
+  const fd = new FormData(form);
+  try{
+    if (tipo === 'login'){
+      const email = (fd.get('email')||'').trim(), senha = fd.get('senha')||'';
+      state.carregando = true; render();
+      const uid = await fazerLogin(email, senha);
+      await entrarComUid(uid);
+    }
+    else if (tipo === 'cadastro'){
+      const dados = { nome: (fd.get('nome')||'').trim(), email: (fd.get('email')||'').trim(), senha: fd.get('senha')||'' };
+      if (!dados.nome || !dados.email || !dados.senha){ showToast('Preencha todos os campos.'); return; }
+      state.carregando = true; render();
+      const uid = await fazerCadastro(dados);
+      await entrarComUid(uid);
+    }
+    else if (tipo === 'comentario'){
+      const texto = (fd.get('texto')||'').trim();
+      if (!texto) return;
+      const obj = { data: state.diaSelecionado, uid: state.usuario.id, nome: state.usuario.nome, texto, criadoEm: new Date().toISOString() };
+      const id = await colAdicionar('comentarios', obj);
+      state.comentariosDoDia.push({ id, ...obj });
+      form.reset();
+      render();
+    }
+    else if (tipo === 'config-grupo'){
+      const nomeGrupo = (fd.get('nomeGrupo')||'').trim() || state.config.nomeGrupo;
+      const lema = (fd.get('lema')||'').trim();
+      state.config = { ...state.config, nomeGrupo, lema };
+      await salvarConfig(state.config);
+      showToast('Configurações salvas.');
+      state.aba = 'mais';
+      render();
+    }
+  }catch(err){
+    console.error(err);
+    state.carregando = false;
+    showToast('Ops: ' + mensagemErro(err));
+    render();
+  }
+}
+
+function iniciarApp(){
+  const app = document.getElementById('app');
+  app.addEventListener('click', handleClick);
+  app.addEventListener('submit', handleSubmit);
+  app.addEventListener('change', handleChange);
+  app.addEventListener('input', handleInput);
+
+  if (FIREBASE_CONFIGURADO && auth){
+    auth.onAuthStateChanged(async (user) => {
+      if (user){ await entrarComUid(user.uid); }
+      else { state.carregando = false; state.usuario = null; render(); }
+    });
+  } else {
+    const uidSalvo = demoSessaoLer();
+    if (uidSalvo){ entrarComUid(uidSalvo); }
+    else { state.carregando = false; render(); }
+  }
+}
+
+document.addEventListener('DOMContentLoaded', iniciarApp);
+</script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "Despertas · Devocional do Grupo de Crescimento",
+  "short_name": "Despertas",
+  "description": "Devocional semanal (segunda a sexta) pro seu grupo de crescimento, com check-in diário e comentários.",
+  "start_url": "/devocional/index.html",
+  "scope": "/devocional/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7F1",
+  "theme_color": "#5B3E96",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSI4NCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM0EyODYxIiBzdHJva2Utd2lkdGg9IjEwIi8+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTEyIiByPSIzNCIgZmlsbD0iI0Y0Qjc0MCIvPjxwYXRoIGQ9Ik0xMDAgNDB2MjBNMTAwIDE1MnYyME00MCAxMDBoMjBNMTQwIDEwMGgyME02MCA2MGwxNCAxNE0xMjYgMTI2bDE0IDE0TTE0MCA2MGwtMTQgMTRNNzQgMTI2bC0xNCAxNCIgc3Ryb2tlPSIjRTg2MThDIiBzdHJva2Utd2lkdGg9IjEwIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=",
+      "sizes": "200x200",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

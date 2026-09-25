@@ -137,6 +137,7 @@ netlify/functions/agradecimento-servico.mjs  → agradecimento pós-culto
 netlify/functions/status-lideres.mjs         → resumo pros líderes (ter/sáb)
 netlify/functions/vagas-abertas.mjs          → aviso automático de vaga aberta (qua)
 treino/                           → app pessoal "FORJA" (personal trainer), veja abaixo
+devocional/                       → app "Despertas" (devocional do grupo de crescimento), veja abaixo
 ```
 
 ## FORJA — personal trainer digital (`treino/`)
@@ -199,6 +200,55 @@ FORJA separado não mexe nele.
 
 Pra só testar rapidinho sem publicar nada: abra `treino/index.html` direto
 no navegador.
+
+## Despertas — devocional do grupo de crescimento (`devocional/`)
+
+Um terceiro app, independente do SERVE e do FORJA, guardado na pasta
+`devocional/`. Resolve um problema de quem lidera um grupo de crescimento:
+dar continuidade, de segunda a sexta, ao estudo que você ensinou no domingo
+— no estilo do plano de leitura do app Bíblia (YouVersion).
+
+- **Você adiciona o estudo, a IA escreve a semana**: em "Mais" → "Estudos da
+  semana" → "+ Nova semana", cole o título e as anotações do que você
+  ensinou. O botão "✨ Gerar com IA" chama uma função do Netlify que usa a
+  API da Anthropic (Claude) pra escrever 5 devocionais (segunda a sexta),
+  cada um com versículo, reflexão, pergunta pra compartilhar no grupo e uma
+  oração — sempre revisáveis (e editáveis campo a campo) antes de publicar.
+  Sem a IA configurada, ou se preferir escrever você mesmo, o botão
+  "✍️ Escrever manualmente" abre os 5 dias em branco pra preencher na mão.
+- **Check-in e comentário por dia**: cada pessoa do grupo marca "Concluído"
+  no dia que fez o devocional e pode comentar o que aquele dia falou com
+  ela — os comentários e o check-in são vistos por todo o grupo.
+- **Aba "Grupo"**: mostra, pra cada pessoa, quais dos 5 dias da semana ela já
+  concluiu — accountability leve, sem virar ranking nem gamificação.
+- **Liderança compartilhável**: a primeira pessoa que se cadastra vira
+  líder automaticamente (igual ao SERVE); qualquer líder pode promover
+  outra pessoa do grupo a líder também, na aba "Grupo".
+- **Modo demonstração**: sem configurar nada, o app já funciona salvando os
+  dados no navegador (`localStorage`) — inclusive a geração de devocional
+  cai pro preenchimento manual sem a função de IA configurada.
+
+### Publicar o Despertas de verdade
+
+1. **Firebase** (banco compartilhado do grupo): mesmo passo a passo do
+   SERVE — crie um projeto grátis em [firebase.google.com](https://firebase.google.com),
+   ative Firestore (produção) e Authentication → "E-mail/senha", e cole o
+   `firebaseConfig` no início do `devocional/index.html` (procure por
+   `COLE_AQUI`). Pode ser um projeto Firebase novo, só pro Despertas.
+2. **IA (opcional, mas é o que torna a geração automática)**: no painel do
+   Netlify do site do Despertas, em "Site settings" → "Environment
+   variables", adicione `ANTHROPIC_API_KEY` com uma chave da
+   [console.anthropic.com](https://console.anthropic.com). Sem essa
+   variável, o botão "Gerar com IA" mostra um aviso e o líder escreve os
+   dias manualmente — o resto do app funciona normalmente.
+3. **Netlify**: igual ao FORJA — dá pra importar o mesmo repositório
+   (`erickgenarthe/VK`) de novo em [app.netlify.com](https://app.netlify.com),
+   "Add new site" → "Import an existing project", e definir **Base
+   directory** como `devocional`. Esse site novo mostra o Despertas direto
+   na raiz (`/`), sem depender do SERVE nem do FORJA.
+
+Pra só testar rapidinho sem publicar nada: abra `devocional/index.html`
+direto no navegador (ou `python3 -m http.server` na pasta).
 
 ## Limitações conhecidas (é um MVP, não um produto de 5 anos de estrada)
 
