@@ -78,27 +78,39 @@
 
   /* ---------- Topbar ---------- */
   .topbar{
-    background: linear-gradient(135deg, var(--roxo-escuro) 0%, var(--roxo) 55%, var(--rosa) 130%);
-    padding:22px 20px 26px 20px;
+    background:
+      radial-gradient(140% 100% at 100% 0%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(135deg, var(--roxo-escuro) 0%, var(--roxo) 50%, var(--rosa) 140%);
+    padding:26px 22px 32px 22px;
     position:relative;
+    overflow:hidden;
     color:var(--branco);
+    box-shadow: 0 6px 20px rgba(110,50,69,0.28);
   }
-  .topbar-linha1{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .marca{ display:flex; align-items:center; gap:10px; }
+  .topbar-brilhos{ position:absolute; inset:0; pointer-events:none; opacity:0.55; }
+  .topbar-linha1{ display:flex; align-items:center; justify-content:space-between; gap:10px; position:relative; z-index:1; }
+  .marca{ display:flex; align-items:center; gap:12px; }
   .marca-selo{
-    width:38px; height:38px; border-radius:12px; background:var(--branco);
-    display:flex; align-items:center; justify-content:center; box-shadow:0 4px 10px rgba(0,0,0,0.18);
+    width:52px; height:52px; border-radius:16px; background:var(--branco);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.22), 0 0 0 3px rgba(255,255,255,0.25);
     flex-shrink:0;
   }
-  .marca-nome{ font-family:'Yellowtail', cursive; font-weight:400; font-size:24px; letter-spacing:0.2px; }
-  .marca-sub{ font-size:11px; opacity:0.85; margin-top:-2px; }
-  .topbar-acoes{ display:flex; gap:8px; align-items:center; }
+  .marca-nome{
+    font-family:'Yellowtail', cursive; font-weight:400; font-size:34px; line-height:1;
+    letter-spacing:0.3px; text-shadow: 0 2px 10px rgba(0,0,0,0.22);
+  }
+  .marca-sub{ font-size:12px; font-weight:700; letter-spacing:0.4px; opacity:0.92; margin-top:2px; }
+  .topbar-acoes{ display:flex; gap:8px; align-items:center; position:relative; z-index:1; }
   .icon-btn{
     width:36px; height:36px; border-radius:50%; border:none; background:rgba(255,255,255,0.18);
     color:var(--branco); font-size:16px; display:flex; align-items:center; justify-content:center; cursor:pointer;
   }
   .icon-btn:active{ background:rgba(255,255,255,0.32); }
-  .topbar-titulo{ margin-top:16px; font-size:22px; font-weight:800; }
+  .topbar-titulo{
+    margin-top:20px; font-size:29px; font-weight:800; position:relative; z-index:1;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
 
   /* ---------- Componentes básicos ---------- */
   .conteudo{ padding:18px 18px 8px 18px; }
@@ -404,55 +416,69 @@ async function garantirConfigInicial(){
 }
 
 /* ============ 5) AUTENTICAÇÃO ============
-   Sem senha, de propósito: cada pessoa só digita o nome. Com Firebase
-   configurado, isso usa login anônimo (firebase.auth().signInAnonymously)
-   pra ter um uid estável nesse navegador — dá pra saber "quem" fez check-in
-   e comentou sem exigir e-mail/senha de ninguém do grupo. Sem Firebase, o
-   "modo demonstração" guarda um uid direto no localStorage. Em ambos os
-   casos, a sessão fica só naquele navegador/aparelho — trocar de aparelho
-   sem querer cria uma pessoa "nova" no grupo. */
+   Cadastro simples com e-mail/senha (firebase.auth() de verdade, quando
+   configurado). Além da senha, toda conta nova precisa ser aprovada por um
+   líder antes de acessar o grupo — ver "status" no perfil. Sem Firebase, o
+   "modo demonstração" guarda as contas no localStorage. */
+function demoContas(){ return lsLista('contas'); }
+function demoCriarConta(email, senha){
+  const contas = demoContas();
+  if (contas.some(c => c.email.toLowerCase() === email.toLowerCase())) throw new Error('Já existe uma conta com esse e-mail.');
+  const uid = 'demo-' + genId();
+  contas.push({ id: uid, email, senha });
+  lsSalvarLista('contas', contas);
+  return uid;
+}
+function demoLogin(email, senha){
+  const conta = demoContas().find(c => c.email.toLowerCase() === email.toLowerCase());
+  if (!conta || conta.senha !== senha) throw new Error('E-mail ou senha incorretos.');
+  return conta.id;
+}
 function demoSessaoSalvar(uid){ localStorage.setItem(LS_PREFIX + 'sessao', uid); }
 function demoSessaoLer(){ return localStorage.getItem(LS_PREFIX + 'sessao'); }
+function demoSessaoLimpar(){ localStorage.removeItem(LS_PREFIX + 'sessao'); }
 
 async function carregarPerfilMembro(uid){ return colGetDoc('membros', uid); }
 
 async function criarPerfilMembro(uid, dados){
-  const { nome } = dados;
+  const { nome, email } = dados;
   const todos = await colLista('membros');
-  const ehPrimeiro = todos.length === 0; // primeira pessoa a entrar vira líder automaticamente, já aprovada
+  const ehPrimeiro = todos.length === 0; // primeira pessoa a se cadastrar vira líder automaticamente, já aprovada
   const perfil = {
-    nome,
+    nome, email,
     role: ehPrimeiro ? 'lider' : 'membro',
-    status: ehPrimeiro ? 'aprovado' : 'pendente', // toda entrada nova precisa de aprovação da liderança
+    status: ehPrimeiro ? 'aprovado' : 'pendente', // toda conta nova precisa de aprovação da liderança
     criadoEm: new Date().toISOString(),
   };
   await colDefinir('membros', uid, perfil);
   return { id: uid, ...perfil };
 }
-async function entrarComNome(nome){
-  state.carregando = true; render();
-  try{
-    let uid;
-    if (FIREBASE_CONFIGURADO && auth){
-      uid = auth.currentUser ? auth.currentUser.uid : (await auth.signInAnonymously()).user.uid;
-    } else {
-      uid = demoSessaoLer();
-      if (!uid){ uid = 'demo-' + genId(); demoSessaoSalvar(uid); }
-    }
-    let perfil = await carregarPerfilMembro(uid);
-    if (!perfil) perfil = await criarPerfilMembro(uid, { nome });
-    state.usuario = perfil;
-    await garantirConfigInicial();
-    state.membros = await colLista('membros');
-    state.carregando = false;
-    if (perfil.status === 'pendente'){ state.aba = 'pendente'; render(); }
-    else await irParaHoje();
-  }catch(err){
-    console.error(err);
-    state.carregando = false;
-    render();
-    showToast('Ops: ' + mensagemErro(err));
+async function fazerLogin(email, senha){
+  if (FIREBASE_CONFIGURADO && auth){
+    const cred = await auth.signInWithEmailAndPassword(email, senha);
+    return cred.user.uid;
   }
+  return demoLogin(email, senha);
+}
+async function fazerCadastro(dados){
+  const { email, senha } = dados;
+  let uid;
+  if (FIREBASE_CONFIGURADO && auth){
+    const cred = await auth.createUserWithEmailAndPassword(email, senha);
+    uid = cred.user.uid;
+  } else {
+    uid = demoCriarConta(email, senha);
+  }
+  await criarPerfilMembro(uid, dados);
+  if (!FIREBASE_CONFIGURADO) demoSessaoSalvar(uid);
+  return uid;
+}
+async function fazerLogout(){
+  if (FIREBASE_CONFIGURADO && auth){ await auth.signOut(); }
+  else { demoSessaoLimpar(); }
+  state.usuario = null;
+  state.aba = 'hoje';
+  render();
 }
 async function verificarAprovacao(){
   try{
@@ -489,7 +515,9 @@ const state = {
   grupoProgresso: [],
   pendentes: [],
   toast: null,
-  nomeForm: { nome:'' },
+  telaAuth: 'login', // 'login' | 'cadastro'
+  loginForm: { email:'', senha:'' },
+  cadastroForm: { nome:'', email:'', senha:'' },
 };
 
 function esc(s){
@@ -682,7 +710,7 @@ function render(){
     app.innerHTML = telaCarregando();
   } else if (!state.usuario){
     app.className = 'sem-nav';
-    app.innerHTML = telaNome();
+    app.innerHTML = state.telaAuth === 'cadastro' ? telaCadastro() : telaLogin();
   } else if (state.usuario.status === 'pendente'){
     app.className = 'sem-nav';
     app.innerHTML = telaPendente();
@@ -726,8 +754,8 @@ function telaCarregando(){
   </div>`;
 }
 
-function telaNome(){
-  const f = state.nomeForm;
+function telaLogin(){
+  const f = state.loginForm;
   return `<div class="tela-auth">
     <div class="marca-central">
       <div class="marca-selo-grande">${marcaFlor(72)}</div>
@@ -736,12 +764,32 @@ function telaNome(){
       <p class="gc-versiculo">1 Pedro 1:13-16</p>
       <p class="hint">Devocional semanal do seu grupo de crescimento.</p>
     </div>
-    <form data-form="nome">
-      <div class="campo"><label>Seu nome</label><input type="text" name="nome" required value="${esc(f.nome)}" placeholder="Como o grupo te conhece"></div>
+    <form data-form="login">
+      <div class="campo"><label>E-mail</label><input type="email" name="email" required value="${esc(f.email)}" placeholder="voce@email.com"></div>
+      <div class="campo"><label>Senha</label><input type="password" name="senha" required minlength="6" placeholder="••••••" value="${esc(f.senha)}"></div>
       <button type="submit" class="btn btn-primary btn-block">Entrar</button>
     </form>
-    <p class="hint" style="text-align:center; margin-top:16px;">Sem senha — é só digitar seu nome. A primeira pessoa a entrar vira líder do grupo automaticamente; depois disso, toda entrada nova precisa ser aprovada pela liderança.</p>
+    <p style="text-align:center; margin-top:16px; font-size:13.5px;">Ainda não tem conta? <a href="#" data-action="ir-cadastro">Cadastre-se</a></p>
     ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:18px; background:var(--dourado-suave);"><p class="hint" style="margin:0;">🧪 <strong>Modo demonstração</strong> — os dados ficam salvos só neste navegador (localStorage). Configure o Firebase no início do <code>index.html</code> pra publicar de verdade. Veja o README.</p></div>` : ''}
+  </div>`;
+}
+
+function telaCadastro(){
+  const f = state.cadastroForm;
+  return `<div class="tela-auth">
+    <div class="marca-central">
+      <div class="marca-selo-grande">${marcaFlor(72)}</div>
+      <p class="gc-pretitulo">GC das</p>
+      <h1 class="gc-titulo">Despertas</h1>
+    </div>
+    <form data-form="cadastro">
+      <div class="campo"><label>Nome</label><input type="text" name="nome" required value="${esc(f.nome)}"></div>
+      <div class="campo"><label>E-mail</label><input type="email" name="email" required value="${esc(f.email)}"></div>
+      <div class="campo"><label>Senha</label><input type="password" name="senha" required minlength="6" value="${esc(f.senha)}"></div>
+      <button type="submit" class="btn btn-primary btn-block">Criar conta</button>
+    </form>
+    <p class="hint" style="text-align:center; margin-top:16px;">A primeira pessoa a se cadastrar vira líder automaticamente; depois disso, toda conta nova precisa ser aprovada pela liderança antes de entrar.</p>
+    <p style="text-align:center; margin-top:10px; font-size:13.5px;">Já tem conta? <a href="#" data-action="ir-login">Entrar</a></p>
   </div>`;
 }
 
@@ -761,19 +809,38 @@ function telaPendente(){
   </div>`;
 }
 
+/* Brilhinhos espalhados no fundo do topbar — mesmo motivo da capa do
+   WhatsApp, só que posicionados em % pra funcionar em qualquer tamanho de
+   topbar (varia com o conteúdo da aba e com a tela desktop/mobile). */
+function brilhoSvg(tamanho){
+  return `<svg width="${tamanho}" height="${tamanho}" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 1 L11.6 8.4 19 10 11.6 11.6 10 19 8.4 11.6 1 10 8.4 8.4 Z" fill="#FBF7F1"/></svg>`;
+}
+function topbarBrilhos(){
+  const pontos = [
+    { pos:'top:10%; left:6%;', tam:15, op:0.55 },
+    { pos:'top:16%; right:9%;', tam:10, op:0.45 },
+    { pos:'bottom:16%; right:22%;', tam:17, op:0.4 },
+    { pos:'bottom:20%; left:16%;', tam:9, op:0.4 },
+    { pos:'top:52%; right:3%;', tam:12, op:0.35 },
+  ];
+  return `<div class="topbar-brilhos">${pontos.map(p => `<span style="position:absolute; ${p.pos} opacity:${p.op};">${brilhoSvg(p.tam)}</span>`).join('')}</div>`;
+}
+
 function telaShell(){
   const subTela = ehSubTela();
   return `<div class="topbar">
+      ${topbarBrilhos()}
       <div class="topbar-linha1">
         ${subTela ? `
           <button class="icon-btn" data-action="voltar" data-destino="${esc(state.subTelaVoltarPara||'mais')}" title="Voltar">←</button>
-          <div class="marca-nome" style="font-size:17px;">${esc(tituloDaAba())}</div>
-          <div class="topbar-acoes"></div>
+          <div class="marca-nome" style="font-size:20px;">${esc(tituloDaAba())}</div>
+          <div class="topbar-acoes"><button class="icon-btn" data-action="sair" title="Sair">⎋</button></div>
         ` : `
           <div class="marca">
-            <div class="marca-selo">${marcaFlor(22)}</div>
+            <div class="marca-selo">${marcaFlor(34)}</div>
             <div><div class="marca-nome">Despertas</div><div class="marca-sub">${esc((state.config&&state.config.nomeGrupo)||'')}</div></div>
           </div>
+          <div class="topbar-acoes"><button class="icon-btn" data-action="sair" title="Sair">⎋</button></div>
         `}
       </div>
       ${!subTela ? `<div class="topbar-titulo">${esc(tituloDaAba())}</div>` : ''}
@@ -899,8 +966,7 @@ function telaMais(){
   const u = state.usuario;
   return `<div class="cartao">
     <div class="cartao-titulo">Minha conta</div>
-    <p style="margin:0;"><strong>${esc(u.nome)}</strong><br><span class="hint">${u.role==='lider'?'líder do grupo':'membro do grupo'}</span></p>
-    <p class="hint" style="margin-top:8px;">Você continua entrando automaticamente neste aparelho — não tem senha nem conta pra sair.</p>
+    <p style="margin:0;"><strong>${esc(u.nome)}</strong><br><span class="hint">${esc(u.email||'')} · ${u.role==='lider'?'líder do grupo':'membro do grupo'}</span></p>
   </div>
   ${u.role==='lider' ? `
   <div class="cartao">
@@ -910,6 +976,7 @@ function telaMais(){
       <button type="button" class="btn btn-ghost btn-block" data-action="ir-config-grupo">⚙️ Configurações do grupo</button>
     </div>
   </div>` : ''}
+  <button type="button" class="btn btn-danger btn-block" data-action="sair">Sair da minha conta</button>
   ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:14px; background:var(--dourado-suave);"><p class="hint" style="margin:0;">🧪 Modo demonstração — os dados ficam salvos só neste navegador.</p></div>` : ''}`;
 }
 
@@ -991,8 +1058,8 @@ async function entrarComUid(uid){
   try{
     const perfil = await carregarPerfilMembro(uid);
     if (!perfil){
-      // sessão existe (anônima ou demo) mas ainda não tem nome — mostra a tela pra digitar
       state.carregando = false; state.usuario = null; render();
+      showToast('Não encontramos seu cadastro nesse grupo. Fale com a liderança.');
       return;
     }
     state.usuario = perfil;
@@ -1016,7 +1083,10 @@ async function handleClick(e){
   const a = el.dataset.action;
   const d = el.dataset;
   try{
-    if (a === 'voltar'){ state.aba = d.destino || 'mais'; render(); }
+    if (a === 'ir-cadastro'){ e.preventDefault(); state.telaAuth='cadastro'; render(); }
+    else if (a === 'ir-login'){ e.preventDefault(); state.telaAuth='login'; render(); }
+    else if (a === 'sair'){ await fazerLogout(); }
+    else if (a === 'voltar'){ state.aba = d.destino || 'mais'; render(); }
     else if (a === 'ir-aba'){
       if (d.aba === 'hoje') await irParaHoje();
       else if (d.aba === 'grupo') await abrirGrupo();
@@ -1112,7 +1182,8 @@ function handleInput(e){
   const form = el.closest('form');
   if (!form || !el.name) return;
   const tipo = form.dataset.form;
-  if (tipo === 'nome' && (el.name in state.nomeForm)) state.nomeForm[el.name] = el.value;
+  if (tipo === 'cadastro' && (el.name in state.cadastroForm)) state.cadastroForm[el.name] = el.value;
+  else if (tipo === 'login' && (el.name in state.loginForm)) state.loginForm[el.name] = el.value;
   else if (tipo === 'estudo' && state.estudoForm){
     const ef = state.estudoForm;
     if (el.name === 'titulo' || el.name === 'texto' || el.name === 'respostaIA') ef[el.name] = el.value;
@@ -1155,10 +1226,18 @@ async function handleSubmit(e){
   const tipo = form.dataset.form;
   const fd = new FormData(form);
   try{
-    if (tipo === 'nome'){
-      const nome = (fd.get('nome')||'').trim();
-      if (!nome){ showToast('Digite seu nome.'); return; }
-      await entrarComNome(nome);
+    if (tipo === 'login'){
+      const email = (fd.get('email')||'').trim(), senha = fd.get('senha')||'';
+      state.carregando = true; render();
+      const uid = await fazerLogin(email, senha);
+      await entrarComUid(uid);
+    }
+    else if (tipo === 'cadastro'){
+      const dados = { nome: (fd.get('nome')||'').trim(), email: (fd.get('email')||'').trim(), senha: fd.get('senha')||'' };
+      if (!dados.nome || !dados.email || !dados.senha){ showToast('Preencha todos os campos.'); return; }
+      state.carregando = true; render();
+      const uid = await fazerCadastro(dados);
+      await entrarComUid(uid);
     }
     else if (tipo === 'comentario'){
       const texto = (fd.get('texto')||'').trim();
