@@ -136,7 +136,49 @@ netlify/functions/lembrete-escala.mjs        → lembrete de compromisso (seg/qu
 netlify/functions/agradecimento-servico.mjs  → agradecimento pós-culto
 netlify/functions/status-lideres.mjs         → resumo pros líderes (ter/sáb)
 netlify/functions/vagas-abertas.mjs          → aviso automático de vaga aberta (qua)
+treino/                           → app pessoal "FORJA" (personal trainer), veja abaixo
 ```
+
+## FORJA — personal trainer digital (`treino/`)
+
+Um segundo app, independente do SERVE, guardado na pasta `treino/`. Não tem
+nada a ver com escala de voluntários — é um app pessoal de treino, dieta e
+evolução física, pensado pra rotina corrida (trabalho de manhã, filho à
+tarde, pouco tempo pra treinar).
+
+- **100% local**: sem Firebase, sem login — todos os dados (medidas, treinos,
+  dieta) ficam salvos só no `localStorage` do navegador. "Mais" → "Backup"
+  exporta/importa tudo em um `.json`.
+- **Dois perfis independentes**: botões "Erick" / "Nayara" no topo do app.
+  Cada perfil tem seus próprios dados (medidas, treino, dieta, programa) —
+  trocar de perfil não mexe nos dados do outro. Erick usa a trilha padrão
+  (já treina); Nayara usa a trilha **iniciante**, com menos exercícios por
+  treino e uma dica de execução em cada um (como fazer, erros comuns),
+  pensada pra quem nunca treinou.
+- **Hoje**: painel diário com o treino do dia, refeições, água, suplementos,
+  progresso até a meta de peso e uma dica que muda todo dia.
+- **Treino**: split adaptável (3x a 6x por semana, ou 3x/4x na trilha
+  iniciante) que se ajusta sozinho — se um dia é pulado, o próximo treino
+  continua de onde parou, sem perder o ciclo. Inclui modo "expresso" (só os
+  exercícios essenciais) pra quando o tempo aperta, finisher de cardio
+  embutido no treino da semana (já que cardio separado é difícil de
+  encaixar), e sugestão de carga por progressão a partir do histórico de
+  cada exercício.
+- **Programa até fevereiro**: macrociclo de ~22 semanas dividido em blocos
+  (hipertrofia, força/definição, definição metabólica, deload) com datas
+  calculadas a partir de hoje. Cada bloco diz a faixa de reps, o descanso e
+  a regra de progressão de carga daquela fase, e avisa quantos dias faltam
+  pra trocar de bloco — sem precisar reconfigurar nada manualmente.
+- **Dieta**: Erick vem com o plano de 1.900 kcal combinado pré-carregado;
+  Nayara começa com um modelo em branco. Os dois editáveis refeição por
+  refeição direto no app.
+- **Medidas**: histórico de peso e medidas corporais com gráfico de evolução.
+- **PWA**: `treino/manifest.json` e `treino/sw.js` deixam instalável no
+  celular, com scope próprio (`/treino/`), sem interferir no SERVE.
+
+Pra testar: abra `treino/index.html` direto no navegador, ou publique junto
+com o resto do repositório (o `netlify.toml` já publica a raiz inteira, então
+fica disponível em `/treino/`).
 
 ## Limitações conhecidas (é um MVP, não um produto de 5 anos de estrada)
 

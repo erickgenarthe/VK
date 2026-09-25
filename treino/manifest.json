@@ -1,0 +1,20 @@
+{
+  "name": "FORJA · Personal Trainer Digital",
+  "short_name": "FORJA",
+  "description": "Treino, dieta, medidas e evolução — seu personal trainer digital no seu ritmo.",
+  "start_url": "/treino/index.html",
+  "scope": "/treino/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FAF7F2",
+  "theme_color": "#E8501F",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjMjIyNjJCIi8+PHBhdGggZD0iTTQwIDEwMGgxMjBNNTYgNzZ2NDhNMTQ0IDc2djQ4TTM2IDg0djMyTTE2NCA4NHYzMiIgc3Ryb2tlPSIjRTg1MDFGIiBzdHJva2Utd2lkdGg9IjE2IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=",
+      "sizes": "200x200",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
