@@ -136,7 +136,36 @@ netlify/functions/lembrete-escala.mjs        → lembrete de compromisso (seg/qu
 netlify/functions/agradecimento-servico.mjs  → agradecimento pós-culto
 netlify/functions/status-lideres.mjs         → resumo pros líderes (ter/sáb)
 netlify/functions/vagas-abertas.mjs          → aviso automático de vaga aberta (qua)
+treino/                           → app pessoal "FORJA" (personal trainer), veja abaixo
 ```
+
+## FORJA — personal trainer digital (`treino/`)
+
+Um segundo app, independente do SERVE, guardado na pasta `treino/`. Não tem
+nada a ver com escala de voluntários — é um app pessoal de treino, dieta e
+evolução física, pensado pra rotina corrida (trabalho de manhã, filho à
+tarde, pouco tempo pra treinar).
+
+- **100% local**: sem Firebase, sem login — todos os dados (medidas, treinos,
+  dieta) ficam salvos só no `localStorage` do navegador. "Mais" → "Backup"
+  exporta/importa tudo em um `.json`.
+- **Hoje**: painel diário com o treino do dia, refeições, água, suplementos,
+  progresso até a meta de peso e uma dica que muda todo dia.
+- **Treino**: split adaptável (3x a 6x por semana) que se ajusta sozinho —
+  se um dia é pulado, o próximo treino continua de onde parou, sem perder o
+  ciclo. Inclui modo "expresso" (só os exercícios essenciais) pra quando o
+  tempo aperta, finisher de cardio de 5-8 min embutido no treino da semana
+  (já que cardio separado é difícil de encaixar), e sugestão de carga por
+  progressão a partir do histórico de cada exercício.
+- **Dieta**: vem pré-carregada com o plano de 1.900 kcal combinado, editável
+  refeição por refeição direto no app.
+- **Medidas**: histórico de peso e medidas corporais com gráfico de evolução.
+- **PWA**: `treino/manifest.json` e `treino/sw.js` deixam instalável no
+  celular, com scope próprio (`/treino/`), sem interferir no SERVE.
+
+Pra testar: abra `treino/index.html` direto no navegador, ou publique junto
+com o resto do repositório (o `netlify.toml` já publica a raiz inteira, então
+fica disponível em `/treino/`).
 
 ## Limitações conhecidas (é um MVP, não um produto de 5 anos de estrada)
 
