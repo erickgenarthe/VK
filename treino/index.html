@@ -33,6 +33,12 @@ header.topbar{
 .topbar h1{font-size:20px;margin:0;font-weight:800;letter-spacing:.3px}
 .topbar .tag{font-size:12px;color:#C7CCD3;margin:2px 0 0}
 .topbar .date{font-size:13px;color:#E8DED5;margin-top:10px;text-transform:capitalize}
+.profswitch{display:flex;gap:6px;margin-top:12px}
+.profswitch button{
+  flex:1;background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.16);color:#D9DEE3;
+  padding:8px 10px;border-radius:10px;font-size:12.5px;font-weight:700;cursor:pointer;
+}
+.profswitch button.active{background:var(--ember);border-color:var(--ember);color:#fff}
 main{padding:16px 14px 24px}
 .card{
   background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:14px;
@@ -158,6 +164,7 @@ a{color:var(--ember-dark)}
       </div>
     </div>
     <div class="date" id="topDate"></div>
+    <div class="profswitch" id="profSwitch"></div>
   </header>
 
   <main>
@@ -197,10 +204,20 @@ a{color:var(--ember-dark)}
 
 <script>
 /* ============================= DADOS & ESTADO ============================= */
+// Dois perfis independentes no mesmo app: p1 = Erick, p2 = Nayara. Cada um com
+// seus próprios dados (medidas, treino, dieta) namespaced por perfil — trocar
+// de perfil só troca o sufixo das chaves e recarrega tudo.
+let perfilAtivo = localStorage.getItem('forja_perfil_ativo') || 'p1';
+const PERFIS = { p1:{ nomePadrao:'Erick' }, p2:{ nomePadrao:'Nayara' } };
 const KEY = {
-  perfil:'forja_perfil', medidas:'forja_medidas', treinoEstado:'forja_treino_estado',
-  logTreino:'forja_log_treino', dietaPlano:'forja_dieta_plano', dietaLog:'forja_dieta_log',
-  config:'forja_config'
+  get perfil(){ return 'forja_perfil__'+perfilAtivo; },
+  get medidas(){ return 'forja_medidas__'+perfilAtivo; },
+  get treinoEstado(){ return 'forja_treino_estado__'+perfilAtivo; },
+  get logTreino(){ return 'forja_log_treino__'+perfilAtivo; },
+  get dietaPlano(){ return 'forja_dieta_plano__'+perfilAtivo; },
+  get dietaLog(){ return 'forja_dieta_log__'+perfilAtivo; },
+  get config(){ return 'forja_config__'+perfilAtivo; },
+  get programaInicio(){ return 'forja_programa_inicio__'+perfilAtivo; }
 };
 function load(k, fallback){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
 function save(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
@@ -209,20 +226,54 @@ function fmtDate(iso){ const [y,m,d]=iso.split('-'); return d+'/'+m+'/'+y; }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
 function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window.__toastT); window.__toastT=setTimeout(()=>t.classList.remove('show'), 2200); }
 
-const DEFAULT_PERFIL = { nome:'', altura:0, pesoMeta:97 };
+function nomeDoPerfil(pid){
+  const p = load('forja_perfil__'+pid, null);
+  return (p && p.nome) ? p.nome : PERFIS[pid].nomePadrao;
+}
 const DEFAULT_CONFIG = { horarioSemana:'11:00', horarioSabado:'12:00', duracaoMin:40, metaAguaMl:3800 };
+function defaultPerfil(pid){
+  return pid==='p2'
+    ? { nome:'Nayara', altura:0, pesoMeta:0, trilha:'iniciante' }
+    : { nome:'Erick', altura:0, pesoMeta:97, trilha:'classica' };
+}
+function defaultTreinoEstado(pid){
+  return { splitSize: pid==='p2' ? 3 : 4, cursorDia:0 };
+}
 
-let perfil = load(KEY.perfil, DEFAULT_PERFIL);
-let medidas = load(KEY.medidas, []); // {id, data, peso, cintura, quadril, peito, bracoD, bracoE, coxaD, coxaE, gordura}
-let treinoEstado = load(KEY.treinoEstado, { splitSize:4, cursorDia:0 });
-let logTreino = load(KEY.logTreino, []); // {id, data, diaNome, exercicios:[{nome,sets:[{peso,reps}],rpe}], finisher:bool, cardioExtraMin:0, expresso:bool}
-let dietaLog = load(KEY.dietaLog, {}); // { '2026-09-25': { feitas:[mealId,...], aguaMl:0, creatina:false } }
-let config = load(KEY.config, DEFAULT_CONFIG);
+let perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, programaInicio;
 
-// seed medida inicial se não houver nenhuma (101kg conforme plano combinado)
-if(medidas.length===0){
-  medidas.push({ id:uid(), data:todayISO(), criadoEm:Date.now(), peso:101, cintura:null, quadril:null, peito:null, bracoD:null, bracoE:null, coxaD:null, coxaE:null, gordura:null });
-  save(KEY.medidas, medidas);
+function carregarEstadoDoStorage(){
+  perfil = load(KEY.perfil, defaultPerfil(perfilAtivo));
+  if(!perfil.trilha) perfil.trilha = defaultPerfil(perfilAtivo).trilha; // migração de dados antigos
+  medidas = load(KEY.medidas, []);
+  treinoEstado = load(KEY.treinoEstado, defaultTreinoEstado(perfilAtivo));
+  logTreino = load(KEY.logTreino, []);
+  dietaLog = load(KEY.dietaLog, {});
+  config = load(KEY.config, DEFAULT_CONFIG);
+  dietaPlano = load(KEY.dietaPlano, perfilAtivo==='p2' ? DEFAULT_DIETA_ELA : DEFAULT_DIETA);
+  programaInicio = load(KEY.programaInicio, null);
+  if(!programaInicio){ programaInicio = todayISO(); save(KEY.programaInicio, programaInicio); }
+  // seed de medida inicial só pro Erick (peso combinado de 101kg) — a Nayara
+  // registra a dela do zero em "Medidas".
+  if(perfilAtivo==='p1' && medidas.length===0){
+    medidas.push({ id:uid(), data:todayISO(), criadoEm:Date.now(), peso:101, cintura:null, quadril:null, peito:null, bracoD:null, bracoE:null, coxaD:null, coxaE:null, gordura:null });
+    save(KEY.medidas, medidas);
+  }
+}
+function trocarPerfil(pid){
+  if(pid===perfilAtivo) return;
+  perfilAtivo = pid;
+  localStorage.setItem('forja_perfil_ativo', pid);
+  carregarEstadoDoStorage();
+  renderAll();
+  renderProfSwitch();
+  toast('Agora vendo: '+nomeDoPerfil(pid));
+}
+function renderProfSwitch(){
+  document.getElementById('profSwitch').innerHTML = `
+    <button class="${perfilAtivo==='p1'?'active':''}" onclick="trocarPerfil('p1')">${nomeDoPerfil('p1')}</button>
+    <button class="${perfilAtivo==='p2'?'active':''}" onclick="trocarPerfil('p2')">${nomeDoPerfil('p2')}</button>
+  `;
 }
 
 /* ============================= PLANO ALIMENTAR (seed) ============================= */
@@ -275,10 +326,26 @@ const DEFAULT_DIETA = {
     'Beba água com gás e limão nos momentos de ansiedade fora das refeições.'
   ]
 };
-let dietaPlano = load(KEY.dietaPlano, DEFAULT_DIETA);
+// Plano da Nayara ainda não foi definido — fica como modelo em branco,
+// editável refeição por refeição em "Dieta" (mesma tela, botão "Editar itens").
+const DEFAULT_DIETA_ELA = {
+  kcalAlvo: 0,
+  refeicoes: [
+    { id:'cafe', nome:'Café da Manhã', horario:'07:00', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
+    { id:'colacao', nome:'Colação (Pré-Treino)', horario:'10:15', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
+    { id:'almoco', nome:'Almoço', horario:'13:00', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
+    { id:'lanche', nome:'Lanche da Tarde', horario:'16:00', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
+    { id:'jantar', nome:'Jantar', horario:'19:30', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] }
+  ],
+  regrasOuro: [
+    'Monte pratos coloridos e volumosos com os legumes liberados no seu plano.',
+    'Mastigue devagar para dar tempo de o cérebro registrar a saciedade.',
+    'Beba água ao longo do dia, não só nas refeições.'
+  ]
+};
 
 /* ============================= SPLITS DE TREINO ============================= */
-function ex(nome, series, reps, essencial){ return { nome, series, reps, essencial: essencial!==false }; }
+function ex(nome, series, reps, essencial, dica){ return { nome, series, reps, essencial: essencial!==false, dica: dica||'' }; }
 const FINISHERS = [
   { nome:'Pular corda', duracao:'5 min', formato:'30s forte / 30s leve, repetir' },
   { nome:'Burpees + Mountain climbers', duracao:'6 min', formato:'40s trabalho / 20s descanso · 6 rounds' },
@@ -286,7 +353,13 @@ const FINISHERS = [
   { nome:'Polichinelo + Agachamento com salto', duracao:'5 min', formato:'circuito · 4 rounds' },
   { nome:'Corda naval / Kettlebell swing', duracao:'6 min', formato:'30s forte / 30s leve · 6 rounds' }
 ];
+const FINISHERS_INICIANTE = [
+  { nome:'Caminhada rápida (esteira ou local)', duracao:'8 min', formato:'ritmo confortável, dá pra puxar assunto sem ficar ofegante' },
+  { nome:'Polichinelo em ritmo leve', duracao:'5 min', formato:'30s de polichinelo / 30s parada, repetir' },
+  { nome:'Subir e descer degrau', duracao:'6 min', formato:'ritmo tranquilo, troque a perna que sobe primeiro na metade' }
+];
 const CARDIO_SABADO = { nome:'Cardio livre (esteira, bike ou caminhada inclinada)', duracao:'20–30 min', formato:'ritmo moderado e constante — aproveite o tempo livre do sábado' };
+const CARDIO_SABADO_INICIANTE = { nome:'Caminhada livre (esteira, bike leve ou ao ar livre)', duracao:'20–30 min', formato:'ritmo confortável — sem pressa, é só pra somar' };
 
 const SPLITS = {
   3: { nome:'Full Body · 3x/semana', dias:[
@@ -317,6 +390,61 @@ const SPLITS = {
   ]}
 };
 
+// Trilha "iniciante": pensada pra quem nunca treinou. Menos exercícios por
+// dia, mais explicação de como fazer (campo "dica"), cardio mais suave e
+// nada de tabela de 5-6 dias — começa com o básico bem feito.
+const SPLITS_INICIANTE = {
+  3: { nome:'Iniciante · 3x/semana', dias:[
+    { nome:'Treino A · Perna e Glúteo', foco:'Perna e glúteo', exercicios:[
+      ex('Agachamento no banco (sentar e levantar)',3,'10-12',true,'Fique de costas pra um banco, desça até encostar de leve e levante sem "cair" sentada. Joelho sempre apontando pra mesma direção do pé.'),
+      ex('Elevação de quadril no chão (hip thrust)',3,'12-15',true,'Deitada, pés apoiados perto do quadril, suba o quadril apertando o glúteo no topo e desça devagar.'),
+      ex('Cadeira extensora',3,'12-15',true,'Comece com carga leve — o importante é sentir a coxa trabalhando, não o peso.'),
+      ex('Panturrilha em pé',2,'15-20',false,'Suba na ponta dos pés bem devagar, segure 1 segundo em cima.'),
+      ex('Prancha apoiada no joelho',3,'20-30s',false,'Mantenha a barriga contraída e a coluna reta, sem deixar o quadril cair.')
+    ]},
+    { nome:'Treino B · Superiores leve + Core', foco:'Costas, ombro e abdômen', exercicios:[
+      ex('Remada sentada (máquina)',3,'12',true,'Puxe o cabo até perto da barriga, aperte as costas no final do movimento e volte devagar.'),
+      ex('Puxada frente (pegada aberta, carga leve)',3,'12',true,'Puxe a barra até a altura do queixo, sem balançar o corpo.'),
+      ex('Elevação lateral com halteres leves',2,'15',false,'Suba os braços até a altura do ombro, cotovelo levemente flexionado, sem usar impulso.'),
+      ex('Abdominal bicicleta',3,'15',false,'Movimento controlado, sem puxar o pescoço com a mão.'),
+      ex('Prancha apoiada no joelho',3,'20-30s',false,'Mantenha a barriga contraída e a coluna reta.')
+    ]},
+    { nome:'Treino C · Corpo inteiro leve', foco:'Corpo inteiro', exercicios:[
+      ex('Leg press (carga leve/moderada)',3,'12-15',true,'Empurre com o pé todo apoiado na plataforma, sem travar o joelho no final.'),
+      ex('Cadeira abdutora',3,'15',true,'Abra as pernas contra a resistência devagar, sinta o lado do quadril trabalhando.'),
+      ex('Remada baixa',3,'12',true,'Puxe o cabo até a barriga, mantendo as costas retas, sem balançar pra trás.'),
+      ex('Rosca direta com halteres leves',2,'12',false,'Cotovelo parado ao lado do corpo, sobe e desce controlado.'),
+      ex('Panturrilha sentado',2,'15-20',false,'Movimento curto e controlado, sem pressa.')
+    ]}
+  ]},
+  4: { nome:'Iniciante · 4x/semana', dias:[
+    { nome:'Treino A · Perna e Glúteo', foco:'Perna e glúteo', exercicios:[
+      ex('Agachamento no banco (sentar e levantar)',3,'10-12',true,'Desça até encostar de leve no banco, joelho alinhado com o pé.'),
+      ex('Elevação de quadril no chão (hip thrust)',3,'12-15',true,'Aperte o glúteo no topo do movimento e desça devagar.'),
+      ex('Cadeira extensora',3,'12-15',true,'Carga leve pra começar, foco em sentir a coxa.'),
+      ex('Panturrilha em pé',2,'15-20',false,'Suba na ponta dos pés devagar.')
+    ]},
+    { nome:'Treino B · Superiores leve', foco:'Costas e ombro', exercicios:[
+      ex('Remada sentada (máquina)',3,'12',true,'Aperte as costas no final do movimento, volte devagar.'),
+      ex('Puxada frente (pegada aberta, carga leve)',3,'12',true,'Puxe até a altura do queixo sem balançar o corpo.'),
+      ex('Elevação lateral com halteres leves',2,'15',false,'Suba até a altura do ombro, sem impulso.'),
+      ex('Rosca direta com halteres leves',2,'12',false,'Cotovelo parado, movimento controlado.')
+    ]},
+    { nome:'Treino C · Glúteo e Posterior', foco:'Glúteo e posterior de coxa', exercicios:[
+      ex('Cadeira abdutora',3,'15',true,'Abra as pernas contra a resistência devagar.'),
+      ex('Mesa flexora',3,'12',true,'Dobre o joelho trazendo o calcanhar em direção ao glúteo, controlado.'),
+      ex('Leg press (carga leve/moderada)',3,'12-15',true,'Pé todo apoiado na plataforma, sem travar o joelho.'),
+      ex('Panturrilha sentado',2,'15-20',false,'Movimento curto, sem pressa.')
+    ]},
+    { nome:'Treino D · Core e Corpo inteiro', foco:'Abdômen e corpo inteiro leve', exercicios:[
+      ex('Remada baixa',3,'12',true,'Costas retas, puxe até a barriga.'),
+      ex('Agachamento no banco (sentar e levantar)',2,'12',true,'Mesma técnica do treino A, carga leve.'),
+      ex('Abdominal bicicleta',3,'15',false,'Movimento controlado, sem puxar o pescoço.'),
+      ex('Prancha apoiada no joelho',3,'20-30s',false,'Barriga contraída, coluna reta.')
+    ]}
+  ]}
+};
+
 const DICAS = [
   'Definição vem da soma de pequenas decisões — treino de hoje + refeição de hoje. Um dia de cada vez.',
   'Se hoje o tempo apertar, prefira fazer um treino de 25 minutos bem feito a pular o treino inteiro.',
@@ -336,11 +464,111 @@ const DICAS = [
 ];
 function dicaDoDia(){ const d=new Date(); const n=Math.floor(d.getTime()/86400000); return DICAS[n % DICAS.length]; }
 
+/* ============================= PROGRAMA ATÉ FEVEREIRO (macrociclo) ============================= */
+// Periodização em blocos (mesociclos) sobre o mesmo split já escolhido em "Treino".
+// Cada bloco só muda a REGRA de progressão de carga/reps/descanso — os exercícios
+// continuam vindo do split ativo (SPLITS[treinoEstado.splitSize]).
+const MESOCICLOS_DEF = [
+  { nome:'Bloco 1 · Adaptação e Hipertrofia', semanas:4, tipo:'hipertrofia',
+    foco:'Base de volume, aprender a técnica de cada exercício com folga.',
+    reps:'Fique na faixa alta da tabela (ex: 10-12 em vez de 8-12).', descanso:'60-90s entre séries.',
+    progressao:'Se completar todas as séries no topo da faixa por 2 treinos seguidos, suba 2,5kg nos compostos (agachamento, supino, remada, terra) ou 1,25kg nos isolados (rosca, elevação, tríceps).' },
+  { nome:'Bloco 2 · Hipertrofia intensificada', semanas:4, tipo:'hipertrofia',
+    foco:'Mais estímulo de volume, ainda sem forçar carga máxima.',
+    reps:'Meio da faixa (ex: 8-10 em vez de 8-12).', descanso:'60-75s entre séries.',
+    progressao:'Mesma regra do Bloco 1, e a cada 2 semanas acrescente 1 série extra (bis/dropset leve) só no último exercício do treino.' },
+  { nome:'Deload · Recuperação', semanas:1, tipo:'deload',
+    foco:'Semana de folga ativa pro corpo absorver o volume acumulado.',
+    reps:'Mesmos exercícios, mas RPE sempre "Fácil".', descanso:'Sem pressa, descanse o quanto precisar.',
+    progressao:'Reduza a carga usada em 30-40% em todos os exercícios. Não busque progressão essa semana — é recuperação, não retrocesso.' },
+  { nome:'Bloco 3 · Força e Definição', semanas:4, tipo:'forca',
+    foco:'Carga mais pesada nos compostos, isolados seguem pra definição.',
+    reps:'Compostos: 6-8 reps. Isolados: mantenha 10-15 reps.', descanso:'90-120s nos compostos, 45-60s nos isolados.',
+    progressao:'Suba a carga do exercício composto em ~5% assim que completar 6 reps limpas em todas as séries (RPE moderado ou menor).' },
+  { nome:'Bloco 4 · Definição metabólica', semanas:4, tipo:'definicao',
+    foco:'Descanso curto, mais reps, foco em queima calórica dentro do treino.',
+    reps:'12-15 reps em tudo, inclusive nos compostos.', descanso:'45s entre séries — cronometre.',
+    progressao:'Mantenha a carga do Bloco 3. Só suba o peso quando conseguir 15 reps limpas em todas as séries de um exercício.' },
+  { nome:'Deload · Recuperação', semanas:1, tipo:'deload',
+    foco:'Segunda folga ativa antes do bloco final do ciclo.',
+    reps:'Mesmos exercícios, RPE sempre "Fácil".', descanso:'Sem pressa.',
+    progressao:'Reduza a carga em 30-40%. Aproveite pra registrar medidas e comparar com o início do ciclo.' },
+  { nome:'Bloco 5 · Hipertrofia final e reavaliação', semanas:4, tipo:'hipertrofia',
+    foco:'Fechar o ciclo, comparar evolução e preparar o próximo programa.',
+    reps:'Volta à faixa padrão (8-12 reps).', descanso:'60-90s entre séries.',
+    progressao:'Regra padrão: +2,5kg (compostos) ou +1,25kg (isolados) quando bater o topo da faixa por 2 treinos seguidos. No fim do bloco, registre medidas e monte o próximo ciclo.' }
+];
+// Versão do programa pra quem está começando agora (trilha iniciante) — mesma
+// duração total, progressão bem mais cautelosa e sem fase de carga pesada.
+const MESOCICLOS_DEF_ELA = [
+  { nome:'Bloco 1 · Aprendendo os movimentos', semanas:4, tipo:'hipertrofia',
+    foco:'O objetivo aqui não é carga, é aprender a fazer cada exercício com segurança.',
+    reps:'Siga a faixa de cada exercício com carga bem leve — o que importa é a postura.', descanso:'60-90s, sem pressa nenhuma.',
+    progressao:'Só pense em aumentar o peso quando conseguir fazer todas as repetições com folga (bem fácil) por 2 treinos seguidos. Aumente pouco: 1-2kg em halteres, 2-5kg em máquina.' },
+  { nome:'Bloco 2 · Ganhando consistência', semanas:4, tipo:'hipertrofia',
+    foco:'Com a técnica mais confiante, o corpo já aguenta um pouco mais.',
+    reps:'Mesma faixa de reps do Bloco 1.', descanso:'60-75s entre séries.',
+    progressao:'Mesma regra do Bloco 1: só sobe carga quando as reps ficarem fáceis por 2 treinos seguidos, sempre em passos pequenos.' },
+  { nome:'Deload · Semana mais leve', semanas:1, tipo:'deload',
+    foco:'Semana de folga ativa — o corpo absorve o que treinou até aqui.',
+    reps:'Mesmos exercícios, bem tranquilo.', descanso:'Sem pressa.',
+    progressao:'Reduza a carga em 30-40% em tudo. Essa semana é descanso, não retrocesso.' },
+  { nome:'Bloco 3 · Evoluindo a carga', semanas:4, tipo:'hipertrofia',
+    foco:'Agora dá pra ser um pouco mais consistente com o aumento de peso.',
+    reps:'Continue na faixa de 10-15 reps — nunca precisa descer disso.', descanso:'60-90s entre séries.',
+    progressao:'Continue subindo aos poucos sempre que as reps ficarem fáceis por 2 treinos seguidos. A prioridade sempre é a postura correta, nunca o peso.' },
+  { nome:'Bloco 4 · Resistência e tônus', semanas:4, tipo:'definicao',
+    foco:'Descanso mais curto, foco em sentir o músculo trabalhando.',
+    reps:'Suba pra 15 reps nos exercícios, mesma carga do Bloco 3.', descanso:'45-60s entre séries.',
+    progressao:'Não precisa aumentar carga nesse bloco — só quando 15 reps ficarem fáceis em todas as séries de um exercício.' },
+  { nome:'Deload · Semana mais leve', semanas:1, tipo:'deload',
+    foco:'Segunda folga ativa antes de fechar o ciclo.',
+    reps:'Mesmos exercícios, bem tranquilo.', descanso:'Sem pressa.',
+    progressao:'Reduza a carga em 30-40%. Aproveite pra registrar as medidas e comparar com o início.' },
+  { nome:'Bloco 5 · Consolidação e reavaliação', semanas:4, tipo:'hipertrofia',
+    foco:'Fechar o ciclo com confiança nos movimentos e comparar a evolução.',
+    reps:'Volta à faixa padrão de cada exercício.', descanso:'60-90s entre séries.',
+    progressao:'Regra padrão: sobe um pouco de carga quando as reps ficarem fáceis por 2 treinos seguidos. No fim, registre as medidas — daí montamos o próximo ciclo já mais avançado.' }
+];
+function getMesociclosDef(){ return (perfil && perfil.trilha==='iniciante') ? MESOCICLOS_DEF_ELA : MESOCICLOS_DEF; }
+function addDias(iso, n){ const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function diffDias(isoA, isoB){ return Math.round((new Date(isoA+'T00:00:00')-new Date(isoB+'T00:00:00'))/86400000); }
+function mesociclosComDatas(){
+  let cursor = programaInicio; const out=[];
+  for(const m of getMesociclosDef()){
+    const inicio = cursor, fim = addDias(cursor, m.semanas*7-1);
+    out.push({ ...m, inicio, fim });
+    cursor = addDias(fim, 1);
+  }
+  return out;
+}
+function programaInfo(){
+  const blocos = mesociclosComDatas();
+  const hoje = todayISO();
+  const atualIdx = blocos.findIndex(b=>hoje>=b.inicio && hoje<=b.fim);
+  const totalSemanas = getMesociclosDef().reduce((s,m)=>s+m.semanas,0);
+  if(atualIdx<0){
+    const ultimo = blocos[blocos.length-1];
+    if(hoje>ultimo.fim) return { concluido:true, blocos, totalSemanas, fimPrograma:ultimo.fim };
+    return { aindaNaoComecou:true, blocos, totalSemanas, inicioPrograma:blocos[0].inicio };
+  }
+  const bloco = blocos[atualIdx];
+  const semanaDoBloco = Math.floor(diffDias(hoje, bloco.inicio)/7)+1;
+  const diasAteTroca = diffDias(bloco.fim, hoje)+1;
+  const proximo = blocos[atualIdx+1] || null;
+  return { concluido:false, bloco, blocoIdx:atualIdx, semanaDoBloco, diasAteTroca, proximo, blocos, totalSemanas,
+    semanaGeral: Math.floor(diffDias(hoje, blocos[0].inicio)/7)+1 };
+}
+
 /* ============================= HELPERS DE DADOS ============================= */
 function cmpMedida(a,b){ const d = a.data.localeCompare(b.data); if(d!==0) return d; return (a.criadoEm||0)-(b.criadoEm||0); }
 function pesoAtual(){ if(medidas.length===0) return null; return [...medidas].sort((a,b)=>cmpMedida(b,a))[0].peso; }
 function pesoInicial(){ if(medidas.length===0) return null; return [...medidas].sort(cmpMedida)[0].peso; }
-function splitAtual(){ return SPLITS[treinoEstado.splitSize] || SPLITS[4]; }
+function splitsDisponiveis(){ return (perfil.trilha==='iniciante') ? SPLITS_INICIANTE : SPLITS; }
+function tamanhosDeSplitDisponiveis(){ return perfil.trilha==='iniciante' ? [3,4] : [3,4,5,6]; }
+function splitAtual(){ const sp=splitsDisponiveis(); return sp[treinoEstado.splitSize] || sp[tamanhosDeSplitDisponiveis()[0]]; }
+function finishersAtuais(){ return perfil.trilha==='iniciante' ? FINISHERS_INICIANTE : FINISHERS; }
+function cardioSabadoAtual(){ return perfil.trilha==='iniciante' ? CARDIO_SABADO_INICIANTE : CARDIO_SABADO; }
 function diaDeHojeSplit(){ const s=splitAtual(); return s.dias[treinoEstado.cursorDia % s.dias.length]; }
 function isDomingo(){ return new Date().getDay()===0; }
 function isSabado(){ return new Date().getDay()===6; }
@@ -397,10 +625,11 @@ function renderHoje(){
   const dia = diaDeHojeSplit();
   const peso = pesoAtual();
   const pInicial = pesoInicial();
-  const meta = perfil.pesoMeta || 97;
-  const totalPerder = (pInicial!=null) ? Math.max(pInicial-meta,0.0001) : 1;
-  const jaPerdeu = (peso!=null && pInicial!=null) ? Math.max(pInicial-peso,0) : 0;
-  const pct = Math.min(100, Math.round((jaPerdeu/totalPerder)*100));
+  const metaDefinida = !!perfil.pesoMeta;
+  const meta = perfil.pesoMeta || 0;
+  const totalPerder = (pInicial!=null && metaDefinida) ? Math.max(pInicial-meta,0.0001) : 1;
+  const jaPerdeu = (peso!=null && pInicial!=null && metaDefinida) ? Math.max(pInicial-peso,0) : 0;
+  const pct = metaDefinida ? Math.min(100, Math.round((jaPerdeu/totalPerder)*100)) : 0;
   const janela = domingo ? 'Descanso' : (sabado ? `${config.horarioSabado} · janela mais livre` : `${config.horarioSemana} · ${config.duracaoMin} min`);
   const dLog = getDietaLogHoje();
   const refFeitas = dLog.feitas.length;
@@ -427,7 +656,7 @@ function renderHoje(){
         <div class="row"><h2><span class="em">💪</span> Treino de hoje: ${dia.nome}</h2><span class="pill">${dia.foco}</span></div>
         <p class="sub">Janela sugerida: ${janela}</p>
         <ul class="exlist">
-          ${dia.exercicios.filter(e=>e.essencial).map(e=>`<li><span class="exname">${e.nome}</span><span class="exmeta">${e.series}x${e.reps}</span></li>`).join('')}
+          ${dia.exercicios.filter(e=>e.essencial).map(e=>`<li><span class="exname">${e.nome}${e.dica?`<br><span class="small">${e.dica}</span>`:''}</span><span class="exmeta">${e.series}x${e.reps}</span></li>`).join('')}
         </ul>
         <div class="btn-row" style="margin-top:12px">
           <button class="btn btn-primary" onclick="abrirLogTreino(false)">Fazer treino agora</button>
@@ -451,11 +680,13 @@ function renderHoje(){
         </div>
         <div style="text-align:right">
           <div class="sub" style="margin-bottom:2px">Meta</div>
-          <div style="font-weight:800;font-size:18px">${meta}kg</div>
+          <div style="font-weight:800;font-size:18px">${metaDefinida?meta+'kg':'--'}</div>
         </div>
       </div>
+      ${metaDefinida ? `
       <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
       <div class="row"><span class="small">${jaPerdeu.toFixed(1)}kg perdido${jaPerdeu==1?'':'s'}</span><span class="small">${pct}% da meta</span></div>
+      ` : `<p class="small" style="margin-top:8px">Defina sua meta de peso em "Mais" → Perfil.</p>`}
     </div>
 
     ${treinoCardHtml}
@@ -464,7 +695,7 @@ function renderHoje(){
     <div class="card">
       <div class="row"><h2>🏃 Cardio extra de sábado</h2><span class="pill ink">opcional</span></div>
       <p class="sub">Hoje você tem mais tempo livre — ótimo momento pro cardio que não cabe durante a semana.</p>
-      <p style="font-size:13px"><b>${CARDIO_SABADO.nome}</b><br><span class="small">${CARDIO_SABADO.duracao} · ${CARDIO_SABADO.formato}</span></p>
+      <p style="font-size:13px"><b>${cardioSabadoAtual().nome}</b><br><span class="small">${cardioSabadoAtual().duracao} · ${cardioSabadoAtual().formato}</span></p>
     </div>` : ''}
 
     <div class="card">
@@ -492,21 +723,75 @@ function renderHoje(){
     <div class="card">
       <div class="row"><h2>🔥 Sequência</h2><span class="pill">${streak} dia${streak===1?'':'s'}</span></div>
       <p class="sub" style="margin:0">${treinosNestaSemana()} treino${treinosNestaSemana()===1?'':'s'} essa semana · plano atual: ${splitAtual().nome}</p>
+      ${(()=>{ const info=programaInfo(); if(info.concluido||info.aindaNaoComecou) return ''; return `<p class="small" style="margin-top:8px">📅 ${info.bloco.nome} · ${info.diasAteTroca<=0?'troca hoje':`troca em ${info.diasAteTroca} dia${info.diasAteTroca===1?'':'s'}`} <button class="linkbtn" style="margin-left:6px" onclick="irPara('treino')">ver programa →</button></p>`; })()}
     </div>
   `;
 }
 function diaDeHojeSplit_preview(){ const s=splitAtual(); return s.dias[(treinoEstado.cursorDia)%s.dias.length].nome; }
 
 /* ============================= RENDER: TREINO ============================= */
+function renderCardPrograma(){
+  const info = programaInfo();
+  if(info.aindaNaoComecou){
+    return `
+    <div class="card">
+      <div class="row"><h2>📅 Programa até fevereiro</h2><span class="pill ink">em breve</span></div>
+      <p class="sub" style="margin:0">Começa em ${fmtDate(info.inicioPrograma)}.</p>
+    </div>`;
+  }
+  if(info.concluido){
+    return `
+    <div class="card">
+      <div class="row"><h2>📅 Programa até fevereiro</h2><span class="pill success">Concluído</span></div>
+      <p class="sub" style="margin:0">Ciclo de ${info.totalSemanas} semanas terminado em ${fmtDate(info.fimPrograma)}. Hora de registrar as medidas finais e montar o próximo ciclo — fale com seu personal (esse app 😉) pra planejar a continuação.</p>
+    </div>`;
+  }
+  const b = info.bloco;
+  const tipoPill = { hipertrofia:'', forca:'warn', definicao:'success', deload:'ink' }[b.tipo] || '';
+  return `
+    <div class="card">
+      <div class="row"><h2>📅 Programa até fevereiro</h2><span class="pill ${tipoPill}">semana ${info.semanaGeral} de ${info.totalSemanas}</span></div>
+      <p style="font-weight:800;font-size:14.5px;margin:4px 0 2px">${b.nome}</p>
+      <p class="sub" style="margin:0 0 10px">${b.foco}</p>
+      <ul class="exlist">
+        <li><span class="exname">Reps nesse bloco</span><span class="exmeta">${b.reps}</span></li>
+        <li><span class="exname">Descanso</span><span class="exmeta">${b.descanso}</span></li>
+      </ul>
+      <div class="divider"></div>
+      <p class="sub" style="margin:0 0 4px"><b>Progressão de carga:</b></p>
+      <p style="font-size:13px;margin:0 0 10px">${b.progressao}</p>
+      <div class="row">
+        <span class="small">Semana ${info.semanaDoBloco} de ${b.semanas} desse bloco</span>
+        <span class="small">${info.diasAteTroca<=0?'Troca hoje':`troca em ${info.diasAteTroca} dia${info.diasAteTroca===1?'':'s'}`}</span>
+      </div>
+      ${info.proximo ? `<p class="small" style="margin-top:6px">Depois vem: <b>${info.proximo.nome}</b> (a partir de ${fmtDate(info.proximo.inicio)})</p>` : ''}
+      <button class="linkbtn" style="margin-top:10px" onclick="abrirLinhaDoTempoPrograma()">Ver todos os blocos até fevereiro →</button>
+    </div>`;
+}
+function abrirLinhaDoTempoPrograma(){
+  const info = programaInfo();
+  abrirModal(`
+    <button class="closebtn" onclick="fecharModal()">&times;</button>
+    <h3>Programa até fevereiro</h3>
+    ${info.blocos.map((b,i)=>`
+      <div class="exblock" style="${info.bloco && i===info.blocoIdx ? 'border-color:var(--ember)':''}">
+        <div class="exhead"><span class="n">${i===(info.blocoIdx??-1)?'▶️ ':''}${b.nome}</span><span class="meta">${fmtDate(b.inicio)} – ${fmtDate(b.fim)}</span></div>
+        <p class="small" style="margin:0 0 6px">${b.foco}</p>
+        <p class="small" style="margin:0"><b>Reps:</b> ${b.reps} · <b>Descanso:</b> ${b.descanso}</p>
+      </div>
+    `).join('')}
+  `);
+}
 function renderTreino(){
   const el = document.getElementById('tab-treino');
   const s = splitAtual();
   el.innerHTML = `
+    ${renderCardPrograma()}
     <div class="card">
       <h2>Seu plano de treino</h2>
       <p class="sub">Normalmente, quantos dias por semana você treina? O plano se adapta — se faltar um dia, o próximo treino continua de onde parou, não é perdido.</p>
       <select id="selSplitSize" onchange="mudarSplitSize(this.value)">
-        ${[3,4,5,6].map(n=>`<option value="${n}" ${treinoEstado.splitSize==n?'selected':''}>${n}x por semana — ${SPLITS[n].nome}</option>`).join('')}
+        ${tamanhosDeSplitDisponiveis().map(n=>`<option value="${n}" ${treinoEstado.splitSize==n?'selected':''}>${n}x por semana — ${splitsDisponiveis()[n].nome}</option>`).join('')}
       </select>
       <p class="small" style="margin-top:8px">Trocar o número de dias reinicia o ciclo do split no dia 1.</p>
     </div>
@@ -521,7 +806,7 @@ function renderTreino(){
       <div class="card">
         <div class="row"><h2>${i===treinoEstado.cursorDia%s.dias.length?'▶️ ':''}${d.nome}</h2><span class="pill ink">${d.foco}</span></div>
         <ul class="exlist">
-          ${d.exercicios.map(e=>`<li><span class="exname">${e.nome}${!e.essencial?' <span class=\"small\">(opcional se tempo curto)</span>':''}</span><span class="exmeta">${e.series}x${e.reps}</span></li>`).join('')}
+          ${d.exercicios.map(e=>`<li><span class="exname">${e.nome}${!e.essencial?' <span class=\"small\">(opcional se tempo curto)</span>':''}${e.dica?`<br><span class="small">${e.dica}</span>`:''}</span><span class="exmeta">${e.series}x${e.reps}</span></li>`).join('')}
         </ul>
       </div>
     `).join('')}
@@ -558,7 +843,7 @@ function abrirLogTreino(expresso){
     diaNome: dia.nome, expresso,
     exercicios: exList.map(e=>{
       const sug = sugestaoCarga(e.nome);
-      return { nome:e.nome, seriesAlvo:e.series, reps:e.reps, rpe:'moderado',
+      return { nome:e.nome, seriesAlvo:e.series, reps:e.reps, rpe:'moderado', dica:e.dica,
         sets: Array.from({length:e.series}).map(()=>({peso: sug?String(sug.valor):'', reps:''})) };
     }),
     finisher: !expresso,
@@ -567,13 +852,15 @@ function abrirLogTreino(expresso){
   abrirModal(renderModalLogTreino());
 }
 function renderModalLogTreino(){
-  const finisher = FINISHERS[new Date().getDay() % FINISHERS.length];
+  const fins = finishersAtuais();
+  const finisher = fins[new Date().getDay() % fins.length];
   return `
     <button class="closebtn" onclick="fecharModal()">&times;</button>
     <h3>${logRascunho.diaNome}${logRascunho.expresso?' · Expresso':''}</h3>
     ${logRascunho.exercicios.map((e,ei)=>`
       <div class="exblock">
         <div class="exhead"><span class="n">${e.nome}</span><span class="meta">alvo ${e.seriesAlvo}x${e.reps}</span></div>
+        ${e.dica?`<p class="small" style="margin:2px 0 8px">${e.dica}</p>`:''}
         ${sugestaoTexto(e.nome)}
         ${e.sets.map((st,si)=>`
           <div class="setrow">
@@ -789,13 +1076,19 @@ function renderMais(){
   const el = document.getElementById('tab-mais');
   el.innerHTML = `
     <div class="card">
-      <h2>Perfil</h2>
+      <h2>Perfil · ${nomeDoPerfil(perfilAtivo)}</h2>
       <label class="f">Nome</label>
       <input type="text" id="pNome" value="${perfil.nome||''}">
       <div class="grid2">
         <div><label class="f">Altura (cm)</label><input type="number" id="pAltura" value="${perfil.altura||''}"></div>
-        <div><label class="f">Meta de peso (kg)</label><input type="number" step="0.1" id="pMeta" value="${perfil.pesoMeta||97}"></div>
+        <div><label class="f">Meta de peso (kg)</label><input type="number" step="0.1" id="pMeta" value="${perfil.pesoMeta||''}"></div>
       </div>
+      <label class="f">Nível de treino</label>
+      <select id="pTrilha">
+        <option value="classica" ${perfil.trilha==='classica'?'selected':''}>Padrão (já treina / conhece os exercícios)</option>
+        <option value="iniciante" ${perfil.trilha==='iniciante'?'selected':''}>Iniciante (nunca treinou / precisa de instrução passo a passo)</option>
+      </select>
+      <p class="small" style="margin-top:6px">Trocar o nível reinicia o plano de treino desse perfil (o histórico de treinos e medidas continua guardado).</p>
       <button class="btn btn-secondary" style="margin-top:12px" onclick="salvarPerfil()">Salvar perfil</button>
     </div>
 
@@ -828,16 +1121,24 @@ function renderMais(){
 
     <div class="card">
       <h2>Sobre o FORJA</h2>
-      <p class="sub" style="margin:0">App pessoal de treino, dieta e evolução — foco em hipertrofia, definição e perda de peso gradual, pensado pra rotina corrida (trabalho + filho + pouco tempo pra treinar). Todos os dados ficam no seu navegador.</p>
+      <p class="sub" style="margin:0">App de treino, dieta e evolução pra dois perfis independentes neste navegador — Erick (trilha padrão, foco em hipertrofia e definição) e Nayara (trilha iniciante, bem orientativa). Troque de perfil pelos botões no topo. Todos os dados ficam salvos localmente.</p>
     </div>
   `;
 }
 function salvarPerfil(){
   perfil.nome = document.getElementById('pNome').value;
   perfil.altura = Number(document.getElementById('pAltura').value)||0;
-  perfil.pesoMeta = Number(document.getElementById('pMeta').value)||97;
+  perfil.pesoMeta = Number(document.getElementById('pMeta').value)||0;
+  const novaTrilha = document.getElementById('pTrilha').value;
+  const trocouTrilha = novaTrilha !== perfil.trilha;
+  perfil.trilha = novaTrilha;
   save(KEY.perfil, perfil);
-  renderHoje();
+  if(trocouTrilha){
+    treinoEstado = defaultTreinoEstado(perfilAtivo);
+    save(KEY.treinoEstado, treinoEstado);
+  }
+  renderAll();
+  renderProfSwitch();
   toast('Perfil salvo');
 }
 function salvarConfig(){
@@ -850,11 +1151,11 @@ function salvarConfig(){
   toast('Configurações salvas');
 }
 function exportarDados(){
-  const data = { perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, exportadoEm:new Date().toISOString() };
+  const data = { perfilAtivo, perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, programaInicio, exportadoEm:new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = 'forja-backup-'+todayISO()+'.json';
+  a.download = 'forja-backup-'+nomeDoPerfil(perfilAtivo).toLowerCase()+'-'+todayISO()+'.json';
   a.click();
 }
 function importarDados(evt){
@@ -870,7 +1171,9 @@ function importarDados(evt){
       if(data.dietaPlano) { dietaPlano=data.dietaPlano; save(KEY.dietaPlano,dietaPlano); }
       if(data.dietaLog) { dietaLog=data.dietaLog; save(KEY.dietaLog,dietaLog); }
       if(data.config) { config=data.config; save(KEY.config,config); }
+      if(data.programaInicio) { programaInicio=data.programaInicio; save(KEY.programaInicio,programaInicio); }
       renderAll();
+      renderProfSwitch();
       toast('Backup importado com sucesso');
     }catch(e){ toast('Arquivo inválido'); }
   };
@@ -909,6 +1212,8 @@ function renderAll(){
   const d = new Date();
   document.getElementById('topDate').textContent = d.toLocaleDateString('pt-BR',{weekday:'long', day:'numeric', month:'long'});
 }
+carregarEstadoDoStorage();
+renderProfSwitch();
 renderAll();
 
 if('serviceWorker' in navigator){

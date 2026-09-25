@@ -149,16 +149,29 @@ tarde, pouco tempo pra treinar).
 - **100% local**: sem Firebase, sem login — todos os dados (medidas, treinos,
   dieta) ficam salvos só no `localStorage` do navegador. "Mais" → "Backup"
   exporta/importa tudo em um `.json`.
+- **Dois perfis independentes**: botões "Erick" / "Nayara" no topo do app.
+  Cada perfil tem seus próprios dados (medidas, treino, dieta, programa) —
+  trocar de perfil não mexe nos dados do outro. Erick usa a trilha padrão
+  (já treina); Nayara usa a trilha **iniciante**, com menos exercícios por
+  treino e uma dica de execução em cada um (como fazer, erros comuns),
+  pensada pra quem nunca treinou.
 - **Hoje**: painel diário com o treino do dia, refeições, água, suplementos,
   progresso até a meta de peso e uma dica que muda todo dia.
-- **Treino**: split adaptável (3x a 6x por semana) que se ajusta sozinho —
-  se um dia é pulado, o próximo treino continua de onde parou, sem perder o
-  ciclo. Inclui modo "expresso" (só os exercícios essenciais) pra quando o
-  tempo aperta, finisher de cardio de 5-8 min embutido no treino da semana
-  (já que cardio separado é difícil de encaixar), e sugestão de carga por
-  progressão a partir do histórico de cada exercício.
-- **Dieta**: vem pré-carregada com o plano de 1.900 kcal combinado, editável
-  refeição por refeição direto no app.
+- **Treino**: split adaptável (3x a 6x por semana, ou 3x/4x na trilha
+  iniciante) que se ajusta sozinho — se um dia é pulado, o próximo treino
+  continua de onde parou, sem perder o ciclo. Inclui modo "expresso" (só os
+  exercícios essenciais) pra quando o tempo aperta, finisher de cardio
+  embutido no treino da semana (já que cardio separado é difícil de
+  encaixar), e sugestão de carga por progressão a partir do histórico de
+  cada exercício.
+- **Programa até fevereiro**: macrociclo de ~22 semanas dividido em blocos
+  (hipertrofia, força/definição, definição metabólica, deload) com datas
+  calculadas a partir de hoje. Cada bloco diz a faixa de reps, o descanso e
+  a regra de progressão de carga daquela fase, e avisa quantos dias faltam
+  pra trocar de bloco — sem precisar reconfigurar nada manualmente.
+- **Dieta**: Erick vem com o plano de 1.900 kcal combinado pré-carregado;
+  Nayara começa com um modelo em branco. Os dois editáveis refeição por
+  refeição direto no app.
 - **Medidas**: histórico de peso e medidas corporais com gráfico de evolução.
 - **PWA**: `treino/manifest.json` e `treino/sw.js` deixam instalável no
   celular, com scope próprio (`/treino/`), sem interferir no SERVE.
