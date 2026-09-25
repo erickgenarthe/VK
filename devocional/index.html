@@ -423,7 +423,7 @@ async function criarPerfilMembro(uid, dados){
   const ehPrimeiro = todos.length === 0; // primeira pessoa a entrar vira líder automaticamente
   const perfil = { nome, role: ehPrimeiro ? 'lider' : 'membro', criadoEm: new Date().toISOString() };
   await colDefinir('membros', uid, perfil);
-  return perfil;
+  return { id: uid, ...perfil };
 }
 async function entrarComNome(nome){
   state.carregando = true; render();
