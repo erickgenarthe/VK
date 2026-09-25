@@ -232,8 +232,10 @@ function nomeDoPerfil(pid){
 }
 const DEFAULT_CONFIG = { horarioSemana:'11:00', horarioSabado:'12:00', duracaoMin:40, metaAguaMl:3800 };
 function defaultPerfil(pid){
+  // Nayara: 1,70m, 70kg atuais, objetivo de perder 5-10kg — meta em 64kg
+  // (meio da faixa), ajustável a qualquer momento em "Mais" → Perfil.
   return pid==='p2'
-    ? { nome:'Nayara', altura:0, pesoMeta:0, trilha:'iniciante' }
+    ? { nome:'Nayara', altura:170, pesoMeta:64, trilha:'iniciante' }
     : { nome:'Erick', altura:0, pesoMeta:97, trilha:'classica' };
 }
 function defaultTreinoEstado(pid){
@@ -328,19 +330,56 @@ const DEFAULT_DIETA = {
 };
 // Plano da Nayara ainda não foi definido — fica como modelo em branco,
 // editável refeição por refeição em "Dieta" (mesma tela, botão "Editar itens").
+// Plano da Nayara: 1,70m, 70kg, objetivo de perder 5-10kg — déficit moderado
+// (~1.550kcal) com proteína alta pra preservar massa magra enquanto emagrece.
+// Totalmente editável em "Dieta" conforme ela for ajustando na prática.
 const DEFAULT_DIETA_ELA = {
-  kcalAlvo: 0,
+  kcalAlvo: 1550,
   refeicoes: [
-    { id:'cafe', nome:'Café da Manhã', horario:'07:00', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
-    { id:'colacao', nome:'Colação (Pré-Treino)', horario:'10:15', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
-    { id:'almoco', nome:'Almoço', horario:'13:00', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
-    { id:'lanche', nome:'Lanche da Tarde', horario:'16:00', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] },
-    { id:'jantar', nome:'Jantar', horario:'19:30', kcal:0, itens:['Toque em "Editar itens" e monte sua refeição aqui.'] }
+    { id:'cafe', nome:'Café da Manhã', horario:'07:00', kcal:300, itens:[
+      '2 ovos inteiros (mexidos, cozidos ou omelete)',
+      '1 fatia de pão integral',
+      '1 fatia de queijo branco/cottage ou 2 colheres (sopa) de cottage',
+      '1 fruta pequena (banana, maçã ou mamão)',
+      'Café preto ou chá sem açúcar'
+    ]},
+    { id:'colacao', nome:'Colação (Pré-Treino)', horario:'10:15', kcal:170, itens:[
+      '1 iogurte natural desnatado (150g)',
+      '1 colher (sopa) de aveia em flocos',
+      '4-5 morangos ou 1/2 banana picada',
+      'Consumir 45-60 min antes do treino'
+    ]},
+    { id:'almoco', nome:'Almoço', horario:'13:00', kcal:450, itens:[
+      '120g de frango grelhado, peixe ou patinho moído',
+      '3 colheres (sopa) de arroz integral OU 100g de batata-doce',
+      '1 concha pequena de feijão ou lentilha (80g)',
+      'Prato grande de legumes (brócolis, abobrinha, cenoura, couve-flor)',
+      'Folhas verdes à vontade (alface, rúcula, espinafre)',
+      '1 colher (chá) de azeite de oliva (5ml)'
+    ]},
+    { id:'lanche', nome:'Lanche da Tarde', horario:'16:00', kcal:180, itens:[
+      '1 fruta (pera, maçã ou 1 fatia de mamão)',
+      '1 potinho de iogurte natural desnatado ou grego zero (150g)',
+      '4-5 castanhas ou amêndoas'
+    ]},
+    { id:'jantar', nome:'Jantar', horario:'19:30', kcal:380, itens:[
+      '120g de frango, peixe ou patinho moído',
+      '100g de abóbora, mandioquinha ou batata-doce assada (opcional, ajuste se estiver com pressa pra emagrecer)',
+      'Salada grande de folhas, tomate e pepino à vontade',
+      '1 colher (chá) de azeite de oliva (5ml)'
+    ]},
+    { id:'ceia', nome:'Ceia / Ritual da Noite', horario:'21:30', kcal:70, itens:[
+      '1 xícara de chá quente (camomila, erva-cidreira ou passiflora)',
+      '1 quadradinho (10g) de chocolate amargo 70%+',
+      'Opcional — ajuda a fechar o dia com calma'
+    ]}
   ],
   regrasOuro: [
-    'Monte pratos coloridos e volumosos com os legumes liberados no seu plano.',
+    'Monte pratos coloridos e volumosos com os legumes liberados — eles enchem o prato sem pesar nas calorias.',
+    'Priorize a proteína em toda refeição (ovo, frango, peixe, iogurte) — ajuda a manter a saciedade e preserva o músculo enquanto o peso cai.',
     'Mastigue devagar para dar tempo de o cérebro registrar a saciedade.',
-    'Beba água ao longo do dia, não só nas refeições.'
+    'Beba água ao longo do dia (pelo menos 2 litros), não só nas refeições.',
+    'Perder 5-10kg é um processo gradual — espere algo em torno de 0,5kg por semana, não mais que isso.'
   ]
 };
 
@@ -572,6 +611,7 @@ function cardioSabadoAtual(){ return perfil.trilha==='iniciante' ? CARDIO_SABADO
 function diaDeHojeSplit(){ const s=splitAtual(); return s.dias[treinoEstado.cursorDia % s.dias.length]; }
 function isDomingo(){ return new Date().getDay()===0; }
 function isSabado(){ return new Date().getDay()===6; }
+function temWheyNoPlano(){ return dietaPlano.refeicoes.some(r=>r.itens.some(it=>/whey/i.test(it))); }
 function getDietaLogHoje(){
   const k=todayISO();
   if(!dietaLog[k]) dietaLog[k] = { feitas:[], aguaMl:0, creatina:false };
@@ -942,7 +982,7 @@ function renderDieta(){
       </div>
       <div class="checkrow ${dLog.creatina?'done':''}" style="margin-top:10px">
         <input type="checkbox" ${dLog.creatina?'checked':''} onchange="toggleCreatina()">
-        <span class="lbl">Creatina 5g tomada hoje (whey já está nas refeições acima)</span>
+        <span class="lbl">Creatina 5g tomada hoje${temWheyNoPlano()?' (whey já está nas refeições acima)':''}</span>
       </div>
     </div>
 
