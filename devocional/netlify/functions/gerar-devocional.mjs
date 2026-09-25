@@ -49,7 +49,13 @@ const FERRAMENTA = {
   },
 };
 
-const SYSTEM_PROMPT = 'Você escreve devocionais diários para um pequeno grupo de crescimento de igreja, no estilo do plano de leitura do aplicativo Bíblia (YouVersion): linguagem acolhedora, direta e prática, sem jargão teológico complicado. A partir do estudo que o líder ensinou no domingo, crie 5 devocionais (segunda a sexta) que aprofundem o mesmo tema ao longo da semana, cada um com um ângulo diferente e progredindo em profundidade, terminando com uma pergunta pra compartilhar no grupo e uma oração curta. Escreva em português do Brasil, em segunda pessoa, de forma acolhedora e nunca condescendente. Cite os versículos com o melhor da sua memória, mas isso pode não ser 100% preciso — o líder vai revisar antes de publicar.';
+const SYSTEM_PROMPT = 'Você escreve devocionais diários para um pequeno grupo de crescimento de igreja, no estilo do plano de leitura do aplicativo Bíblia (YouVersion): linguagem acolhedora, direta e prática, sem jargão teológico complicado. A partir do estudo que o líder ensinou no domingo — em texto colado e/ou num PDF anexado (pode ser um PDF escaneado, com fotos de anotações à mão) — crie 5 devocionais (segunda a sexta) que aprofundem o mesmo tema ao longo da semana, cada um com um ângulo diferente e progredindo em profundidade, terminando com uma pergunta pra compartilhar no grupo e uma oração curta. Escreva em português do Brasil, em segunda pessoa, de forma acolhedora e nunca condescendente. Cite os versículos com o melhor da sua memória, mas isso pode não ser 100% preciso — o líder vai revisar antes de publicar.';
+
+// Payload de function síncrona do Netlify tem teto de ~6MB; um PDF em
+// base64 pesa ~33% a mais que o arquivo original, então 4MB de PDF (o
+// limite que o app já valida no navegador) vira uns 5.4MB aqui — ainda
+// cabe, com folga pro resto do JSON.
+const PDF_BASE64_MAX = 6 * 1024 * 1024;
 
 export default async (req) => {
   if (req.method !== 'POST') return json({ erro: 'Método não permitido.' }, 405);
@@ -63,15 +69,25 @@ export default async (req) => {
 
   const titulo = (body.titulo || '').trim();
   const texto = (body.texto || '').trim();
+  const pdfBase64 = typeof body.pdfBase64 === 'string' ? body.pdfBase64 : null;
   const dataInicioISO = body.dataInicioISO || '';
-  if (!titulo || !texto) return json({ erro: 'Preencha o título e o conteúdo do estudo.' }, 400);
+  if (!titulo || (!texto && !pdfBase64)) return json({ erro: 'Preencha o título e cole o conteúdo do estudo (ou anexe um PDF).' }, 400);
+  if (pdfBase64 && pdfBase64.length > PDF_BASE64_MAX) return json({ erro: 'PDF muito grande.' }, 400);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(dataInicioISO)) return json({ erro: 'Data de início inválida.' }, 400);
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return json({ erro: 'ANTHROPIC_API_KEY não configurada no Netlify — veja o README.' }, 500);
 
   const datas = diasUteis(dataInicioISO);
-  const userMsg = 'Estudo da semana: "' + titulo + '"\n\nConteúdo/anotações do estudo:\n' + texto;
+  const userMsg = 'Estudo da semana: "' + titulo + '"' +
+    (texto ? '\n\nConteúdo/anotações do estudo:\n' + texto : '') +
+    (pdfBase64 ? '\n\n(o conteúdo do estudo também está no PDF anexado a esta mensagem)' : '');
+
+  const conteudoUsuario = [];
+  if (pdfBase64) {
+    conteudoUsuario.push({ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } });
+  }
+  conteudoUsuario.push({ type: 'text', text: userMsg });
 
   let res, data;
   try {
@@ -81,12 +97,13 @@ export default async (req) => {
         'content-type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
+        ...(pdfBase64 ? { 'anthropic-beta': 'pdfs-2024-09-25' } : {}),
       },
       body: JSON.stringify({
         model: 'claude-sonnet-5',
         max_tokens: 4000,
         system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: userMsg }],
+        messages: [{ role: 'user', content: conteudoUsuario }],
         tools: [FERRAMENTA],
         tool_choice: { type: 'tool', name: 'definir_semana' },
       }),

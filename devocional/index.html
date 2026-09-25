@@ -580,15 +580,24 @@ function proximaSegundaLivre(lista){
 function novoDiaVazio(iso){
   return { data: iso, titulo:'', referencia:'', versiculo:'', texto:'', pergunta:'', oracao:'' };
 }
+const PDF_TAMANHO_MAX = 4 * 1024 * 1024; // 4MB — cabe folgado no limite de payload da function
+function lerArquivoComoBase64(file){
+  return new Promise((resolve, reject) => {
+    const leitor = new FileReader();
+    leitor.onload = () => resolve(String(leitor.result).split(',')[1] || '');
+    leitor.onerror = () => reject(new Error('não deu pra ler o arquivo'));
+    leitor.readAsDataURL(file);
+  });
+}
 async function gerarDevocionalIA(){
   const ef = state.estudoForm;
-  if (!ef.titulo.trim() || !ef.texto.trim()){ showToast('Preencha o título e o conteúdo do estudo primeiro.'); return; }
+  if (!ef.titulo.trim() || (!ef.texto.trim() && !ef.pdfBase64)){ showToast('Preencha o título e cole o conteúdo do estudo (ou anexe um PDF) primeiro.'); return; }
   ef.gerando = true; render();
   try{
     const resp = await fetch('/.netlify/functions/gerar-devocional', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ titulo: ef.titulo.trim(), texto: ef.texto.trim(), dataInicioISO: ef.segunda }),
+      body: JSON.stringify({ titulo: ef.titulo.trim(), texto: ef.texto.trim(), dataInicioISO: ef.segunda, pdfBase64: ef.pdfBase64 || null }),
     });
     let data;
     try{ data = await resp.json(); }catch(e){ throw new Error('resposta inválida do servidor'); }
@@ -869,6 +878,12 @@ function telaEstudoForm(){
       <div class="campo"><label>Semana (segunda-feira)</label><input type="date" value="${ef.segunda}" data-action="mudar-segunda-estudo"></div>
       <div class="campo"><label>Título do estudo</label><input type="text" name="titulo" value="${esc(ef.titulo)}" placeholder="Ex.: Confiança em tempos de espera"></div>
       <div class="campo"><label>Do que você ensinou / anotações do estudo</label><textarea name="texto" rows="6" placeholder="Cole aqui os principais pontos do que você ensinou — o Despertas usa isso pra escrever os 5 devocionais da semana.">${esc(ef.texto)}</textarea></div>
+      <div class="campo">
+        <label>Ou anexe o PDF do estudo (opcional, até 4MB)</label>
+        <input type="file" accept="application/pdf" data-action="selecionar-pdf-estudo">
+        ${ef.pdfNome ? `<p class="hint" style="margin-top:6px;">📎 ${esc(ef.pdfNome)} — <a href="#" data-action="remover-pdf-estudo">remover</a></p>` : ''}
+        <p class="hint" style="margin-top:6px;">Pode colar o texto, anexar o PDF, ou os dois — a IA lê o PDF direto, mesmo escaneado.</p>
+      </div>
       ${!dias ? `<div class="row">
         <button type="button" class="btn btn-primary" style="flex:1;" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Escrevendo…':'✨ Gerar com IA'}</button>
         <button type="button" class="btn btn-ghost" style="flex:1;" data-action="escrever-manual">✍️ Escrever manualmente</button>
@@ -945,14 +960,14 @@ async function handleClick(e){
     else if (a === 'ir-estudos'){ await abrirEstudos(); }
     else if (a === 'ir-config-grupo'){ state.aba = 'config-grupo'; state.subTelaVoltarPara = 'mais'; render(); }
     else if (a === 'criar-estudo-semana'){
-      state.estudoForm = { segunda: d.segunda, titulo:'', texto:'', dias:null, gerando:false };
+      state.estudoForm = { segunda: d.segunda, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false };
       state.subTelaVoltarPara = 'hoje';
       state.aba = 'estudo-form';
       render();
     }
     else if (a === 'novo-estudo'){
       const livre = proximaSegundaLivre(state.estudosLista||[]);
-      state.estudoForm = { segunda: livre, titulo:'', texto:'', dias:null, gerando:false };
+      state.estudoForm = { segunda: livre, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false };
       state.subTelaVoltarPara = 'estudos';
       state.aba = 'estudo-form';
       render();
@@ -960,12 +975,18 @@ async function handleClick(e){
     else if (a === 'editar-estudo'){
       const s = (state.estudosLista||[]).find(x => x.id === d.id);
       if (!s) return;
-      state.estudoForm = { segunda: s.id, titulo: s.titulo||'', texto: s.temaTexto||'', dias: (s.dias||[]).map(x => ({...x})), gerando:false };
+      state.estudoForm = { segunda: s.id, titulo: s.titulo||'', texto: s.temaTexto||'', pdfBase64:null, pdfNome:null, dias: (s.dias||[]).map(x => ({...x})), gerando:false };
       state.subTelaVoltarPara = 'estudos';
       state.aba = 'estudo-form';
       render();
     }
     else if (a === 'gerar-devocional'){ await gerarDevocionalIA(); }
+    else if (a === 'remover-pdf-estudo'){
+      e.preventDefault();
+      state.estudoForm.pdfBase64 = null;
+      state.estudoForm.pdfNome = null;
+      render();
+    }
     else if (a === 'escrever-manual'){
       state.estudoForm.dias = datasDaSemana(state.estudoForm.segunda).map(novoDiaVazio);
       render();
@@ -1006,6 +1027,20 @@ async function handleChange(e){
       ef.dias = ef.dias.map((dd,i) => ({ ...dd, data: novasDatas[i] }));
     }
     render();
+  }
+  else if (a === 'selecionar-pdf-estudo'){
+    const file = el.files && el.files[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf'){ showToast('Escolha um arquivo PDF.'); el.value=''; return; }
+    if (file.size > PDF_TAMANHO_MAX){ showToast('PDF muito grande — até 4MB, por favor.'); el.value=''; return; }
+    try{
+      state.estudoForm.pdfBase64 = await lerArquivoComoBase64(file);
+      state.estudoForm.pdfNome = file.name;
+      showToast('📎 PDF anexado: ' + file.name);
+      render();
+    }catch(err){
+      showToast('Não deu pra ler esse PDF — tenta colar o texto manualmente.');
+    }
   }
   else if (a === 'mudar-role-membro'){
     const uid = el.dataset.uid;
