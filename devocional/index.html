@@ -170,6 +170,23 @@
   .comentario-tempo{ font-size:11px; color:var(--grafite-suave); white-space:nowrap; flex-shrink:0; }
   .comentario-texto{ margin:3px 0 0 0; font-size:14px; line-height:1.5; }
 
+  .conquista-linha{ display:flex; align-items:center; gap:12px; padding:10px 2px; border-bottom:1px solid #F1ECE0; }
+  .conquista-linha:last-child{ border-bottom:none; }
+  .conquista-emoji{
+    width:42px; height:42px; border-radius:50%; background:#F1ECE0; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center; font-size:19px;
+  }
+  .conquista-linha.desbloqueada .conquista-emoji{ background: var(--dourado-suave); }
+  .conquista-texto{ flex:1; min-width:0; }
+  .conquista-texto strong{ display:block; font-size:13.5px; color:var(--roxo-escuro); }
+  .conquista-linha.bloqueada .conquista-texto strong{ color:var(--grafite-suave); }
+  .conquista-texto .hint{ margin:0; }
+  .conquista-progresso{
+    font-size:11px; font-weight:800; color:var(--grafite-suave); background:#F1ECE0;
+    padding:3px 9px; border-radius:100px; flex-shrink:0; white-space:nowrap;
+  }
+  .conquista-check{ font-size:18px; flex-shrink:0; }
+
   .toast{
     position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:200;
     background: var(--grafite); color:var(--branco); padding:12px 18px; border-radius:14px;
@@ -290,6 +307,35 @@ const CONFIG_PADRAO = {
   lema: 'Um devocional por dia, juntos.',
 };
 
+/* ============ 2b) PONTOS E TROFÉUS ============
+   Tema "despertar/luz", ligado ao nome do grupo e a 1 Pedro 1:13-16. Cada
+   troféu olha pra um campo do perfil (pontos, sequência ou total) e uma
+   meta — quando bate, desbloqueia e fica registrado pra sempre. */
+const PONTOS_CHECKIN = 5;
+const PONTOS_COMENTARIO = 3;
+const CONQUISTAS = [
+  { id:'primeira-luz', nome:'Primeira Luz', emoji:'🌱', descricao:'Faça seu 1º check-in', campo:'totalCheckins', meta:1 },
+  { id:'chama-acesa', nome:'Chama Acesa', emoji:'🔥', descricao:'3 dias seguidos de devocional', campo:'sequenciaAtual', meta:3 },
+  { id:'semana-desperta', nome:'Semana Desperta', emoji:'☀️', descricao:'Uma semana inteira seguida (5 dias)', campo:'sequenciaAtual', meta:5 },
+  { id:'alvorada-fiel', nome:'Alvorada Fiel', emoji:'🌅', descricao:'15 dias seguidos de devocional', campo:'sequenciaAtual', meta:15 },
+  { id:'inabalavel', nome:'Inabalável', emoji:'🌟', descricao:'30 dias seguidos de devocional', campo:'sequenciaAtual', meta:30 },
+  { id:'voz-do-grupo', nome:'Voz do Grupo', emoji:'💬', descricao:'Escreva 5 comentários', campo:'totalComentarios', meta:5 },
+  { id:'alma-que-debate', nome:'Alma que Debate', emoji:'🗣️', descricao:'Escreva 20 comentários', campo:'totalComentarios', meta:20 },
+  { id:'coracao-desperto', nome:'Coração Desperto', emoji:'💗', descricao:'Complete 20 devocionais', campo:'totalCheckins', meta:20 },
+  { id:'raiz-profunda', nome:'Raiz Profunda', emoji:'🌳', descricao:'Complete 50 devocionais', campo:'totalCheckins', meta:50 },
+  { id:'cem-pontos', nome:'Cem Pontos', emoji:'💯', descricao:'Junte 100 pontos', campo:'pontos', meta:100 },
+  { id:'lenda-despertas', nome:'Lenda das Despertas', emoji:'👑', descricao:'Junte 300 pontos', campo:'pontos', meta:300 },
+];
+function verificarNovasConquistas(membro){
+  const antigas = new Set(membro.conquistas || []);
+  const novas = CONQUISTAS.filter(c => !antigas.has(c.id) && (membro[c.campo]||0) >= c.meta);
+  if (novas.length) membro.conquistas = [...antigas, ...novas.map(c => c.id)];
+  return novas;
+}
+function toastConquistas(novas){
+  showToast('🏆 Troféu' + (novas.length>1?'s':'') + ' desbloqueado' + (novas.length>1?'s':'') + ': ' + novas.map(c => c.emoji+' '+c.nome).join(', '));
+}
+
 /* ============ 3) DATAS ============ */
 function hojeISO(){
   const d = new Date();
@@ -303,6 +349,15 @@ function somarDiasIso(iso, n){
   const dt = new Date(a, m-1, d);
   dt.setDate(dt.getDate() + n);
   return isoDeDate(dt);
+}
+/* Próximo dia útil (pula fim de semana) — usado pra saber se um check-in
+   novo continua a sequência de alguém ou se ela quebrou. */
+function proximoDiaUtil(iso){
+  let d = somarDiasIso(iso, 1);
+  const diaSemana = new Date(d + 'T00:00:00').getDay(); // 0=domingo ... 6=sábado
+  if (diaSemana === 6) d = somarDiasIso(d, 2);
+  else if (diaSemana === 0) d = somarDiasIso(d, 1);
+  return d;
 }
 /* Segunda-feira da semana daquela data — no fim de semana, mostra a semana
    que acabou de passar (a última que teve devocional de seg a sex). */
@@ -461,6 +516,7 @@ async function criarPerfilMembro(uid, dados){
     nome, email,
     role: ehPrimeiro ? 'lider' : 'membro',
     status: ehPrimeiro ? 'aprovado' : 'pendente', // toda conta nova precisa de aprovação da liderança
+    pontos: 0, totalCheckins: 0, totalComentarios: 0, sequenciaAtual: 0, ultimoCheckinData: null, conquistas: [],
     criadoEm: new Date().toISOString(),
   };
   await colDefinir('membros', uid, perfil);
@@ -608,18 +664,32 @@ async function toggleCheckin(){
   if (!iso || !state.usuario) return;
   const uid = state.usuario.id;
   const id = iso + '_' + uid;
+  const m = state.usuario;
   const jaFez = state.checkinsDoDia.some(c => c.uid === uid);
   if (jaFez){
     await colRemover('checkins', id);
     state.checkinsDoDia = state.checkinsDoDia.filter(c => c.uid !== uid);
     state.meusCheckinsSemana.delete(iso);
+    const patch = { pontos: Math.max(0, (m.pontos||0) - PONTOS_CHECKIN), totalCheckins: Math.max(0, (m.totalCheckins||0) - 1) };
+    Object.assign(m, patch);
+    await colAtualizar('membros', uid, patch);
     showToast('Check-in desfeito.');
   } else {
     const criadoEm = new Date().toISOString();
     await colDefinir('checkins', id, { data: iso, uid, nome: state.usuario.nome, criadoEm });
     state.checkinsDoDia.push({ id, data: iso, uid, nome: state.usuario.nome, criadoEm });
     state.meusCheckinsSemana.add(iso);
-    showToast('✅ Check-in feito! Continue firme.');
+    const novaSequencia = (m.ultimoCheckinData && proximoDiaUtil(m.ultimoCheckinData) === iso) ? (m.sequenciaAtual||0) + 1 : 1;
+    const patch = { pontos: (m.pontos||0) + PONTOS_CHECKIN, totalCheckins: (m.totalCheckins||0) + 1, sequenciaAtual: novaSequencia, ultimoCheckinData: iso };
+    Object.assign(m, patch);
+    await colAtualizar('membros', uid, patch);
+    const novas = verificarNovasConquistas(m);
+    if (novas.length){
+      await colAtualizar('membros', uid, { conquistas: m.conquistas });
+      toastConquistas(novas);
+    } else {
+      showToast('✅ +' + PONTOS_CHECKIN + ' pontos! Sequência: 🔥 ' + novaSequencia + (novaSequencia===1?' dia':' dias') + '.');
+    }
   }
   render();
 }
@@ -637,6 +707,12 @@ async function abrirGrupo(){
     .sort((a,b) => a.membro.nome.localeCompare(b.membro.nome));
   state.pendentes = state.membros.filter(m => m.status === 'pendente').sort((a,b) => a.nome.localeCompare(b.nome));
   state.aba = 'grupo';
+  render();
+}
+
+async function abrirConquistas(){
+  state.membros = await colLista('membros');
+  state.aba = 'conquistas';
   render();
 }
 
@@ -914,6 +990,7 @@ function navInferior(){
   const itens = [
     { id:'hoje', icone:'☀️', nome:'Hoje' },
     { id:'grupo', icone:'👥', nome:'Grupo' },
+    { id:'conquistas', icone:'🏆', nome:'Troféus' },
     { id:'mais', icone:'☰', nome:'Mais' },
   ];
   return `<div class="nav-inferior">${itens.map(it => `<button class="nav-item ${state.aba===it.id?'ativo':''}" data-action="ir-aba" data-aba="${it.id}"><span class="nav-icone-bolha"><span class="nav-icone">${it.icone}</span></span>${it.nome}</button>`).join('')}</div>`;
@@ -922,6 +999,7 @@ function navInferior(){
 function telaConteudo(){
   switch(state.aba){
     case 'grupo': return telaGrupo();
+    case 'conquistas': return telaConquistas();
     case 'mais': return telaMais();
     case 'estudos': return telaEstudos();
     case 'estudo-form': return telaEstudoForm();
@@ -1005,6 +1083,7 @@ function telaGrupo(){
         <strong>${esc(g.membro.nome)}</strong>
         <span class="badge ${g.membro.role==='lider'?'badge-lider':'badge-membro'}" style="margin-left:6px;">${g.membro.role==='lider'?'líder':'membro'}</span>
         <div class="grupo-dots">${g.checks.map((ok,i) => `<span class="dot ${ok?'ok':''}" title="${NOMES[i]}"></span>`).join('')}</div>
+        <p class="hint" style="margin-top:4px;">🔥 ${g.membro.sequenciaAtual||0} · ⭐ ${g.membro.pontos||0} pts</p>
       </div>
       ${(state.usuario.role==='lider' && g.membro.id!==state.usuario.id) ? `
         <div class="col" style="align-items:flex-end; gap:4px;">
@@ -1032,6 +1111,53 @@ function telaGrupo(){
     <div class="cartao-titulo">Quem já fez o devocional essa semana</div>
     ${linhas || '<p class="hint">Ninguém no grupo ainda.</p>'}
   </div>`;
+}
+
+/* ---------- Tela: Troféus ---------- */
+function telaConquistas(){
+  const u = state.usuario;
+  const ranking = [...state.membros].sort((a,b) => (b.pontos||0) - (a.pontos||0));
+  const minhaPos = ranking.findIndex(m => m.id === u.id) + 1;
+  const medalhas = ['🥇','🥈','🥉'];
+
+  const resumo = `<div class="cartao" style="background:linear-gradient(135deg, var(--roxo-escuro) 0%, var(--roxo) 100%); color:var(--branco); text-align:center;">
+    <div style="font-size:36px;">🏆</div>
+    <div style="font-size:34px; font-weight:800; line-height:1;">${u.pontos||0}</div>
+    <div style="font-size:11.5px; font-weight:800; letter-spacing:1px; opacity:0.85;">PONTOS</div>
+    <div class="row" style="justify-content:center; gap:26px; margin-top:16px;">
+      <div><div style="font-size:19px; font-weight:800;">🔥 ${u.sequenciaAtual||0}</div><div class="hint" style="color:rgba(255,255,255,0.85);">sequência</div></div>
+      <div><div style="font-size:19px; font-weight:800;">#${minhaPos||'-'}</div><div class="hint" style="color:rgba(255,255,255,0.85);">no grupo</div></div>
+      <div><div style="font-size:19px; font-weight:800;">${(u.conquistas||[]).length}/${CONQUISTAS.length}</div><div class="hint" style="color:rgba(255,255,255,0.85);">troféus</div></div>
+    </div>
+  </div>`;
+
+  const listaConquistas = CONQUISTAS.map(c => {
+    const desbloqueada = (u.conquistas||[]).includes(c.id);
+    const valorAtual = Math.min(u[c.campo]||0, c.meta);
+    return `<div class="conquista-linha ${desbloqueada?'desbloqueada':'bloqueada'}">
+      <div class="conquista-emoji">${c.emoji}</div>
+      <div class="conquista-texto">
+        <strong>${esc(c.nome)}</strong>
+        <p class="hint">${esc(c.descricao)}</p>
+      </div>
+      ${desbloqueada ? '<span class="conquista-check">✅</span>' : `<span class="conquista-progresso">${valorAtual}/${c.meta}</span>`}
+    </div>`;
+  }).join('');
+
+  const listaRanking = ranking.map((m,i) => `<div class="lista-item">
+    <div><strong>${medalhas[i]||('#'+(i+1)+' ')} ${esc(m.nome)}</strong>${m.id===u.id ? ' <span class="hint">(você)</span>' : ''}</div>
+    <span class="badge badge-tema">${m.pontos||0} pts</span>
+  </div>`).join('');
+
+  return resumo + `
+    <div class="cartao">
+      <div class="cartao-titulo">Troféus</div>
+      ${listaConquistas}
+    </div>
+    <div class="cartao">
+      <div class="cartao-titulo">🏅 Ranking do grupo</div>
+      ${listaRanking || '<p class="hint">Ninguém no ranking ainda.</p>'}
+    </div>`;
 }
 
 /* ---------- Tela: Mais ---------- */
@@ -1170,6 +1296,7 @@ async function handleClick(e){
     else if (a === 'ir-aba'){
       if (d.aba === 'hoje') await irParaHoje();
       else if (d.aba === 'grupo') await abrirGrupo();
+      else if (d.aba === 'conquistas') await abrirConquistas();
       else { state.aba = d.aba; render(); }
     }
     else if (a === 'selecionar-dia'){ await selecionarDia(d.data); }
@@ -1340,6 +1467,15 @@ async function handleSubmit(e){
       const id = await colAdicionar('comentarios', obj);
       state.comentariosDoDia.push({ id, ...obj });
       form.reset();
+      const m = state.usuario;
+      const patch = { pontos: (m.pontos||0) + PONTOS_COMENTARIO, totalComentarios: (m.totalComentarios||0) + 1 };
+      Object.assign(m, patch);
+      await colAtualizar('membros', m.id, patch);
+      const novas = verificarNovasConquistas(m);
+      if (novas.length){
+        await colAtualizar('membros', m.id, { conquistas: m.conquistas });
+        toastConquistas(novas);
+      }
       render();
     }
     else if (tipo === 'config-grupo'){
