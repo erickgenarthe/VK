@@ -498,6 +498,7 @@ async function verificarAprovacao(){
 const state = {
   carregando: true,
   usuario: null,
+  completar: null, // { uid, email } — conta autenticada sem cadastro no Firestore ainda
   config: null,
   membros: [],
   aba: 'hoje', // hoje | grupo | mais | estudos | estudo-form | config-grupo
@@ -708,6 +709,9 @@ function render(){
   if (state.carregando){
     app.className = 'sem-nav';
     app.innerHTML = telaCarregando();
+  } else if (state.completar){
+    app.className = 'sem-nav';
+    app.innerHTML = telaCompletarCadastro();
   } else if (!state.usuario){
     app.className = 'sem-nav';
     app.innerHTML = state.telaAuth === 'cadastro' ? telaCadastro() : telaLogin();
@@ -790,6 +794,26 @@ function telaCadastro(){
     </form>
     <p class="hint" style="text-align:center; margin-top:16px;">A primeira pessoa a se cadastrar vira líder automaticamente; depois disso, toda conta nova precisa ser aprovada pela liderança antes de entrar.</p>
     <p style="text-align:center; margin-top:10px; font-size:13.5px;">Já tem conta? <a href="#" data-action="ir-login">Entrar</a></p>
+  </div>`;
+}
+
+/* Sua conta já existe no login (e-mail/senha), mas ficou sem o cadastro
+   completo no Firestore — normalmente de uma tentativa anterior que caiu
+   no meio do caminho. Só falta o nome pra terminar. */
+function telaCompletarCadastro(){
+  return `<div class="tela-auth">
+    <div class="marca-central">
+      <div class="marca-selo-grande">${marcaFlor(72)}</div>
+      <p class="gc-pretitulo">GC das</p>
+      <h1 class="gc-titulo">Despertas</h1>
+    </div>
+    <div class="cartao">
+      <p class="hint" style="margin-bottom:10px;">Quase lá! Sua conta já existe — só falta seu nome pra completar o cadastro.</p>
+      <form data-form="completar-cadastro">
+        <div class="campo"><label>Seu nome</label><input type="text" name="nome" required autofocus></div>
+        <button type="submit" class="btn btn-primary btn-block">Concluir cadastro</button>
+      </form>
+    </div>
   </div>`;
 }
 
@@ -1056,19 +1080,18 @@ function telaConfigGrupo(){
 /* ============ 11) EVENTOS (delegação num único listener por tipo) ============ */
 async function entrarComUid(uid){
   try{
-    let perfil = await carregarPerfilMembro(uid);
+    const perfil = await carregarPerfilMembro(uid);
     if (!perfil){
       // a conta existe no login mas ficou sem o cadastro completo no banco
       // (ex.: uma tentativa anterior que caiu no meio do caminho) — em vez
-      // de travar dizendo "não encontramos seu cadastro", completa agora.
-      const nome = (prompt('Quase lá! Qual é o seu nome, pra completar seu cadastro?') || '').trim();
-      if (!nome){
-        state.carregando = false; state.usuario = null; render();
-        showToast('Precisa do seu nome pra completar o cadastro — tenta de novo.');
-        return;
-      }
+      // de travar dizendo "não encontramos seu cadastro", pede só o nome
+      // numa tela de verdade (nada de prompt() nativo, que muitos
+      // navegadores — principalmente PWA instalado no celular — bloqueiam).
       const email = (FIREBASE_CONFIGURADO && auth && auth.currentUser) ? (auth.currentUser.email || '') : '';
-      perfil = await criarPerfilMembro(uid, { nome, email });
+      state.completar = { uid, email };
+      state.carregando = false;
+      render();
+      return;
     }
     state.usuario = perfil;
     await garantirConfigInicial();
@@ -1246,6 +1269,20 @@ async function handleSubmit(e){
       state.carregando = true; render();
       const uid = await fazerCadastro(dados);
       await entrarComUid(uid);
+    }
+    else if (tipo === 'completar-cadastro'){
+      const nome = (fd.get('nome')||'').trim();
+      if (!nome){ showToast('Digite seu nome.'); return; }
+      state.carregando = true; render();
+      const { uid, email } = state.completar;
+      const perfil = await criarPerfilMembro(uid, { nome, email });
+      state.completar = null;
+      state.usuario = perfil;
+      await garantirConfigInicial();
+      state.membros = await colLista('membros');
+      state.carregando = false;
+      if (perfil.status === 'pendente'){ state.aba = 'pendente'; render(); }
+      else await irParaHoje();
     }
     else if (tipo === 'comentario'){
       const texto = (fd.get('texto')||'').trim();
