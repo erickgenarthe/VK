@@ -413,7 +413,6 @@ async function garantirConfigInicial(){
    sem querer cria uma pessoa "nova" no grupo. */
 function demoSessaoSalvar(uid){ localStorage.setItem(LS_PREFIX + 'sessao', uid); }
 function demoSessaoLer(){ return localStorage.getItem(LS_PREFIX + 'sessao'); }
-function demoSessaoLimpar(){ localStorage.removeItem(LS_PREFIX + 'sessao'); }
 
 async function carregarPerfilMembro(uid){ return colGetDoc('membros', uid); }
 
@@ -449,14 +448,6 @@ async function entrarComNome(nome){
     showToast('Ops: ' + mensagemErro(err));
   }
 }
-async function fazerLogout(){
-  if (FIREBASE_CONFIGURADO && auth){ await auth.signOut(); }
-  else { demoSessaoLimpar(); }
-  state.usuario = null;
-  state.aba = 'hoje';
-  render();
-}
-
 /* ============ 6) ESTADO GLOBAL ============ */
 const state = {
   carregando: true,
@@ -720,14 +711,11 @@ function telaShell(){
         ${subTela ? `
           <button class="icon-btn" data-action="voltar" data-destino="${esc(state.subTelaVoltarPara||'mais')}" title="Voltar">←</button>
           <div class="marca-nome" style="font-size:17px;">${esc(tituloDaAba())}</div>
-          <div class="topbar-acoes"><button class="icon-btn" data-action="sair" title="Sair">⎋</button></div>
+          <div class="topbar-acoes"></div>
         ` : `
           <div class="marca">
             <div class="marca-selo">${marcaFlor(22)}</div>
             <div><div class="marca-nome">Despertas</div><div class="marca-sub">${esc((state.config&&state.config.nomeGrupo)||'')}</div></div>
-          </div>
-          <div class="topbar-acoes">
-            <button class="icon-btn" data-action="sair" title="Sair">⎋</button>
           </div>
         `}
       </div>
@@ -822,10 +810,13 @@ function telaGrupo(){
         <div class="grupo-dots">${g.checks.map((ok,i) => `<span class="dot ${ok?'ok':''}" title="${NOMES[i]}"></span>`).join('')}</div>
       </div>
       ${(state.usuario.role==='lider' && g.membro.id!==state.usuario.id) ? `
-        <select data-action="mudar-role-membro" data-uid="${g.membro.id}" style="width:auto; padding:6px 10px; font-size:12px;">
-          <option value="membro" ${g.membro.role==='membro'?'selected':''}>membro</option>
-          <option value="lider" ${g.membro.role==='lider'?'selected':''}>líder</option>
-        </select>` : ''}
+        <div class="col" style="align-items:flex-end; gap:4px;">
+          <select data-action="mudar-role-membro" data-uid="${g.membro.id}" style="width:auto; padding:6px 10px; font-size:12px;">
+            <option value="membro" ${g.membro.role==='membro'?'selected':''}>membro</option>
+            <option value="lider" ${g.membro.role==='lider'?'selected':''}>líder</option>
+          </select>
+          <button type="button" class="btn btn-danger btn-small" data-action="remover-membro" data-uid="${g.membro.id}" data-nome="${esc(g.membro.nome)}">Remover</button>
+        </div>` : ''}
     </div>`).join('');
   return `<div class="cartao">
     <div class="cartao-titulo">Quem já fez o devocional essa semana</div>
@@ -839,6 +830,7 @@ function telaMais(){
   return `<div class="cartao">
     <div class="cartao-titulo">Minha conta</div>
     <p style="margin:0;"><strong>${esc(u.nome)}</strong><br><span class="hint">${u.role==='lider'?'líder do grupo':'membro do grupo'}</span></p>
+    <p class="hint" style="margin-top:8px;">Você continua entrando automaticamente neste aparelho — não tem senha nem conta pra sair.</p>
   </div>
   ${u.role==='lider' ? `
   <div class="cartao">
@@ -848,7 +840,6 @@ function telaMais(){
       <button type="button" class="btn btn-ghost btn-block" data-action="ir-config-grupo">⚙️ Configurações do grupo</button>
     </div>
   </div>` : ''}
-  <button type="button" class="btn btn-danger btn-block" data-action="sair">Sair da minha conta</button>
   ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:14px; background:var(--dourado-suave);"><p class="hint" style="margin:0;">🧪 Modo demonstração — os dados ficam salvos só neste navegador.</p></div>` : ''}`;
 }
 
@@ -948,8 +939,7 @@ async function handleClick(e){
   const a = el.dataset.action;
   const d = el.dataset;
   try{
-    if (a === 'sair'){ await fazerLogout(); }
-    else if (a === 'voltar'){ state.aba = d.destino || 'mais'; render(); }
+    if (a === 'voltar'){ state.aba = d.destino || 'mais'; render(); }
     else if (a === 'ir-aba'){
       if (d.aba === 'hoje') await irParaHoje();
       else if (d.aba === 'grupo') await abrirGrupo();
@@ -959,6 +949,13 @@ async function handleClick(e){
     else if (a === 'toggle-checkin'){ await toggleCheckin(); }
     else if (a === 'ir-estudos'){ await abrirEstudos(); }
     else if (a === 'ir-config-grupo'){ state.aba = 'config-grupo'; state.subTelaVoltarPara = 'mais'; render(); }
+    else if (a === 'remover-membro'){
+      if (!confirm('Remover "' + d.nome + '" do grupo? Isso não desfaz check-ins ou comentários que já foram feitos, só tira a pessoa da lista.')) return;
+      await colRemover('membros', d.uid);
+      state.membros = state.membros.filter(m => m.id !== d.uid);
+      await abrirGrupo();
+      showToast(d.nome + ' removido(a) do grupo.');
+    }
     else if (a === 'criar-estudo-semana'){
       state.estudoForm = { segunda: d.segunda, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false };
       state.subTelaVoltarPara = 'hoje';
