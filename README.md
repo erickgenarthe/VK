@@ -176,9 +176,29 @@ tarde, pouco tempo pra treinar).
 - **PWA**: `treino/manifest.json` e `treino/sw.js` deixam instalável no
   celular, com scope próprio (`/treino/`), sem interferir no SERVE.
 
-Pra testar: abra `treino/index.html` direto no navegador, ou publique junto
-com o resto do repositório (o `netlify.toml` já publica a raiz inteira, então
-fica disponível em `/treino/`).
+### Publicar o FORJA como site separado do SERVE
+
+O FORJA e o SERVE são dois produtos diferentes que só compartilham o mesmo
+repositório Git — cada um pode virar um site Netlify próprio, com domínio
+`.netlify.app` próprio, sem misturar um com o outro:
+
+1. Em [app.netlify.com](https://app.netlify.com), "Add new site" → "Import
+   an existing project" → escolha o mesmo repositório (`erickgenarthe/VK`)
+   de novo — dá pra importar o mesmo repositório mais de uma vez, cada
+   importação vira um site separado.
+2. Nas configurações de build dessa nova importação, defina **Base
+   directory** como `treino`. O `treino/netlify.toml` já cuida do resto
+   (publica a própria pasta como raiz do site).
+3. Deploy. Esse site novo mostra o FORJA direto na raiz (`/`), sem precisar
+   do caminho `/treino/` e sem depender do site do SERVE.
+4. (Opcional) Troque o nome do site em "Site settings" → "Change site name"
+   pra algo como `forja-erick.netlify.app`.
+
+O site do SERVE que já existe continua exatamente como está — publicar o
+FORJA separado não mexe nele.
+
+Pra só testar rapidinho sem publicar nada: abra `treino/index.html` direto
+no navegador.
 
 ## Limitações conhecidas (é um MVP, não um produto de 5 anos de estrada)
 
