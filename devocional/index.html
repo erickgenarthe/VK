@@ -157,6 +157,19 @@
   }
   .lista-item:last-child{ border-bottom:none; }
 
+  .comentario-item{ display:flex; gap:10px; padding:12px 0; border-bottom:1px solid #F1ECE0; }
+  .comentario-item:last-child{ border-bottom:none; }
+  .comentario-avatar{
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    background: var(--roxo-suave); color: var(--roxo-escuro);
+    display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12.5px;
+  }
+  .comentario-corpo{ flex:1; min-width:0; }
+  .comentario-cabecalho{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+  .comentario-nome{ font-weight:800; font-size:13.5px; color:var(--roxo-escuro); }
+  .comentario-tempo{ font-size:11px; color:var(--grafite-suave); white-space:nowrap; flex-shrink:0; }
+  .comentario-texto{ margin:3px 0 0 0; font-size:14px; line-height:1.5; }
+
   .toast{
     position:fixed; left:50%; bottom:96px; transform:translateX(-50%); z-index:200;
     background: var(--grafite); color:var(--branco); padding:12px 18px; border-radius:14px;
@@ -538,6 +551,25 @@ function paragrafos(texto){
   const partes = (texto || '').split(/\n+/).map(p => p.trim()).filter(Boolean);
   if (!partes.length) return '<p class="hint">—</p>';
   return partes.map(p => `<p style="margin:0 0 10px 0; line-height:1.6;">${esc(p)}</p>`).join('');
+}
+function iniciaisNome(nome){
+  const palavras = (nome || '').trim().split(/\s+/).filter(Boolean);
+  if (!palavras.length) return '?';
+  const primeira = palavras[0][0] || '';
+  const ultima = palavras.length > 1 ? (palavras[palavras.length-1][0] || '') : '';
+  return (primeira + ultima).toUpperCase();
+}
+function tempoRelativo(isoDataHora){
+  if (!isoDataHora) return '';
+  const diffMs = Date.now() - new Date(isoDataHora).getTime();
+  const min = Math.floor(diffMs / 60000);
+  if (min < 1) return 'agora';
+  if (min < 60) return 'há ' + min + 'min';
+  const h = Math.floor(min / 60);
+  if (h < 24) return 'há ' + h + 'h';
+  const d = Math.floor(h / 24);
+  if (d < 7) return 'há ' + d + (d===1 ? ' dia' : ' dias');
+  return new Date(isoDataHora).toLocaleDateString('pt-BR');
 }
 
 /* ============ 7) FLUXO "HOJE" (semana + dia selecionado) ============ */
@@ -939,12 +971,24 @@ function telaHoje(){
       ${outros.length ? `<p class="hint" style="margin-top:10px;">Também já fizeram: ${outros.map(c=>esc(c.nome)).join(', ')}</p>` : ''}
     </div>
     <div class="cartao">
-      <div class="cartao-titulo">Comentários</div>
+      <div class="linha" style="margin-bottom:${state.comentariosDoDia.length ? '4' : '10'}px;">
+        <div class="cartao-titulo" style="margin-bottom:0;">💬 Comentários</div>
+        ${state.comentariosDoDia.length ? `<span class="badge badge-tema">${state.comentariosDoDia.length}</span>` : ''}
+      </div>
       ${state.comentariosDoDia.length ? state.comentariosDoDia.map(c => `
-        <div class="lista-item" style="display:block;">
-          <strong>${esc(c.nome)}</strong>
-          <p style="margin:2px 0 0 0;">${esc(c.texto)}</p>
-        </div>`).join('') : '<p class="hint">Nenhum comentário ainda — seja a primeira pessoa a compartilhar!</p>'}
+        <div class="comentario-item">
+          <div class="comentario-avatar">${esc(iniciaisNome(c.nome))}</div>
+          <div class="comentario-corpo">
+            <div class="comentario-cabecalho">
+              <span class="comentario-nome">${esc(c.nome)}</span>
+              <span class="comentario-tempo">${esc(tempoRelativo(c.criadoEm))}</span>
+            </div>
+            <p class="comentario-texto">${esc(c.texto)}</p>
+          </div>
+        </div>`).join('') : `<div class="vazio" style="padding:14px 6px;">
+        <span class="vazio-emoji">🗣️</span>
+        Comece o papo! Compartilhe o que esse dia falou com você e convide o grupo a comentar também — é aqui que a conversa da semana acontece.
+      </div>`}
       <form data-form="comentario" style="margin-top:10px;">
         <textarea name="texto" rows="2" placeholder="Escreva o que esse devocional falou com você…" required></textarea>
         <button type="submit" class="btn btn-secondary btn-small" style="margin-top:8px;">Comentar</button>
