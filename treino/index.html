@@ -400,31 +400,43 @@ const FINISHERS_INICIANTE = [
 const CARDIO_SABADO = { nome:'Cardio livre (esteira, bike ou caminhada inclinada)', duracao:'20–30 min', formato:'ritmo moderado e constante — aproveite o tempo livre do sábado' };
 const CARDIO_SABADO_INICIANTE = { nome:'Caminhada livre (esteira, bike leve ou ao ar livre)', duracao:'20–30 min', formato:'ritmo confortável — sem pressa, é só pra somar' };
 
+// Trilha clássica (Erick, veterano de 10+ anos): priorizada pra construir
+// cintura escapular — ombro largo (deltoide lateral/posterior) e costas
+// largas (pegada aberta) pro shape em V, com técnicas avançadas (drop set,
+// rest-pause, tempo controlado) nos exercícios-chave. O trabalho direto de
+// ombro fica espalhado em 2-3 sessões por semana, nunca em todos os dias —
+// deltoide é articulação pequena e sensível a overuse, então a intensidade
+// vem de técnica, não de empilhar volume em cima de volume.
+const DICA_LATERAL_A = 'Técnica avançada: controle a descida em 2-3s (deltoide lateral responde bem a tensão prolongada). Na última série, faça um drop set — reduza ~30% da carga, sem descanso, até a falha de novo. É o exercício que mais constrói largura de ombro.';
+const DICA_LATERAL_B = 'Ângulo diferente da sessão anterior (cabo ou unilateral) pra estimular as fibras de outro jeito. Na última série, rest-pause: vá até a falha, descanse 15s, faça mais 4-6 reps.';
+const DICA_PUXADA_ABERTA = 'Pegada mais aberta que a largura dos ombros, cotovelo indo pro bolso de trás — foco é abrir as costas (largura), não só puxar peso. Pausa de 1s na contração máxima.';
+const DICA_FACE_PULL = 'Puxe até a altura do rosto e rode o ombro pra fora no final — trabalha o deltoide posterior (dá profundidade ao ombro visto de frente) e protege o manguito rotador pras cargas pesadas de peito e ombro.';
+const DICA_CRUCIFIXO_INV = 'Cotovelo levemente flexionado, abra os braços pensando em "juntar as escápulas" no final — outro ângulo pro deltoide posterior, alternando com face pull pra não repetir o mesmo padrão toda semana.';
 const SPLITS = {
   3: { nome:'Full Body · 3x/semana', dias:[
-    { nome:'Full Body A', foco:'Corpo inteiro', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Supino reto (barra ou halteres)',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Rosca direta',2,'10-15',false),ex('Prancha abdominal',3,'40-60s',false)] },
-    { nome:'Full Body B', foco:'Corpo inteiro', exercicios:[ex('Leg press ou avanço',3,'10-12'),ex('Puxada frente',3,'8-12'),ex('Supino inclinado com halteres',3,'8-12'),ex('Elevação lateral',2,'12-15',false),ex('Tríceps corda',2,'10-15',false),ex('Abdominal infra',3,'12-15',false)] },
-    { nome:'Full Body C', foco:'Corpo inteiro', exercicios:[ex('Levantamento terra romeno',3,'8-10'),ex('Remada baixa',3,'8-12'),ex('Crucifixo ou peck deck',3,'10-12'),ex('Desenvolvimento com halteres',2,'10-12',false),ex('Rosca alternada',2,'10-15',false),ex('Panturrilha em pé',3,'15-20',false)] }
+    { nome:'Full Body A', foco:'Corpo inteiro', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Supino reto (barra ou halteres)',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Prancha abdominal',3,'40-60s',false)] },
+    { nome:'Full Body B', foco:'Corpo inteiro', exercicios:[ex('Leg press ou avanço',3,'10-12'),ex('Puxada frente (pegada aberta)',3,'8-12',true,DICA_PUXADA_ABERTA),ex('Supino inclinado com halteres',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_B),ex('Tríceps corda',2,'10-15',false),ex('Abdominal infra',3,'12-15',false)] },
+    { nome:'Full Body C', foco:'Corpo inteiro', exercicios:[ex('Levantamento terra romeno',3,'8-10'),ex('Remada baixa',3,'8-12'),ex('Crucifixo ou peck deck',3,'10-12'),ex('Desenvolvimento com halteres',2,'10-12',false),ex('Face pull (deltoide posterior)',3,'12-15',false,DICA_FACE_PULL),ex('Panturrilha em pé',3,'15-20',false)] }
   ]},
   4: { nome:'Upper/Lower · 4x/semana', dias:[
-    { nome:'Upper A (Superiores)', foco:'Peito, costas, ombro, braço', exercicios:[ex('Supino reto',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Puxada frente',3,'10-12'),ex('Rosca direta',2,'10-15',false),ex('Tríceps testa',2,'10-15',false)] },
+    { nome:'Upper A (Superiores)', foco:'Peito, costas, ombro, braço', exercicios:[ex('Supino reto',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Puxada frente (pegada aberta)',3,'10-12',true,DICA_PUXADA_ABERTA),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Tríceps testa',2,'10-15',false)] },
     { nome:'Lower A (Inferiores)', foco:'Perna e glúteo', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Leg press',3,'10-12'),ex('Cadeira extensora',2,'12-15',false),ex('Mesa flexora',3,'10-12'),ex('Panturrilha em pé',3,'15-20',false),ex('Abdominal supra',3,'15-20',false)] },
-    { nome:'Upper B (Superiores)', foco:'Peito, costas, ombro, braço', exercicios:[ex('Supino inclinado com halteres',3,'8-12'),ex('Remada baixa',3,'8-12'),ex('Elevação lateral',3,'12-15'),ex('Crucifixo ou peck deck',2,'10-12',false),ex('Rosca alternada',2,'10-15',false),ex('Tríceps corda',2,'10-15',false)] },
+    { nome:'Upper B (Superiores)', foco:'Peito, costas, ombro, braço', exercicios:[ex('Supino inclinado com halteres',3,'8-12'),ex('Remada baixa',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_B),ex('Crucifixo ou peck deck',2,'10-12',false),ex('Face pull (deltoide posterior)',2,'12-15',false,DICA_FACE_PULL),ex('Tríceps corda',2,'10-15',false)] },
     { nome:'Lower B (Inferiores)', foco:'Posterior e glúteo', exercicios:[ex('Levantamento terra romeno',3,'8-10'),ex('Afundo (passada)',3,'10-12'),ex('Cadeira abdutora',2,'12-15',false),ex('Panturrilha sentado',3,'15-20',false),ex('Prancha lateral',3,'30-45s',false)] }
   ]},
   5: { nome:'Push/Pull/Legs + Upper/Lower · 5x/semana', dias:[
-    { nome:'Push (Empurrar)', foco:'Peito, ombro, tríceps', exercicios:[ex('Supino reto',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Supino inclinado com halteres',3,'10-12'),ex('Elevação lateral',2,'12-15',false),ex('Tríceps corda',2,'10-15',false)] },
-    { nome:'Pull (Puxar)', foco:'Costas e bíceps', exercicios:[ex('Puxada frente',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Remada baixa',2,'10-12',false),ex('Rosca direta',2,'10-15',false),ex('Rosca martelo',2,'10-15',false)] },
+    { nome:'Push (Empurrar)', foco:'Peito, ombro, tríceps', exercicios:[ex('Supino reto',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Supino inclinado com halteres',3,'10-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Tríceps corda',2,'10-15',false)] },
+    { nome:'Pull (Puxar)', foco:'Costas e bíceps', exercicios:[ex('Puxada frente (pegada aberta)',3,'8-12',true,DICA_PUXADA_ABERTA),ex('Remada curvada',3,'8-12'),ex('Remada baixa',2,'10-12',false),ex('Rosca direta',2,'10-15',false),ex('Face pull (deltoide posterior)',3,'12-15',true,DICA_FACE_PULL)] },
     { nome:'Legs (Pernas)', foco:'Perna e glúteo', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Leg press',3,'10-12'),ex('Cadeira extensora',2,'12-15',false),ex('Mesa flexora',3,'10-12'),ex('Panturrilha em pé',3,'15-20',false)] },
-    { nome:'Upper (Superiores)', foco:'Corpo superior completo', exercicios:[ex('Supino reto',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento com halteres',2,'10-12',false),ex('Puxada frente',2,'10-12',false),ex('Rosca alternada',2,'10-15',false)] },
+    { nome:'Upper (Superiores)', foco:'Corpo superior completo', exercicios:[ex('Supino reto',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento com halteres',2,'10-12',false),ex('Puxada frente (pegada aberta)',2,'10-12',false,DICA_PUXADA_ABERTA),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_B)] },
     { nome:'Lower (Inferiores)', foco:'Posterior, glúteo e core', exercicios:[ex('Levantamento terra',3,'6-10'),ex('Afundo (passada)',3,'10-12'),ex('Cadeira abdutora/adutora',2,'12-15',false),ex('Panturrilha em pé',3,'15-20',false),ex('Prancha abdominal',3,'40-60s',false)] }
   ]},
   6: { nome:'Push/Pull/Legs x2 · 6x/semana', dias:[
-    { nome:'Push A', foco:'Peito, ombro, tríceps', exercicios:[ex('Supino reto',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Elevação lateral',2,'12-15',false),ex('Tríceps corda',2,'10-15',false)] },
-    { nome:'Pull A', foco:'Costas e bíceps', exercicios:[ex('Puxada frente',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Rosca direta',2,'10-15',false),ex('Face pull ou remada alta',2,'12-15',false)] },
+    { nome:'Push A', foco:'Peito, ombro, tríceps', exercicios:[ex('Supino reto',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Tríceps corda',2,'10-15',false)] },
+    { nome:'Pull A', foco:'Costas e bíceps', exercicios:[ex('Puxada frente (pegada aberta)',3,'8-12',true,DICA_PUXADA_ABERTA),ex('Remada curvada',3,'8-12'),ex('Rosca direta',2,'10-15',false),ex('Face pull (deltoide posterior)',3,'12-15',true,DICA_FACE_PULL)] },
     { nome:'Legs A', foco:'Quadríceps e glúteo', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Leg press',3,'10-12'),ex('Cadeira extensora',2,'12-15',false),ex('Panturrilha em pé',3,'15-20',false)] },
-    { nome:'Push B', foco:'Peito, ombro, tríceps (ângulos)', exercicios:[ex('Supino inclinado com halteres',3,'8-12'),ex('Desenvolvimento com halteres',3,'10-12'),ex('Crucifixo ou peck deck',2,'10-12',false),ex('Tríceps testa',2,'10-15',false)] },
-    { nome:'Pull B', foco:'Costas e bíceps (ângulos)', exercicios:[ex('Remada baixa',3,'8-12'),ex('Remada unilateral',3,'8-12'),ex('Rosca martelo',2,'10-15',false),ex('Rosca alternada',2,'10-15',false)] },
+    { nome:'Push B', foco:'Peito, ombro, tríceps (ângulos)', exercicios:[ex('Supino inclinado com halteres',3,'8-12'),ex('Desenvolvimento com halteres',3,'10-12'),ex('Elevação lateral (cabo ou unilateral)',3,'12-15',true,DICA_LATERAL_B),ex('Crucifixo ou peck deck',2,'10-12',false)] },
+    { nome:'Pull B', foco:'Costas e bíceps (ângulos)', exercicios:[ex('Remada baixa',3,'8-12'),ex('Remada unilateral',3,'8-12'),ex('Rosca martelo',2,'10-15',false),ex('Crucifixo invertido (peck deck invertido)',3,'12-15',false,DICA_CRUCIFIXO_INV)] },
     { nome:'Legs B', foco:'Posterior e glúteo', exercicios:[ex('Levantamento terra romeno',3,'8-10'),ex('Afundo (passada)',3,'10-12'),ex('Mesa flexora',3,'10-12'),ex('Panturrilha sentado',3,'15-20',false)] }
   ]}
 };
@@ -508,34 +520,34 @@ function dicaDoDia(){ const d=new Date(); const n=Math.floor(d.getTime()/8640000
 // Cada bloco só muda a REGRA de progressão de carga/reps/descanso — os exercícios
 // continuam vindo do split ativo (SPLITS[treinoEstado.splitSize]).
 const MESOCICLOS_DEF = [
-  { nome:'Bloco 1 · Adaptação e Hipertrofia', semanas:4, tipo:'hipertrofia',
-    foco:'Base de volume, aprender a técnica de cada exercício com folga.',
+  { nome:'Bloco 1 · Volume Base', semanas:4, tipo:'hipertrofia',
+    foco:'Reestabelece o volume de treino e a conexão mente-músculo antes de subir a intensidade. Sem técnica avançada ainda — é a base pro resto do ciclo.',
     reps:'Fique na faixa alta da tabela (ex: 10-12 em vez de 8-12).', descanso:'60-90s entre séries.',
     progressao:'Se completar todas as séries no topo da faixa por 2 treinos seguidos, suba 2,5kg nos compostos (agachamento, supino, remada, terra) ou 1,25kg nos isolados (rosca, elevação, tríceps).' },
-  { nome:'Bloco 2 · Hipertrofia intensificada', semanas:4, tipo:'hipertrofia',
-    foco:'Mais estímulo de volume, ainda sem forçar carga máxima.',
+  { nome:'Bloco 2 · Hipertrofia + Intensidade', semanas:4, tipo:'hipertrofia',
+    foco:'Mais estímulo de volume e entram as primeiras técnicas avançadas — drop set e rest-pause nas séries de elevação lateral, puxada e face pull (já indicado no próprio exercício).',
     reps:'Meio da faixa (ex: 8-10 em vez de 8-12).', descanso:'60-75s entre séries.',
-    progressao:'Mesma regra do Bloco 1, e a cada 2 semanas acrescente 1 série extra (bis/dropset leve) só no último exercício do treino.' },
+    progressao:'Mesma regra do Bloco 1. Aplique as técnicas avançadas só na ÚLTIMA série de cada exercício — nunca em todas, pra não acumular fadiga demais e arriscar lesão por overuse.' },
   { nome:'Deload · Recuperação', semanas:1, tipo:'deload',
-    foco:'Semana de folga ativa pro corpo absorver o volume acumulado.',
+    foco:'Semana de folga ativa — essencial depois de duas semanas de drop set/rest-pause, pra evitar lesão por excesso de treino.',
     reps:'Mesmos exercícios, mas RPE sempre "Fácil".', descanso:'Sem pressa, descanse o quanto precisar.',
     progressao:'Reduza a carga usada em 30-40% em todos os exercícios. Não busque progressão essa semana — é recuperação, não retrocesso.' },
   { nome:'Bloco 3 · Força e Definição', semanas:4, tipo:'forca',
-    foco:'Carga mais pesada nos compostos, isolados seguem pra definição.',
+    foco:'Carga mais pesada nos compostos, isolados seguem pra definição. Nessa fase, ou pesado ou técnica avançada no mesmo exercício — nunca os dois juntos, pra proteger a articulação do ombro.',
     reps:'Compostos: 6-8 reps. Isolados: mantenha 10-15 reps.', descanso:'90-120s nos compostos, 45-60s nos isolados.',
     progressao:'Suba a carga do exercício composto em ~5% assim que completar 6 reps limpas em todas as séries (RPE moderado ou menor).' },
   { nome:'Bloco 4 · Definição metabólica', semanas:4, tipo:'definicao',
-    foco:'Descanso curto, mais reps, foco em queima calórica dentro do treino.',
+    foco:'Descanso curto, mais reps — bom momento pra superséries antagonistas (puxada + desenvolvimento, por exemplo) e mechanical drop sets, sempre com carga moderada, nunca máxima.',
     reps:'12-15 reps em tudo, inclusive nos compostos.', descanso:'45s entre séries — cronometre.',
     progressao:'Mantenha a carga do Bloco 3. Só suba o peso quando conseguir 15 reps limpas em todas as séries de um exercício.' },
   { nome:'Deload · Recuperação', semanas:1, tipo:'deload',
     foco:'Segunda folga ativa antes do bloco final do ciclo.',
     reps:'Mesmos exercícios, RPE sempre "Fácil".', descanso:'Sem pressa.',
-    progressao:'Reduza a carga em 30-40%. Aproveite pra registrar medidas e comparar com o início do ciclo.' },
+    progressao:'Reduza a carga em 30-40%. Aproveite pra registrar medidas (peito, braço, cintura) e comparar com o início do ciclo — é o termômetro do shape em V.' },
   { nome:'Bloco 5 · Hipertrofia final e reavaliação', semanas:4, tipo:'hipertrofia',
-    foco:'Fechar o ciclo, comparar evolução e preparar o próximo programa.',
+    foco:'Fechar o ciclo, comparar evolução (ombro/costas x cintura) e preparar o próximo programa.',
     reps:'Volta à faixa padrão (8-12 reps).', descanso:'60-90s entre séries.',
-    progressao:'Regra padrão: +2,5kg (compostos) ou +1,25kg (isolados) quando bater o topo da faixa por 2 treinos seguidos. No fim do bloco, registre medidas e monte o próximo ciclo.' }
+    progressao:'Regra padrão: +2,5kg (compostos) ou +1,25kg (isolados) quando bater o topo da faixa por 2 treinos seguidos. No fim do bloco, registre medidas e monte o próximo ciclo — já pode ser um ciclo mais avançado.' }
 ];
 // Versão do programa pra quem está começando agora (trilha iniciante) — mesma
 // duração total, progressão bem mais cautelosa e sem fase de carga pesada.
