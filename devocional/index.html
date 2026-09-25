@@ -419,8 +419,13 @@ async function carregarPerfilMembro(uid){ return colGetDoc('membros', uid); }
 async function criarPerfilMembro(uid, dados){
   const { nome } = dados;
   const todos = await colLista('membros');
-  const ehPrimeiro = todos.length === 0; // primeira pessoa a entrar vira líder automaticamente
-  const perfil = { nome, role: ehPrimeiro ? 'lider' : 'membro', criadoEm: new Date().toISOString() };
+  const ehPrimeiro = todos.length === 0; // primeira pessoa a entrar vira líder automaticamente, já aprovada
+  const perfil = {
+    nome,
+    role: ehPrimeiro ? 'lider' : 'membro',
+    status: ehPrimeiro ? 'aprovado' : 'pendente', // toda entrada nova precisa de aprovação da liderança
+    criadoEm: new Date().toISOString(),
+  };
   await colDefinir('membros', uid, perfil);
   return { id: uid, ...perfil };
 }
@@ -440,11 +445,26 @@ async function entrarComNome(nome){
     await garantirConfigInicial();
     state.membros = await colLista('membros');
     state.carregando = false;
-    await irParaHoje();
+    if (perfil.status === 'pendente'){ state.aba = 'pendente'; render(); }
+    else await irParaHoje();
   }catch(err){
     console.error(err);
     state.carregando = false;
     render();
+    showToast('Ops: ' + mensagemErro(err));
+  }
+}
+async function verificarAprovacao(){
+  try{
+    const perfil = await carregarPerfilMembro(state.usuario.id);
+    if (perfil && perfil.status !== 'pendente'){
+      state.usuario = perfil;
+      state.membros = await colLista('membros');
+      await irParaHoje();
+    } else {
+      showToast('Ainda não — a liderança precisa aprovar sua entrada primeiro.');
+    }
+  }catch(err){
     showToast('Ops: ' + mensagemErro(err));
   }
 }
@@ -467,6 +487,7 @@ const state = {
   estudoForm: null,
   grupoDatas: [],
   grupoProgresso: [],
+  pendentes: [],
   toast: null,
   nomeForm: { nome:'' },
 };
@@ -544,13 +565,16 @@ async function toggleCheckin(){
 
 /* ============ 8) FLUXO "GRUPO" ============ */
 async function abrirGrupo(){
+  state.membros = await colLista('membros'); // atualiza pra pegar pedidos de entrada novos
   const base = segundaDaSemana(hojeISO());
   const datas = datasDaSemana(base);
   const checkins = await colListaEmValores('checkins', 'data', datas);
   state.grupoDatas = datas;
-  state.grupoProgresso = state.membros
+  const aprovados = state.membros.filter(m => m.status !== 'pendente');
+  state.grupoProgresso = aprovados
     .map(m => ({ membro: m, checks: datas.map(iso => checkins.some(c => c.data === iso && c.uid === m.id)) }))
     .sort((a,b) => a.membro.nome.localeCompare(b.membro.nome));
+  state.pendentes = state.membros.filter(m => m.status === 'pendente').sort((a,b) => a.nome.localeCompare(b.nome));
   state.aba = 'grupo';
   render();
 }
@@ -645,6 +669,9 @@ function render(){
   } else if (!state.usuario){
     app.className = 'sem-nav';
     app.innerHTML = telaNome();
+  } else if (state.usuario.status === 'pendente'){
+    app.className = 'sem-nav';
+    app.innerHTML = telaPendente();
   } else {
     app.className = '';
     app.innerHTML = telaShell();
@@ -699,8 +726,24 @@ function telaNome(){
       <div class="campo"><label>Seu nome</label><input type="text" name="nome" required value="${esc(f.nome)}" placeholder="Como o grupo te conhece"></div>
       <button type="submit" class="btn btn-primary btn-block">Entrar</button>
     </form>
-    <p class="hint" style="text-align:center; margin-top:16px;">Sem senha — é só digitar seu nome. A primeira pessoa a entrar vira líder do grupo automaticamente.</p>
+    <p class="hint" style="text-align:center; margin-top:16px;">Sem senha — é só digitar seu nome. A primeira pessoa a entrar vira líder do grupo automaticamente; depois disso, toda entrada nova precisa ser aprovada pela liderança.</p>
     ${!FIREBASE_CONFIGURADO ? `<div class="cartao" style="margin-top:18px; background:var(--dourado-suave);"><p class="hint" style="margin:0;">🧪 <strong>Modo demonstração</strong> — os dados ficam salvos só neste navegador (localStorage). Configure o Firebase no início do <code>index.html</code> pra publicar de verdade. Veja o README.</p></div>` : ''}
+  </div>`;
+}
+
+function telaPendente(){
+  return `<div class="tela-auth">
+    <div class="marca-central">
+      <div class="marca-selo-grande">${marcaFlor(72)}</div>
+      <p class="gc-pretitulo">GC das</p>
+      <h1 class="gc-titulo">Despertas</h1>
+    </div>
+    <div class="cartao" style="text-align:center;">
+      <span style="font-size:34px; display:block; margin-bottom:10px;">⏳</span>
+      <h3 style="margin-bottom:6px;">Esperando aprovação</h3>
+      <p class="hint">Oi, ${esc(state.usuario.nome)}! Sua entrada no grupo ainda precisa ser aprovada pela liderança. Assim que aprovarem, você já entra normalmente.</p>
+      <button type="button" class="btn btn-secondary btn-block" style="margin-top:14px;" data-action="checar-aprovacao">Já fui aprovada(o)? Verificar de novo</button>
+    </div>
   </div>`;
 }
 
@@ -818,7 +861,20 @@ function telaGrupo(){
           <button type="button" class="btn btn-danger btn-small" data-action="remover-membro" data-uid="${g.membro.id}" data-nome="${esc(g.membro.nome)}">Remover</button>
         </div>` : ''}
     </div>`).join('');
-  return `<div class="cartao">
+  const pendentes = state.pendentes || [];
+  const secaoPendentes = (state.usuario.role === 'lider' && pendentes.length) ? `
+    <div class="cartao" style="background:var(--dourado-suave);">
+      <div class="cartao-titulo">⏳ Pedidos de entrada (${pendentes.length})</div>
+      ${pendentes.map(p => `
+        <div class="lista-item">
+          <strong>${esc(p.nome)}</strong>
+          <div class="row">
+            <button type="button" class="btn btn-secondary btn-small" data-action="aprovar-membro" data-uid="${p.id}" data-nome="${esc(p.nome)}">Aprovar</button>
+            <button type="button" class="btn btn-danger btn-small" data-action="recusar-membro" data-uid="${p.id}" data-nome="${esc(p.nome)}">Recusar</button>
+          </div>
+        </div>`).join('')}
+    </div>` : '';
+  return secaoPendentes + `<div class="cartao">
     <div class="cartao-titulo">Quem já fez o devocional essa semana</div>
     ${linhas || '<p class="hint">Ninguém no grupo ainda.</p>'}
   </div>`;
@@ -923,7 +979,8 @@ async function entrarComUid(uid){
     await garantirConfigInicial();
     state.membros = await colLista('membros');
     state.carregando = false;
-    await irParaHoje();
+    if (perfil.status === 'pendente'){ state.aba = 'pendente'; render(); }
+    else await irParaHoje();
   }catch(err){
     console.error(err);
     state.carregando = false;
@@ -956,6 +1013,21 @@ async function handleClick(e){
       await abrirGrupo();
       showToast(d.nome + ' removido(a) do grupo.');
     }
+    else if (a === 'aprovar-membro'){
+      await colAtualizar('membros', d.uid, { status: 'aprovado' });
+      const m = state.membros.find(x => x.id === d.uid);
+      if (m) m.status = 'aprovado';
+      await abrirGrupo();
+      showToast('✅ ' + d.nome + ' aprovado(a) — já pode entrar no grupo.');
+    }
+    else if (a === 'recusar-membro'){
+      if (!confirm('Recusar a entrada de "' + d.nome + '"? A pessoa vai precisar digitar o nome de novo pra pedir entrada.')) return;
+      await colRemover('membros', d.uid);
+      state.membros = state.membros.filter(m => m.id !== d.uid);
+      await abrirGrupo();
+      showToast(d.nome + ' recusado(a).');
+    }
+    else if (a === 'checar-aprovacao'){ await verificarAprovacao(); }
     else if (a === 'criar-estudo-semana'){
       state.estudoForm = { segunda: d.segunda, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false };
       state.subTelaVoltarPara = 'hoje';

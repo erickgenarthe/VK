@@ -227,10 +227,16 @@ dar continuidade, de segunda a sexta, ao estudo que você ensinou no domingo
 - **Liderança compartilhável**: a primeira pessoa que entra vira líder
   automaticamente (igual ao SERVE); qualquer líder pode promover outra
   pessoa do grupo a líder também, na aba "Grupo".
-- **Sem senha**: entrar é só digitar o nome — sem e-mail, sem senha, sem
-  fricção pro grupo. Por baixo, o app usa login anônimo do Firebase (um uid
-  estável por navegador/aparelho); trocar de aparelho sem querer cria uma
-  pessoa "nova" no grupo, então vale avisar isso pro pessoal.
+- **Sem senha, mas com aprovação**: entrar é só digitar o nome — sem
+  e-mail, sem senha, sem fricção. Só que não é qualquer um que entra: fora
+  a primeira pessoa (que vira líder e cai direto), toda entrada nova fica
+  "pendente" até um líder aprovar, na aba "Grupo" → "Pedidos de entrada".
+  A pessoa vê uma tela de espera nesse meio-tempo, com um botão pra
+  verificar se já foi aprovada. Por baixo, o app usa login anônimo do
+  Firebase (um uid estável por navegador/aparelho) — não tem "sair da
+  conta" porque não faria sentido (a sessão é presa ao aparelho); se
+  alguém trocar de aparelho, nasce como pedido de entrada novo, e o líder
+  aprova ou usa "Remover" pra limpar duplicata.
 - **Modo demonstração**: sem configurar nada, o app já funciona salvando os
   dados no navegador (`localStorage`) — inclusive a geração de devocional
   cai pro preenchimento manual sem a função de IA configurada.
