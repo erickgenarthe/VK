@@ -239,7 +239,7 @@ function defaultPerfil(pid){
     : { nome:'Erick', altura:0, pesoMeta:97, trilha:'classica' };
 }
 function defaultTreinoEstado(pid){
-  return { splitSize: pid==='p2' ? 3 : 4, cursorDia:0 };
+  return { splitSize: pid==='p2' ? 3 : 5, cursorDia:0 };
 }
 
 let perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, programaInicio;
@@ -384,7 +384,7 @@ const DEFAULT_DIETA_ELA = {
 };
 
 /* ============================= SPLITS DE TREINO ============================= */
-function ex(nome, series, reps, essencial, dica){ return { nome, series, reps, essencial: essencial!==false, dica: dica||'' }; }
+function ex(nome, series, reps, essencial, dica, bloco, descansoBloco){ return { nome, series, reps, essencial: essencial!==false, dica: dica||'', bloco: bloco||null, descansoBloco: descansoBloco||'' }; }
 const FINISHERS = [
   { nome:'Pular corda', duracao:'5 min', formato:'30s forte / 30s leve, repetir' },
   { nome:'Burpees + Mountain climbers', duracao:'6 min', formato:'40s trabalho / 20s descanso · 6 rounds' },
@@ -400,46 +400,106 @@ const FINISHERS_INICIANTE = [
 const CARDIO_SABADO = { nome:'Cardio livre (esteira, bike ou caminhada inclinada)', duracao:'20–30 min', formato:'ritmo moderado e constante — aproveite o tempo livre do sábado' };
 const CARDIO_SABADO_INICIANTE = { nome:'Caminhada livre (esteira, bike leve ou ao ar livre)', duracao:'20–30 min', formato:'ritmo confortável — sem pressa, é só pra somar' };
 
-// Trilha clássica (Erick, veterano de 10+ anos): priorizada pra construir
-// cintura escapular — ombro largo (deltoide lateral/posterior) e costas
-// largas (pegada aberta) pro shape em V, com técnicas avançadas (drop set,
-// rest-pause, tempo controlado) nos exercícios-chave. O trabalho direto de
-// ombro fica espalhado em 2-3 sessões por semana, nunca em todos os dias —
-// deltoide é articulação pequena e sensível a overuse, então a intensidade
-// vem de técnica, não de empilhar volume em cima de volume.
-const DICA_LATERAL_A = 'Técnica avançada: controle a descida em 2-3s (deltoide lateral responde bem a tensão prolongada). Na última série, faça um drop set — reduza ~30% da carga, sem descanso, até a falha de novo. É o exercício que mais constrói largura de ombro.';
-const DICA_LATERAL_B = 'Ângulo diferente da sessão anterior (cabo ou unilateral) pra estimular as fibras de outro jeito. Na última série, rest-pause: vá até a falha, descanse 15s, faça mais 4-6 reps.';
-const DICA_PUXADA_ABERTA = 'Pegada mais aberta que a largura dos ombros, cotovelo indo pro bolso de trás — foco é abrir as costas (largura), não só puxar peso. Pausa de 1s na contração máxima.';
-const DICA_FACE_PULL = 'Puxe até a altura do rosto e rode o ombro pra fora no final — trabalha o deltoide posterior (dá profundidade ao ombro visto de frente) e protege o manguito rotador pras cargas pesadas de peito e ombro.';
-const DICA_CRUCIFIXO_INV = 'Cotovelo levemente flexionado, abra os braços pensando em "juntar as escápulas" no final — outro ângulo pro deltoide posterior, alternando com face pull pra não repetir o mesmo padrão toda semana.';
+// Trilha clássica (Erick): "Shape em V — Trinca Rápida v2.0" — o programa
+// específico que ele trouxe pronto, transcrito exatamente como especificado
+// (bi-sets, RIR, dupla progressão, notas de substituição). Só existe nas
+// versões 3x e 5x — são as duas que o programa define; não inventamos 4x/6x
+// pra não desequilibrar o volume semanal que já foi calibrado com cuidado
+// (a nota "o que mudou da v1" reduziu de propósito o volume de lateral).
+const NOTA_REMADA_LOMBAR = 'Substitui a remada curvada: protege a lombar sob fadiga.';
+const NOTA_LEG_PRESS = 'Agachamento livre só se houver 90s+ de descanso.';
+const NOTA_CADEIRA_EXT = 'Rest-pause na última série.';
+const NOTA_GEMEOS = 'Pausa de 2s no pico e no alongamento.';
+const NOTA_LATERAL_MECANICA = 'Mesmo peso: sentado até 1-2 RIR, levanta e continua em pé com leve impulso.';
+const CARDIO_ESTEIRA = { duracao:'30 min', zona:'Zona 2', equipamento:'Esteira inclinada ou bike' };
+const CARDIO_BIKE = { duracao:'30 min', zona:'Zona 2', equipamento:'Bike (recomendada)' };
+function diaCardio(dia, cardio){ dia.cardio = cardio; return dia; }
 const SPLITS = {
-  3: { nome:'Full Body · 3x/semana', dias:[
-    { nome:'Full Body A', foco:'Corpo inteiro', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Supino reto (barra ou halteres)',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Prancha abdominal',3,'40-60s',false)] },
-    { nome:'Full Body B', foco:'Corpo inteiro', exercicios:[ex('Leg press ou avanço',3,'10-12'),ex('Puxada frente (pegada aberta)',3,'8-12',true,DICA_PUXADA_ABERTA),ex('Supino inclinado com halteres',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_B),ex('Tríceps corda',2,'10-15',false),ex('Abdominal infra',3,'12-15',false)] },
-    { nome:'Full Body C', foco:'Corpo inteiro', exercicios:[ex('Levantamento terra romeno',3,'8-10'),ex('Remada baixa',3,'8-12'),ex('Crucifixo ou peck deck',3,'10-12'),ex('Desenvolvimento com halteres',2,'10-12',false),ex('Face pull (deltoide posterior)',3,'12-15',false,DICA_FACE_PULL),ex('Panturrilha em pé',3,'15-20',false)] }
+  3: { nome:'Shape em V · ABC · 3x/semana', dias:[
+    diaCardio({ nome:'A · Costas, Bíceps e Posterior de Ombro', foco:'Costas e ombro posterior', exercicios:[
+      ex('Puxada Alta Aberta',4,'8-12',true,'',  'BI-SET 1'),
+      ex('Elevação Lateral com Halteres',3,'12-15',true,'','BI-SET 1','60s'),
+      ex('Remada Apoiada (Cavalinho ou Máquina)',3,'8-12',true,NOTA_REMADA_LOMBAR,'BI-SET 2'),
+      ex('Face Pull na Polia Alta',3,'15',true,'','BI-SET 2','60s'),
+      ex('Pullover no Cabo',3,'12-15',true,'','BI-SET 3'),
+      ex('Crucifixo Inverso Inclinado',3,'12-15',true,'','BI-SET 3','45s'),
+      ex('Rosca Direta na Polia Baixa',3,'10-12',true,'','BI-SET 4'),
+      ex('Abdominal na Polia (Crunch)',3,'12-15',true,'','BI-SET 4','45s')
+    ]}, CARDIO_ESTEIRA),
+    diaCardio({ nome:'B · Peito, Ombros e Tríceps', foco:'Peito e ombro', exercicios:[
+      ex('Supino Inclinado com Halteres',4,'8-10',true,'','BI-SET 1'),
+      ex('Elevação Lateral Sentado',3,'12-15',true,'','BI-SET 1','60s'),
+      ex('Desenvolvimento com Halteres ou Smith',3,'6-10',true,'','BI-SET 2'),
+      ex('Crucifixo Inverso Inclinado',3,'12-15',true,'','BI-SET 2','60s'),
+      ex('Supino Reto (Máquina ou Halteres)',3,'8-12',true,'','BI-SET 3'),
+      ex('Tríceps Pulley (Corda ou Barra)',3,'10-12',true,'','BI-SET 3','45s'),
+      ex('Crossover Baixo para Alto',3,'12-15',true,'','BI-SET 4'),
+      ex('Elevação Lateral na Polia Baixa (por trás)',3,'12-15',true,'','BI-SET 4','45s')
+    ]}, CARDIO_ESTEIRA),
+    diaCardio({ nome:'C · Pernas Completas + Ombro Lateral', foco:'Perna e ombro lateral', exercicios:[
+      ex('Leg Press 45°',4,'8-12',true,NOTA_LEG_PRESS,'BI-SET 1'),
+      ex('Prancha',3,'30-45s',true,'','BI-SET 1','75s'),
+      ex('Mesa ou Cadeira Flexora',3,'10-12',true,'','BI-SET 2'),
+      ex('Cadeira Extensora',3,'12-15',true,NOTA_CADEIRA_EXT,'BI-SET 2','45s'),
+      ex('Gêmeos em Pé',3,'12-15',true,NOTA_GEMEOS,'BI-SET 3'),
+      ex('Elevação Lateral na Polia Baixa (por trás)',3,'12-15',true,'','BI-SET 3','45s')
+    ]}, CARDIO_BIKE)
   ]},
-  4: { nome:'Upper/Lower · 4x/semana', dias:[
-    { nome:'Upper A (Superiores)', foco:'Peito, costas, ombro, braço', exercicios:[ex('Supino reto',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Puxada frente (pegada aberta)',3,'10-12',true,DICA_PUXADA_ABERTA),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Tríceps testa',2,'10-15',false)] },
-    { nome:'Lower A (Inferiores)', foco:'Perna e glúteo', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Leg press',3,'10-12'),ex('Cadeira extensora',2,'12-15',false),ex('Mesa flexora',3,'10-12'),ex('Panturrilha em pé',3,'15-20',false),ex('Abdominal supra',3,'15-20',false)] },
-    { nome:'Upper B (Superiores)', foco:'Peito, costas, ombro, braço', exercicios:[ex('Supino inclinado com halteres',3,'8-12'),ex('Remada baixa',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_B),ex('Crucifixo ou peck deck',2,'10-12',false),ex('Face pull (deltoide posterior)',2,'12-15',false,DICA_FACE_PULL),ex('Tríceps corda',2,'10-15',false)] },
-    { nome:'Lower B (Inferiores)', foco:'Posterior e glúteo', exercicios:[ex('Levantamento terra romeno',3,'8-10'),ex('Afundo (passada)',3,'10-12'),ex('Cadeira abdutora',2,'12-15',false),ex('Panturrilha sentado',3,'15-20',false),ex('Prancha lateral',3,'30-45s',false)] }
-  ]},
-  5: { nome:'Push/Pull/Legs + Upper/Lower · 5x/semana', dias:[
-    { nome:'Push (Empurrar)', foco:'Peito, ombro, tríceps', exercicios:[ex('Supino reto',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Supino inclinado com halteres',3,'10-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Tríceps corda',2,'10-15',false)] },
-    { nome:'Pull (Puxar)', foco:'Costas e bíceps', exercicios:[ex('Puxada frente (pegada aberta)',3,'8-12',true,DICA_PUXADA_ABERTA),ex('Remada curvada',3,'8-12'),ex('Remada baixa',2,'10-12',false),ex('Rosca direta',2,'10-15',false),ex('Face pull (deltoide posterior)',3,'12-15',true,DICA_FACE_PULL)] },
-    { nome:'Legs (Pernas)', foco:'Perna e glúteo', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Leg press',3,'10-12'),ex('Cadeira extensora',2,'12-15',false),ex('Mesa flexora',3,'10-12'),ex('Panturrilha em pé',3,'15-20',false)] },
-    { nome:'Upper (Superiores)', foco:'Corpo superior completo', exercicios:[ex('Supino reto',3,'8-12'),ex('Remada curvada',3,'8-12'),ex('Desenvolvimento com halteres',2,'10-12',false),ex('Puxada frente (pegada aberta)',2,'10-12',false,DICA_PUXADA_ABERTA),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_B)] },
-    { nome:'Lower (Inferiores)', foco:'Posterior, glúteo e core', exercicios:[ex('Levantamento terra',3,'6-10'),ex('Afundo (passada)',3,'10-12'),ex('Cadeira abdutora/adutora',2,'12-15',false),ex('Panturrilha em pé',3,'15-20',false),ex('Prancha abdominal',3,'40-60s',false)] }
-  ]},
-  6: { nome:'Push/Pull/Legs x2 · 6x/semana', dias:[
-    { nome:'Push A', foco:'Peito, ombro, tríceps', exercicios:[ex('Supino reto',3,'8-12'),ex('Desenvolvimento militar',3,'8-12'),ex('Elevação lateral',3,'12-15',true,DICA_LATERAL_A),ex('Tríceps corda',2,'10-15',false)] },
-    { nome:'Pull A', foco:'Costas e bíceps', exercicios:[ex('Puxada frente (pegada aberta)',3,'8-12',true,DICA_PUXADA_ABERTA),ex('Remada curvada',3,'8-12'),ex('Rosca direta',2,'10-15',false),ex('Face pull (deltoide posterior)',3,'12-15',true,DICA_FACE_PULL)] },
-    { nome:'Legs A', foco:'Quadríceps e glúteo', exercicios:[ex('Agachamento livre',3,'8-12'),ex('Leg press',3,'10-12'),ex('Cadeira extensora',2,'12-15',false),ex('Panturrilha em pé',3,'15-20',false)] },
-    { nome:'Push B', foco:'Peito, ombro, tríceps (ângulos)', exercicios:[ex('Supino inclinado com halteres',3,'8-12'),ex('Desenvolvimento com halteres',3,'10-12'),ex('Elevação lateral (cabo ou unilateral)',3,'12-15',true,DICA_LATERAL_B),ex('Crucifixo ou peck deck',2,'10-12',false)] },
-    { nome:'Pull B', foco:'Costas e bíceps (ângulos)', exercicios:[ex('Remada baixa',3,'8-12'),ex('Remada unilateral',3,'8-12'),ex('Rosca martelo',2,'10-15',false),ex('Crucifixo invertido (peck deck invertido)',3,'12-15',false,DICA_CRUCIFIXO_INV)] },
-    { nome:'Legs B', foco:'Posterior e glúteo', exercicios:[ex('Levantamento terra romeno',3,'8-10'),ex('Afundo (passada)',3,'10-12'),ex('Mesa flexora',3,'10-12'),ex('Panturrilha sentado',3,'15-20',false)] }
+  5: { nome:'Shape em V · ABCDE · 5x/semana', dias:[
+    diaCardio({ nome:'D1 · Largura de Costas + Ombro Lateral', foco:'Costas e ombro lateral', exercicios:[
+      ex('Puxada Alta Aberta',4,'8-12',true,'','BI-SET 1'),
+      ex('Elevação Lateral com Halteres',3,'12-15',true,'','BI-SET 1','60s'),
+      ex('Remada Apoiada (Cavalinho ou Máquina)',3,'8-12',true,NOTA_REMADA_LOMBAR,'BI-SET 2'),
+      ex('Face Pull na Polia Alta',3,'15',true,'','BI-SET 2','60s'),
+      ex('Pullover no Cabo',3,'12-15',true,'','BI-SET 3'),
+      ex('Elevação Lateral na Polia Baixa (por trás)',3,'12-15',true,'','BI-SET 3','45s')
+    ]}, CARDIO_ESTEIRA),
+    diaCardio({ nome:'D2 · Peito + Ombro Anterior/Posterior', foco:'Peito e ombro', exercicios:[
+      ex('Supino Inclinado com Halteres',4,'8-10',true,'','BI-SET 1'),
+      ex('Crucifixo Inverso Inclinado',3,'12-15',true,'','BI-SET 1','60s'),
+      ex('Supino Reto (Máquina ou Halteres)',3,'8-12',true,'','BI-SET 2'),
+      ex('Elevação Lateral Sentado',3,'12-15',true,'','BI-SET 2','60s'),
+      ex('Crossover Baixo para Alto',3,'12-15',true,'','BI-SET 3'),
+      ex('Tríceps Pulley (Corda ou Barra)',3,'10-12',true,'','BI-SET 3','45s')
+    ]}, CARDIO_ESTEIRA),
+    diaCardio({ nome:'D3 · Pernas + Core + Braços', foco:'Perna, core e braço', exercicios:[
+      ex('Leg Press 45°',4,'8-12',true,NOTA_LEG_PRESS,'BI-SET 1'),
+      ex('Prancha',3,'30-45s',true,'','BI-SET 1','75s'),
+      ex('Mesa ou Cadeira Flexora',3,'10-12',true,'','BI-SET 2'),
+      ex('Cadeira Extensora',3,'12-15',true,NOTA_CADEIRA_EXT,'BI-SET 2','45s'),
+      ex('Gêmeos em Pé',3,'12-15',true,NOTA_GEMEOS,'BI-SET 3'),
+      ex('Abdominal na Polia (Crunch)',3,'12-15',true,'','BI-SET 3','45s'),
+      ex('Tríceps Pulley (Corda ou Barra)',3,'10-12',true,'','BI-SET 4'),
+      ex('Rosca Direta na Polia Baixa',3,'10-12',true,'','BI-SET 4','45s')
+    ]}, CARDIO_BIKE),
+    diaCardio({ nome:'D4 · Ombros + Peito Superior', foco:'Ombro e peito superior', exercicios:[
+      ex('Desenvolvimento com Halteres ou Smith',4,'6-10',true,'','BI-SET 1'),
+      ex('Face Pull na Polia Alta',3,'15',true,'','BI-SET 1','60s'),
+      ex('Supino Inclinado (Smith ou Máquina)',3,'8-12',true,'','BI-SET 2'),
+      ex('Elevação Lateral na Polia Baixa (por trás)',3,'12-15',true,'','BI-SET 2','60s'),
+      ex('Crossover Baixo para Alto',3,'12-15',true,'','BI-SET 3'),
+      ex('Peck Deck Inverso',3,'15',true,'','BI-SET 3','45s'),
+      ex('Elevação Lateral Mecânica (sentado → em pé)',2,'12-20',false,NOTA_LATERAL_MECANICA,'FINISHER 4','45s')
+    ]}, CARDIO_ESTEIRA),
+    diaCardio({ nome:'D5 · Miolo de Costas + Peito + Braços', foco:'Costas, peito e braço', exercicios:[
+      ex('Puxada Supinada no Pulley',3,'8-12',true,'','BI-SET 1'),
+      ex('Supino Reto com Halteres',3,'8-10',true,'','BI-SET 1','60s'),
+      ex('Remada Apoiada (Cavalinho ou Máquina)',3,'8-12',true,NOTA_REMADA_LOMBAR,'BI-SET 2'),
+      ex('Elevação Lateral em Pé',3,'12-15',true,'','BI-SET 2','60s'),
+      ex('Rosca Inclinada com Halteres',3,'10-12',true,'','BI-SET 3'),
+      ex('Tríceps Francês na Polia',3,'10-12',true,'','BI-SET 3','45s')
+    ]}, CARDIO_ESTEIRA)
   ]}
 };
+// Notas gerais do programa (mostradas uma vez no topo da aba Treino, só na
+// trilha clássica) — do jeito que o v2.0 especifica.
+const NOTAS_GERAIS_V = [
+  { titulo:'Aquecimento', texto:'5 min de cardio leve + 1-2 séries leves do primeiro exercício de cada treino.' },
+  { titulo:'Execução do bi-set', texto:'Os 2 exercícios do mesmo bloco são feitos em sequência direta, sem descansar entre eles — o descanso só vem depois de completar o bloco inteiro.' },
+  { titulo:'Intensidade', texto:'Compostos a 1-2 RIR (repetições na reserva — pare 1-2 reps antes da falha). Isoladores podem ir à falha na última série.' },
+  { titulo:'Progressão dupla', texto:'Ao atingir o topo da faixa de reps em TODAS as séries de um exercício, suba a carga em 2-5% e volte ao início da faixa.' },
+  { titulo:'Cardio', texto:'30 min em Zona 2 logo após a musculação — ritmo em que ainda dá pra puxar assunto (teste da fala), não fixo por velocidade.' }
+];
 
 // Trilha "iniciante": pensada pra quem nunca treinou. Menos exercícios por
 // dia, mais explicação de como fazer (campo "dica"), cardio mais suave e
@@ -519,35 +579,33 @@ function dicaDoDia(){ const d=new Date(); const n=Math.floor(d.getTime()/8640000
 // Periodização em blocos (mesociclos) sobre o mesmo split já escolhido em "Treino".
 // Cada bloco só muda a REGRA de progressão de carga/reps/descanso — os exercícios
 // continuam vindo do split ativo (SPLITS[treinoEstado.splitSize]).
+// Segue o esquema do próprio "Shape em V — Trinca Rápida v2.0": progressão
+// dupla contínua (sem trocar faixa de reps por fase) e deload a cada 6-8
+// semanas com metade das séries — nada de blocos temáticos por cima disso.
 const MESOCICLOS_DEF = [
-  { nome:'Bloco 1 · Volume Base', semanas:4, tipo:'hipertrofia',
-    foco:'Reestabelece o volume de treino e a conexão mente-músculo antes de subir a intensidade. Sem técnica avançada ainda — é a base pro resto do ciclo.',
-    reps:'Fique na faixa alta da tabela (ex: 10-12 em vez de 8-12).', descanso:'60-90s entre séries.',
-    progressao:'Se completar todas as séries no topo da faixa por 2 treinos seguidos, suba 2,5kg nos compostos (agachamento, supino, remada, terra) ou 1,25kg nos isolados (rosca, elevação, tríceps).' },
-  { nome:'Bloco 2 · Hipertrofia + Intensidade', semanas:4, tipo:'hipertrofia',
-    foco:'Mais estímulo de volume e entram as primeiras técnicas avançadas — drop set e rest-pause nas séries de elevação lateral, puxada e face pull (já indicado no próprio exercício).',
-    reps:'Meio da faixa (ex: 8-10 em vez de 8-12).', descanso:'60-75s entre séries.',
-    progressao:'Mesma regra do Bloco 1. Aplique as técnicas avançadas só na ÚLTIMA série de cada exercício — nunca em todas, pra não acumular fadiga demais e arriscar lesão por overuse.' },
+  { nome:'Ciclo 1 · Progressão contínua', semanas:7, tipo:'hipertrofia',
+    foco:'Dupla progressão em todos os exercícios do plano — sem trocar de fase, só evoluindo carga/reps sessão após sessão.',
+    reps:'Siga a faixa de cada exercício na tabela do dia. Compostos a 1-2 RIR, isoladores podem ir à falha na última série.',
+    descanso:'O que estiver indicado em cada bloco (geralmente 45-75s, só após completar o bi-set).',
+    progressao:'Dupla progressão: quando bater o topo da faixa de reps em TODAS as séries de um exercício, suba a carga em 2-5% e volte ao início da faixa.' },
   { nome:'Deload · Recuperação', semanas:1, tipo:'deload',
-    foco:'Semana de folga ativa — essencial depois de duas semanas de drop set/rest-pause, pra evitar lesão por excesso de treino.',
-    reps:'Mesmos exercícios, mas RPE sempre "Fácil".', descanso:'Sem pressa, descanse o quanto precisar.',
-    progressao:'Reduza a carga usada em 30-40% em todos os exercícios. Não busque progressão essa semana — é recuperação, não retrocesso.' },
-  { nome:'Bloco 3 · Força e Definição', semanas:4, tipo:'forca',
-    foco:'Carga mais pesada nos compostos, isolados seguem pra definição. Nessa fase, ou pesado ou técnica avançada no mesmo exercício — nunca os dois juntos, pra proteger a articulação do ombro.',
-    reps:'Compostos: 6-8 reps. Isolados: mantenha 10-15 reps.', descanso:'90-120s nos compostos, 45-60s nos isolados.',
-    progressao:'Suba a carga do exercício composto em ~5% assim que completar 6 reps limpas em todas as séries (RPE moderado ou menor).' },
-  { nome:'Bloco 4 · Definição metabólica', semanas:4, tipo:'definicao',
-    foco:'Descanso curto, mais reps — bom momento pra superséries antagonistas (puxada + desenvolvimento, por exemplo) e mechanical drop sets, sempre com carga moderada, nunca máxima.',
-    reps:'12-15 reps em tudo, inclusive nos compostos.', descanso:'45s entre séries — cronometre.',
-    progressao:'Mantenha a carga do Bloco 3. Só suba o peso quando conseguir 15 reps limpas em todas as séries de um exercício.' },
+    foco:'Metade das séries de cada bloco — descarrega a fadiga acumulada nessas ~7 semanas antes de continuar.',
+    reps:'Mesmos exercícios e faixas de reps, só reduza o número de séries pela metade em cada bloco.', descanso:'Sem pressa.',
+    progressao:'Não busque progressão de carga essa semana. Use um peso um pouco abaixo do que vinha usando.' },
+  { nome:'Ciclo 2 · Progressão contínua', semanas:7, tipo:'hipertrofia',
+    foco:'Mesma lógica do Ciclo 1 — dupla progressão contínua, sem mudar a estrutura do plano.',
+    reps:'Siga a faixa de cada exercício na tabela do dia. Compostos a 1-2 RIR, isoladores podem ir à falha na última série.',
+    descanso:'O que estiver indicado em cada bloco.',
+    progressao:'Dupla progressão: bateu o topo da faixa em todas as séries → sobe 2-5% de carga e volta ao início da faixa.' },
   { nome:'Deload · Recuperação', semanas:1, tipo:'deload',
-    foco:'Segunda folga ativa antes do bloco final do ciclo.',
-    reps:'Mesmos exercícios, RPE sempre "Fácil".', descanso:'Sem pressa.',
-    progressao:'Reduza a carga em 30-40%. Aproveite pra registrar medidas (peito, braço, cintura) e comparar com o início do ciclo — é o termômetro do shape em V.' },
-  { nome:'Bloco 5 · Hipertrofia final e reavaliação', semanas:4, tipo:'hipertrofia',
-    foco:'Fechar o ciclo, comparar evolução (ombro/costas x cintura) e preparar o próximo programa.',
-    reps:'Volta à faixa padrão (8-12 reps).', descanso:'60-90s entre séries.',
-    progressao:'Regra padrão: +2,5kg (compostos) ou +1,25kg (isolados) quando bater o topo da faixa por 2 treinos seguidos. No fim do bloco, registre medidas e monte o próximo ciclo — já pode ser um ciclo mais avançado.' }
+    foco:'Segunda semana de metade das séries antes do ciclo final. Aproveite pra registrar medidas e comparar com o início.',
+    reps:'Mesmos exercícios, metade das séries.', descanso:'Sem pressa.',
+    progressao:'Sem progressão essa semana — é recuperação, não retrocesso.' },
+  { nome:'Ciclo 3 · Progressão contínua', semanas:6, tipo:'hipertrofia',
+    foco:'Fecha o ciclo até fevereiro. No fim, registre medidas (peito, braço, cintura) e reavalie o plano.',
+    reps:'Siga a faixa de cada exercício na tabela do dia.',
+    descanso:'O que estiver indicado em cada bloco.',
+    progressao:'Mesma dupla progressão. No fim do ciclo, compare as medidas com o início — é o termômetro do shape em V — e monte o próximo ciclo.' }
 ];
 // Versão do programa pra quem está começando agora (trilha iniciante) — mesma
 // duração total, progressão bem mais cautelosa e sem fase de carga pesada.
@@ -616,7 +674,7 @@ function cmpMedida(a,b){ const d = a.data.localeCompare(b.data); if(d!==0) retur
 function pesoAtual(){ if(medidas.length===0) return null; return [...medidas].sort((a,b)=>cmpMedida(b,a))[0].peso; }
 function pesoInicial(){ if(medidas.length===0) return null; return [...medidas].sort(cmpMedida)[0].peso; }
 function splitsDisponiveis(){ return (perfil.trilha==='iniciante') ? SPLITS_INICIANTE : SPLITS; }
-function tamanhosDeSplitDisponiveis(){ return perfil.trilha==='iniciante' ? [3,4] : [3,4,5,6]; }
+function tamanhosDeSplitDisponiveis(){ return perfil.trilha==='iniciante' ? [3,4] : [3,5]; }
 function splitAtual(){ const sp=splitsDisponiveis(); return sp[treinoEstado.splitSize] || sp[tamanhosDeSplitDisponiveis()[0]]; }
 function finishersAtuais(){ return perfil.trilha==='iniciante' ? FINISHERS_INICIANTE : FINISHERS; }
 function cardioSabadoAtual(){ return perfil.trilha==='iniciante' ? CARDIO_SABADO_INICIANTE : CARDIO_SABADO; }
@@ -634,6 +692,30 @@ function ultimoLogDoExercicio(nome){
   const logs = [...logTreino].sort((a,b)=>b.data.localeCompare(a.data));
   for(const l of logs){ const e = l.exercicios.find(x=>x.nome===nome); if(e) return {log:l, ex:e}; }
   return null;
+}
+function agruparBlocos(exercicios){
+  const grupos = [];
+  for(const e of exercicios){
+    const ultimo = grupos[grupos.length-1];
+    if(ultimo && e.bloco && ultimo.bloco===e.bloco){ ultimo.itens.push(e); }
+    else { grupos.push({ bloco: e.bloco||null, itens:[e] }); }
+  }
+  return grupos;
+}
+function renderExGroupsHTML(exercicios){
+  return agruparBlocos(exercicios).map(g=>{
+    const label = g.bloco ? `<li style="border-bottom:none;padding-bottom:0"><span class="small" style="font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--ember-dark)">${g.bloco}</span></li>` : '';
+    const itens = g.itens.map((e,i)=>{
+      const ultimo = i===g.itens.length-1;
+      const descTxt = ultimo && e.descansoBloco ? ` · desc. ${e.descansoBloco}` : '';
+      return `<li><span class="exname">${e.nome}${!e.essencial?' <span class=\"small\">(opcional se tempo curto)</span>':''}${e.dica?`<br><span class="small">${e.dica}</span>`:''}</span><span class="exmeta">${e.series}x${e.reps}${descTxt}</span></li>`;
+    }).join('');
+    return label + itens;
+  }).join('');
+}
+function renderCardioLinha(dia){
+  if(!dia.cardio) return '';
+  return `<div class="row" style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line)"><span class="small">🏃 Cardio pós-treino</span><span class="small">${dia.cardio.duracao} ${dia.cardio.zona} — ${dia.cardio.equipamento}</span></div>`;
 }
 function sugestaoCarga(nome){
   const achou = ultimoLogDoExercicio(nome);
@@ -708,8 +790,9 @@ function renderHoje(){
         <div class="row"><h2><span class="em">💪</span> Treino de hoje: ${dia.nome}</h2><span class="pill">${dia.foco}</span></div>
         <p class="sub">Janela sugerida: ${janela}</p>
         <ul class="exlist">
-          ${dia.exercicios.filter(e=>e.essencial).map(e=>`<li><span class="exname">${e.nome}${e.dica?`<br><span class="small">${e.dica}</span>`:''}</span><span class="exmeta">${e.series}x${e.reps}</span></li>`).join('')}
+          ${renderExGroupsHTML(dia.exercicios.filter(e=>e.essencial))}
         </ul>
+        ${renderCardioLinha(dia)}
         <div class="btn-row" style="margin-top:12px">
           <button class="btn btn-primary" onclick="abrirLogTreino(false)">Fazer treino agora</button>
           <button class="btn btn-ghost" onclick="abrirLogTreino(true)" style="flex:0 0 auto;width:auto;padding:12px 14px">⚡ Expresso</button>
@@ -743,7 +826,7 @@ function renderHoje(){
 
     ${treinoCardHtml}
 
-    ${sabado && !domingo ? `
+    ${sabado && !domingo && !dia.cardio ? `
     <div class="card">
       <div class="row"><h2>🏃 Cardio extra de sábado</h2><span class="pill ink">opcional</span></div>
       <p class="sub">Hoje você tem mais tempo livre — ótimo momento pro cardio que não cabe durante a semana.</p>
@@ -837,8 +920,16 @@ function abrirLinhaDoTempoPrograma(){
 function renderTreino(){
   const el = document.getElementById('tab-treino');
   const s = splitAtual();
+  const notasGerais = (perfil.trilha==='classica') ? `
+    <div class="card">
+      <h2>📋 Como esse plano funciona</h2>
+      <ul class="exlist" style="margin-top:4px">
+        ${NOTAS_GERAIS_V.map(n=>`<li><span class="exname">${n.titulo}</span></li><li style="border-bottom:none"><span class="small">${n.texto}</span></li>`).join('')}
+      </ul>
+    </div>` : '';
   el.innerHTML = `
     ${renderCardPrograma()}
+    ${notasGerais}
     <div class="card">
       <h2>Seu plano de treino</h2>
       <p class="sub">Normalmente, quantos dias por semana você treina? O plano se adapta — se faltar um dia, o próximo treino continua de onde parou, não é perdido.</p>
@@ -858,8 +949,9 @@ function renderTreino(){
       <div class="card">
         <div class="row"><h2>${i===treinoEstado.cursorDia%s.dias.length?'▶️ ':''}${d.nome}</h2><span class="pill ink">${d.foco}</span></div>
         <ul class="exlist">
-          ${d.exercicios.map(e=>`<li><span class="exname">${e.nome}${!e.essencial?' <span class=\"small\">(opcional se tempo curto)</span>':''}${e.dica?`<br><span class="small">${e.dica}</span>`:''}</span><span class="exmeta">${e.series}x${e.reps}</span></li>`).join('')}
+          ${renderExGroupsHTML(d.exercicios)}
         </ul>
+        ${renderCardioLinha(d)}
       </div>
     `).join('')}
 
@@ -869,7 +961,7 @@ function renderTreino(){
         [...logTreino].sort((a,b)=>b.data.localeCompare(a.data)).slice(0,15).map(l=>`
           <div class="hist-item">
             <div><b>${l.diaNome}</b>${l.expresso?' <span class="pill warn" style="padding:2px 7px">expresso</span>':''}<div class="d">${fmtDate(l.data)}</div></div>
-            <span class="small">${l.finisher?'+ cardio':''}</span>
+            <span class="small">${(l.finisher||l.cardioZona2)?'+ cardio':''}</span>
           </div>
         `).join('')}
     </div>
@@ -895,21 +987,28 @@ function abrirLogTreino(expresso){
     diaNome: dia.nome, expresso,
     exercicios: exList.map(e=>{
       const sug = sugestaoCarga(e.nome);
-      return { nome:e.nome, seriesAlvo:e.series, reps:e.reps, rpe:'moderado', dica:e.dica,
+      return { nome:e.nome, seriesAlvo:e.series, reps:e.reps, rpe:'moderado', dica:e.dica, bloco:e.bloco, descansoBloco:e.descansoBloco,
         sets: Array.from({length:e.series}).map(()=>({peso: sug?String(sug.valor):'', reps:''})) };
     }),
-    finisher: !expresso,
+    finisher: dia.cardio ? false : !expresso,
+    cardioZona2: dia.cardio ? false : undefined,
+    cardioInfo: dia.cardio || null,
     cardioExtraMin: 0
   };
   abrirModal(renderModalLogTreino());
 }
 function renderModalLogTreino(){
+  const grupos = agruparBlocos(logRascunho.exercicios);
   const fins = finishersAtuais();
   const finisher = fins[new Date().getDay() % fins.length];
   return `
     <button class="closebtn" onclick="fecharModal()">&times;</button>
     <h3>${logRascunho.diaNome}${logRascunho.expresso?' · Expresso':''}</h3>
-    ${logRascunho.exercicios.map((e,ei)=>`
+    ${grupos.map(g=>`
+      ${g.bloco?`<p class="small" style="font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:var(--ember-dark);margin:10px 0 4px">${g.bloco}</p>`:''}
+      ${g.itens.map(e=>{
+        const ei = logRascunho.exercicios.indexOf(e);
+        return `
       <div class="exblock">
         <div class="exhead"><span class="n">${e.nome}</span><span class="meta">alvo ${e.seriesAlvo}x${e.reps}</span></div>
         ${e.dica?`<p class="small" style="margin:2px 0 8px">${e.dica}</p>`:''}
@@ -927,12 +1026,19 @@ function renderModalLogTreino(){
           <button class="${e.rpe==='moderado'?'sel':''}" onclick="setRpe(${ei},'moderado')">Moderado</button>
           <button class="${e.rpe==='dificil'?'sel':''}" onclick="setRpe(${ei},'dificil')">Difícil</button>
         </div>
-      </div>
+        ${e.descansoBloco?`<p class="small" style="margin-top:6px">Descanso após esse bloco: ${e.descansoBloco}</p>`:''}
+      </div>`;
+      }).join('')}
     `).join('')}
+    ${logRascunho.cardioInfo ? `
+    <div class="checkrow">
+      <input type="checkbox" ${logRascunho.cardioZona2?'checked':''} onchange="logRascunho.cardioZona2=this.checked">
+      <span class="lbl"><b>Cardio pós-treino:</b> ${logRascunho.cardioInfo.duracao} ${logRascunho.cardioInfo.zona} — ${logRascunho.cardioInfo.equipamento}</span>
+    </div>` : `
     <div class="checkrow">
       <input type="checkbox" ${logRascunho.finisher?'checked':''} onchange="logRascunho.finisher=this.checked">
       <span class="lbl"><b>Finisher de cardio:</b> ${finisher.nome} — ${finisher.duracao} (${finisher.formato})</span>
-    </div>
+    </div>`}
     <button class="btn btn-primary" style="margin-top:14px" onclick="salvarLogTreino()">Salvar treino de hoje</button>
   `;
 }
@@ -945,7 +1051,7 @@ function setRpe(ei,val){ logRascunho.exercicios[ei].rpe=val; abrirModal(renderMo
 function salvarLogTreino(){
   const entry = {
     id:uid(), data:todayISO(), diaNome:logRascunho.diaNome, expresso:logRascunho.expresso,
-    finisher:logRascunho.finisher,
+    finisher:logRascunho.finisher, cardioZona2:logRascunho.cardioZona2,
     exercicios: logRascunho.exercicios.map(e=>({ nome:e.nome, rpe:e.rpe, sets:e.sets.filter(s=>s.peso||s.reps) }))
   };
   logTreino.push(entry); save(KEY.logTreino, logTreino);
