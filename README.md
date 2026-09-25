@@ -208,15 +208,14 @@ Um terceiro app, independente do SERVE e do FORJA, guardado na pasta
 dar continuidade, de segunda a sexta, ao estudo que você ensinou no domingo
 — no estilo do plano de leitura do app Bíblia (YouVersion).
 
-- **Você adiciona o estudo, a IA escreve a semana**: em "Mais" → "Estudos da
-  semana" → "+ Nova semana", cole o título e as anotações do que você
-  ensinou — ou anexe direto o PDF do estudo (até 4MB; funciona até com PDF
-  escaneado ou com fotos de anotações à mão, já que quem lê é o próprio
-  Claude, não uma extração de texto). O botão "✨ Gerar com IA" chama uma
-  função do Netlify que usa a API da Anthropic (Claude) pra escrever 5
-  devocionais (segunda a sexta), cada um com versículo, reflexão, pergunta
-  pra compartilhar no grupo e uma oração — sempre revisáveis (e editáveis
-  campo a campo) antes de publicar. Sem a IA configurada, ou se preferir
+- **Você adiciona o estudo, a IA escreve a semana — de graça**: em "Mais" →
+  "Estudos da semana" → "+ Nova semana", cole o título e as anotações do
+  que você ensinou. O botão "💬 Gerar com IA (sem custo)" monta um prompt
+  pronto pra copiar e colar em qualquer IA gratuita (claude.ai,
+  chatgpt.com...); você cola a resposta dela de volta no app, e ela vira
+  os 5 devocionais da semana (versículo, reflexão, pergunta pra
+  compartilhar e oração), sempre revisáveis (e editáveis campo a campo)
+  antes de publicar. Nenhuma chave de API, nenhuma cobrança. Se preferir
   escrever você mesmo, o botão "✍️ Escrever manualmente" abre os 5 dias em
   branco pra preencher na mão.
 - **Check-in e comentário por dia**: cada pessoa do grupo marca "Concluído"
@@ -250,13 +249,7 @@ dar continuidade, de segunda a sexta, ao estudo que você ensinou no domingo
    E-mail/senha, já que o Despertas não usa senha). Cole o `firebaseConfig`
    no início do `devocional/index.html` (procure por `COLE_AQUI`). Pode ser
    um projeto Firebase novo, só pro Despertas.
-2. **IA (opcional, mas é o que torna a geração automática)**: no painel do
-   Netlify do site do Despertas, em "Site settings" → "Environment
-   variables", adicione `ANTHROPIC_API_KEY` com uma chave da
-   [console.anthropic.com](https://console.anthropic.com). Sem essa
-   variável, o botão "Gerar com IA" mostra um aviso e o líder escreve os
-   dias manualmente — o resto do app funciona normalmente.
-3. **Netlify**: igual ao FORJA — dá pra importar o mesmo repositório
+2. **Netlify**: igual ao FORJA — dá pra importar o mesmo repositório
    (`erickgenarthe/VK`) de novo em [app.netlify.com](https://app.netlify.com),
    "Add new site" → "Import an existing project", e definir **Base
    directory** como `devocional`. Esse site novo mostra o Despertas direto

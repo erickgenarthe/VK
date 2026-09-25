@@ -596,39 +596,7 @@ function novoDiaVazio(iso){
   return { data: iso, titulo:'', referencia:'', versiculo:'', texto:'', pergunta:'', oracao:'' };
 }
 function novoEstudoForm(segunda, extras){
-  return { segunda, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false, mostrarPromptManual:false, respostaIA:'', ...extras };
-}
-const PDF_TAMANHO_MAX = 4 * 1024 * 1024; // 4MB — cabe folgado no limite de payload da function
-function lerArquivoComoBase64(file){
-  return new Promise((resolve, reject) => {
-    const leitor = new FileReader();
-    leitor.onload = () => resolve(String(leitor.result).split(',')[1] || '');
-    leitor.onerror = () => reject(new Error('não deu pra ler o arquivo'));
-    leitor.readAsDataURL(file);
-  });
-}
-async function gerarDevocionalIA(){
-  const ef = state.estudoForm;
-  if (!ef.titulo.trim() || (!ef.texto.trim() && !ef.pdfBase64)){ showToast('Preencha o título e cole o conteúdo do estudo (ou anexe um PDF) primeiro.'); return; }
-  ef.gerando = true; render();
-  try{
-    const resp = await fetch('/.netlify/functions/gerar-devocional', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ titulo: ef.titulo.trim(), texto: ef.texto.trim(), dataInicioISO: ef.segunda, pdfBase64: ef.pdfBase64 || null }),
-    });
-    let data;
-    try{ data = await resp.json(); }catch(e){ throw new Error('resposta inválida do servidor'); }
-    if (!resp.ok || data.erro) throw new Error(data.erro || ('erro ' + resp.status));
-    ef.dias = data.dias;
-    showToast('✨ Devocional gerado! Revise os versículos e o texto antes de publicar.');
-  }catch(err){
-    console.error(err);
-    showToast('Não deu pra gerar automaticamente (' + err.message + '). Escreva os 5 dias manualmente abaixo.');
-    if (!ef.dias) ef.dias = datasDaSemana(ef.segunda).map(novoDiaVazio);
-  }
-  ef.gerando = false;
-  render();
+  return { segunda, titulo:'', texto:'', dias:null, mostrarPromptManual:false, respostaIA:'', ...extras };
 }
 
 /* ---------- Alternativa sem custo: gera um prompt pra copiar numa IA de
@@ -641,11 +609,7 @@ function montarPromptCopiavel(ef){
     'Tema da semana: "' + (ef.titulo || '') + '"',
     '',
   ];
-  if (ef.texto && ef.texto.trim()){
-    linhas.push('Conteúdo/anotações do estudo:', ef.texto.trim(), '');
-  } else {
-    linhas.push('O conteúdo do estudo está no PDF que vou anexar nesta conversa — leia com atenção antes de responder.', '');
-  }
+  linhas.push('Conteúdo/anotações do estudo:', (ef.texto || '').trim(), '');
   linhas.push(
     'Cada um dos 5 devocionais deve aprofundar o mesmo tema com um ângulo diferente, progredindo em profundidade ao longo da semana, e terminar com uma pergunta pra compartilhar no grupo e uma oração curta. Escreva em português do Brasil, em segunda pessoa, de forma acolhedora e nunca condescendente. Cite os versículos com o melhor da sua memória (eu reviso antes de publicar).',
     '',
@@ -975,22 +939,15 @@ function telaEstudoForm(){
       <div class="campo"><label>Semana (segunda-feira)</label><input type="date" value="${ef.segunda}" data-action="mudar-segunda-estudo"></div>
       <div class="campo"><label>Título do estudo</label><input type="text" name="titulo" value="${esc(ef.titulo)}" placeholder="Ex.: Confiança em tempos de espera"></div>
       <div class="campo"><label>Do que você ensinou / anotações do estudo</label><textarea name="texto" rows="6" placeholder="Cole aqui os principais pontos do que você ensinou — o Despertas usa isso pra escrever os 5 devocionais da semana.">${esc(ef.texto)}</textarea></div>
-      <div class="campo">
-        <label>Ou anexe o PDF do estudo (opcional, até 4MB)</label>
-        <input type="file" accept="application/pdf" data-action="selecionar-pdf-estudo">
-        ${ef.pdfNome ? `<p class="hint" style="margin-top:6px;">📎 ${esc(ef.pdfNome)} — <a href="#" data-action="remover-pdf-estudo">remover</a></p>` : ''}
-        <p class="hint" style="margin-top:6px;">Pode colar o texto, anexar o PDF, ou os dois — a IA lê o PDF direto, mesmo escaneado.</p>
-      </div>
       ${!dias ? `<div class="row">
-        <button type="button" class="btn btn-primary" style="flex:1;" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Escrevendo…':'✨ Gerar com IA'}</button>
+        <button type="button" class="btn btn-primary" style="flex:1;" data-action="mostrar-prompt-manual">💬 Gerar com IA (sem custo)</button>
         <button type="button" class="btn btn-ghost" style="flex:1;" data-action="escrever-manual">✍️ Escrever manualmente</button>
-      </div>
-      <button type="button" class="btn btn-ghost btn-small btn-block" style="margin-top:8px;" data-action="mostrar-prompt-manual">💬 Gerar sem custo (copiar prompt pra uma IA de graça)</button>` : `<button type="button" class="btn btn-ghost btn-small" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Gerando de novo…':'🔄 Gerar de novo com IA'}</button>`}
+      </div>` : ''}
     </div>
     ${(!dias && ef.mostrarPromptManual) ? `
     <div class="cartao" style="background:var(--rosa-suave);">
       <div class="cartao-titulo">💬 Gerar numa IA gratuita</div>
-      <p class="hint" style="margin-bottom:8px;">Copie o texto abaixo e cole numa IA de graça (ex.: <strong>claude.ai</strong> ou <strong>chatgpt.com</strong>).${ef.pdfNome ? ' Anexe lá também o mesmo PDF ("' + esc(ef.pdfNome) + '").' : ''} Depois cole a resposta dela no campo logo abaixo.</p>
+      <p class="hint" style="margin-bottom:8px;">Copie o texto abaixo e cole numa IA de graça (ex.: <strong>claude.ai</strong> ou <strong>chatgpt.com</strong>). Depois cole a resposta dela no campo logo abaixo.</p>
       <textarea id="prompt-ia-texto" rows="8" readonly style="font-size:12px; font-family:monospace;">${esc(montarPromptCopiavel(ef))}</textarea>
       <button type="button" class="btn btn-secondary btn-small" style="margin-top:8px;" data-action="copiar-prompt-ia">📋 Copiar prompt</button>
       <div class="campo" style="margin-top:14px;">
@@ -1112,20 +1069,13 @@ async function handleClick(e){
       state.aba = 'estudo-form';
       render();
     }
-    else if (a === 'gerar-devocional'){ await gerarDevocionalIA(); }
-    else if (a === 'remover-pdf-estudo'){
-      e.preventDefault();
-      state.estudoForm.pdfBase64 = null;
-      state.estudoForm.pdfNome = null;
-      render();
-    }
     else if (a === 'escrever-manual'){
       state.estudoForm.dias = datasDaSemana(state.estudoForm.segunda).map(novoDiaVazio);
       render();
     }
     else if (a === 'mostrar-prompt-manual'){
       const ef = state.estudoForm;
-      if (!ef.titulo.trim()){ showToast('Preencha o título primeiro.'); return; }
+      if (!ef.titulo.trim() || !ef.texto.trim()){ showToast('Preencha o título e cole o conteúdo do estudo primeiro.'); return; }
       ef.mostrarPromptManual = true;
       render();
     }
@@ -1185,20 +1135,6 @@ async function handleChange(e){
       ef.dias = ef.dias.map((dd,i) => ({ ...dd, data: novasDatas[i] }));
     }
     render();
-  }
-  else if (a === 'selecionar-pdf-estudo'){
-    const file = el.files && el.files[0];
-    if (!file) return;
-    if (file.type !== 'application/pdf'){ showToast('Escolha um arquivo PDF.'); el.value=''; return; }
-    if (file.size > PDF_TAMANHO_MAX){ showToast('PDF muito grande — até 4MB, por favor.'); el.value=''; return; }
-    try{
-      state.estudoForm.pdfBase64 = await lerArquivoComoBase64(file);
-      state.estudoForm.pdfNome = file.name;
-      showToast('📎 PDF anexado: ' + file.name);
-      render();
-    }catch(err){
-      showToast('Não deu pra ler esse PDF — tenta colar o texto manualmente.');
-    }
   }
   else if (a === 'mudar-role-membro'){
     const uid = el.dataset.uid;
