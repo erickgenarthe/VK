@@ -210,12 +210,15 @@ dar continuidade, de segunda a sexta, ao estudo que você ensinou no domingo
 
 - **Você adiciona o estudo, a IA escreve a semana**: em "Mais" → "Estudos da
   semana" → "+ Nova semana", cole o título e as anotações do que você
-  ensinou. O botão "✨ Gerar com IA" chama uma função do Netlify que usa a
-  API da Anthropic (Claude) pra escrever 5 devocionais (segunda a sexta),
-  cada um com versículo, reflexão, pergunta pra compartilhar no grupo e uma
-  oração — sempre revisáveis (e editáveis campo a campo) antes de publicar.
-  Sem a IA configurada, ou se preferir escrever você mesmo, o botão
-  "✍️ Escrever manualmente" abre os 5 dias em branco pra preencher na mão.
+  ensinou — ou anexe direto o PDF do estudo (até 4MB; funciona até com PDF
+  escaneado ou com fotos de anotações à mão, já que quem lê é o próprio
+  Claude, não uma extração de texto). O botão "✨ Gerar com IA" chama uma
+  função do Netlify que usa a API da Anthropic (Claude) pra escrever 5
+  devocionais (segunda a sexta), cada um com versículo, reflexão, pergunta
+  pra compartilhar no grupo e uma oração — sempre revisáveis (e editáveis
+  campo a campo) antes de publicar. Sem a IA configurada, ou se preferir
+  escrever você mesmo, o botão "✍️ Escrever manualmente" abre os 5 dias em
+  branco pra preencher na mão.
 - **Check-in e comentário por dia**: cada pessoa do grupo marca "Concluído"
   no dia que fez o devocional e pode comentar o que aquele dia falou com
   ela — os comentários e o check-in são vistos por todo o grupo.
