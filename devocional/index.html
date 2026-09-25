@@ -1056,11 +1056,19 @@ function telaConfigGrupo(){
 /* ============ 11) EVENTOS (delegação num único listener por tipo) ============ */
 async function entrarComUid(uid){
   try{
-    const perfil = await carregarPerfilMembro(uid);
+    let perfil = await carregarPerfilMembro(uid);
     if (!perfil){
-      state.carregando = false; state.usuario = null; render();
-      showToast('Não encontramos seu cadastro nesse grupo. Fale com a liderança.');
-      return;
+      // a conta existe no login mas ficou sem o cadastro completo no banco
+      // (ex.: uma tentativa anterior que caiu no meio do caminho) — em vez
+      // de travar dizendo "não encontramos seu cadastro", completa agora.
+      const nome = (prompt('Quase lá! Qual é o seu nome, pra completar seu cadastro?') || '').trim();
+      if (!nome){
+        state.carregando = false; state.usuario = null; render();
+        showToast('Precisa do seu nome pra completar o cadastro — tenta de novo.');
+        return;
+      }
+      const email = (FIREBASE_CONFIGURADO && auth && auth.currentUser) ? (auth.currentUser.email || '') : '';
+      perfil = await criarPerfilMembro(uid, { nome, email });
     }
     state.usuario = perfil;
     await garantirConfigInicial();
