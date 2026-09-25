@@ -221,20 +221,26 @@ dar continuidade, de segunda a sexta, ao estudo que você ensinou no domingo
   ela — os comentários e o check-in são vistos por todo o grupo.
 - **Aba "Grupo"**: mostra, pra cada pessoa, quais dos 5 dias da semana ela já
   concluiu — accountability leve, sem virar ranking nem gamificação.
-- **Liderança compartilhável**: a primeira pessoa que se cadastra vira
-  líder automaticamente (igual ao SERVE); qualquer líder pode promover
-  outra pessoa do grupo a líder também, na aba "Grupo".
+- **Liderança compartilhável**: a primeira pessoa que entra vira líder
+  automaticamente (igual ao SERVE); qualquer líder pode promover outra
+  pessoa do grupo a líder também, na aba "Grupo".
+- **Sem senha**: entrar é só digitar o nome — sem e-mail, sem senha, sem
+  fricção pro grupo. Por baixo, o app usa login anônimo do Firebase (um uid
+  estável por navegador/aparelho); trocar de aparelho sem querer cria uma
+  pessoa "nova" no grupo, então vale avisar isso pro pessoal.
 - **Modo demonstração**: sem configurar nada, o app já funciona salvando os
   dados no navegador (`localStorage`) — inclusive a geração de devocional
   cai pro preenchimento manual sem a função de IA configurada.
 
 ### Publicar o Despertas de verdade
 
-1. **Firebase** (banco compartilhado do grupo): mesmo passo a passo do
-   SERVE — crie um projeto grátis em [firebase.google.com](https://firebase.google.com),
-   ative Firestore (produção) e Authentication → "E-mail/senha", e cole o
-   `firebaseConfig` no início do `devocional/index.html` (procure por
-   `COLE_AQUI`). Pode ser um projeto Firebase novo, só pro Despertas.
+1. **Firebase** (banco compartilhado do grupo): crie um projeto grátis em
+   [firebase.google.com](https://firebase.google.com), ative o **Firestore
+   Database** (modo produção) e, em **Authentication** → **Sign-in
+   method**, ative o provedor **Anônimo** (é só isso — não precisa de
+   E-mail/senha, já que o Despertas não usa senha). Cole o `firebaseConfig`
+   no início do `devocional/index.html` (procure por `COLE_AQUI`). Pode ser
+   um projeto Firebase novo, só pro Despertas.
 2. **IA (opcional, mas é o que torna a geração automática)**: no painel do
    Netlify do site do Despertas, em "Site settings" → "Environment
    variables", adicione `ANTHROPIC_API_KEY` com uma chave da
