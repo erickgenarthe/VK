@@ -638,7 +638,11 @@ function montarPromptCopiavel(ef){
     'Tema da semana: "' + (ef.titulo || '') + '"',
     '',
   ];
-  linhas.push('Conteúdo/anotações do estudo:', (ef.texto || '').trim(), '');
+  if (ef.texto && ef.texto.trim()){
+    linhas.push('Conteúdo/anotações do estudo:', ef.texto.trim(), '');
+  } else {
+    linhas.push('O conteúdo do estudo está no PDF que vou anexar nesta mesma conversa, logo em seguida a este prompt — leia com atenção antes de responder.', '');
+  }
   linhas.push(
     'Cada um dos 5 devocionais deve aprofundar o mesmo tema com um ângulo diferente, progredindo em profundidade ao longo da semana, e terminar com uma pergunta pra compartilhar no grupo e uma oração curta. Escreva em português do Brasil, em segunda pessoa, de forma acolhedora e nunca condescendente. Cite os versículos com o melhor da sua memória (eu reviso antes de publicar).',
     '',
@@ -1038,7 +1042,7 @@ function telaEstudoForm(){
     ${(!dias && ef.mostrarPromptManual) ? `
     <div class="cartao" style="background:var(--rosa-suave);">
       <div class="cartao-titulo">💬 Gerar numa IA gratuita</div>
-      <p class="hint" style="margin-bottom:8px;">Copie o texto abaixo e cole numa IA de graça (ex.: <strong>claude.ai</strong> ou <strong>chatgpt.com</strong>). Depois cole a resposta dela no campo logo abaixo.</p>
+      <p class="hint" style="margin-bottom:8px;">Copie o texto abaixo e cole numa IA de graça (ex.: <strong>claude.ai</strong> ou <strong>chatgpt.com</strong>).${!ef.texto.trim() ? ' Anexe também o PDF do estudo na mesma conversa, junto com o prompt.' : ''} Depois cole a resposta dela no campo logo abaixo.</p>
       <textarea id="prompt-ia-texto" rows="8" readonly style="font-size:12px; font-family:monospace;">${esc(montarPromptCopiavel(ef))}</textarea>
       <button type="button" class="btn btn-secondary btn-small" style="margin-top:8px;" data-action="copiar-prompt-ia">📋 Copiar prompt</button>
       <div class="campo" style="margin-top:14px;">
@@ -1176,7 +1180,7 @@ async function handleClick(e){
     }
     else if (a === 'mostrar-prompt-manual'){
       const ef = state.estudoForm;
-      if (!ef.titulo.trim() || !ef.texto.trim()){ showToast('Preencha o título e cole o conteúdo do estudo primeiro.'); return; }
+      if (!ef.titulo.trim()){ showToast('Preencha o título primeiro.'); return; }
       ef.mostrarPromptManual = true;
       render();
     }
