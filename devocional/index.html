@@ -595,6 +595,9 @@ function proximaSegundaLivre(lista){
 function novoDiaVazio(iso){
   return { data: iso, titulo:'', referencia:'', versiculo:'', texto:'', pergunta:'', oracao:'' };
 }
+function novoEstudoForm(segunda, extras){
+  return { segunda, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false, mostrarPromptManual:false, respostaIA:'', ...extras };
+}
 const PDF_TAMANHO_MAX = 4 * 1024 * 1024; // 4MB — cabe folgado no limite de payload da function
 function lerArquivoComoBase64(file){
   return new Promise((resolve, reject) => {
@@ -626,6 +629,53 @@ async function gerarDevocionalIA(){
   }
   ef.gerando = false;
   render();
+}
+
+/* ---------- Alternativa sem custo: gera um prompt pra copiar numa IA de
+   graça (claude.ai, chatgpt.com...) e colar a resposta de volta aqui. */
+const ESQUELETO_DIA_PROMPT = { titulo:'', referencia:'', versiculo:'', texto:'', pergunta:'', oracao:'' };
+function montarPromptCopiavel(ef){
+  const linhas = [
+    'Você vai escrever 5 devocionais diários (segunda a sexta) para um pequeno grupo de crescimento de igreja, no estilo do plano de leitura do app Bíblia (YouVersion): linguagem acolhedora, direta e prática, sem jargão teológico complicado.',
+    '',
+    'Tema da semana: "' + (ef.titulo || '') + '"',
+    '',
+  ];
+  if (ef.texto && ef.texto.trim()){
+    linhas.push('Conteúdo/anotações do estudo:', ef.texto.trim(), '');
+  } else {
+    linhas.push('O conteúdo do estudo está no PDF que vou anexar nesta conversa — leia com atenção antes de responder.', '');
+  }
+  linhas.push(
+    'Cada um dos 5 devocionais deve aprofundar o mesmo tema com um ângulo diferente, progredindo em profundidade ao longo da semana, e terminar com uma pergunta pra compartilhar no grupo e uma oração curta. Escreva em português do Brasil, em segunda pessoa, de forma acolhedora e nunca condescendente. Cite os versículos com o melhor da sua memória (eu reviso antes de publicar).',
+    '',
+    'Responda SOMENTE com um bloco de código JSON (nada de texto antes ou depois), exatamente neste formato, com os 5 dias na ordem de segunda a sexta:',
+    '',
+    '```json',
+    JSON.stringify({ dias: [ESQUELETO_DIA_PROMPT] }, null, 2),
+    '```',
+    '(repita o objeto dentro de "dias" até ter exatamente 5 itens, um por dia)',
+  );
+  return linhas.join('\n');
+}
+function extrairDiasDeRespostaIA(texto){
+  let bruto = (texto || '').trim();
+  if (!bruto) throw new Error('cole a resposta da IA primeiro');
+  const bloco = bruto.match(/```json\s*([\s\S]*?)```/i) || bruto.match(/```\s*([\s\S]*?)```/);
+  if (bloco) bruto = bloco[1].trim();
+  else {
+    const ini = bruto.indexOf('{'), fim = bruto.lastIndexOf('}');
+    if (ini >= 0 && fim > ini) bruto = bruto.slice(ini, fim + 1);
+  }
+  let obj;
+  try{ obj = JSON.parse(bruto); }
+  catch(e){ throw new Error('não consegui ler esse JSON — confira se copiou a resposta inteira, sem cortar nada'); }
+  const dias = obj && obj.dias;
+  if (!Array.isArray(dias) || dias.length !== 5) throw new Error('preciso de exatamente 5 dias dentro de "dias" no JSON');
+  return dias.map(d => ({
+    titulo: String(d.titulo||''), referencia: String(d.referencia||''), versiculo: String(d.versiculo||''),
+    texto: String(d.texto||''), pergunta: String(d.pergunta||''), oracao: String(d.oracao||''),
+  }));
 }
 async function publicarEstudo(){
   const ef = state.estudoForm;
@@ -934,8 +984,21 @@ function telaEstudoForm(){
       ${!dias ? `<div class="row">
         <button type="button" class="btn btn-primary" style="flex:1;" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Escrevendo…':'✨ Gerar com IA'}</button>
         <button type="button" class="btn btn-ghost" style="flex:1;" data-action="escrever-manual">✍️ Escrever manualmente</button>
-      </div>` : `<button type="button" class="btn btn-ghost btn-small" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Gerando de novo…':'🔄 Gerar de novo com IA'}</button>`}
+      </div>
+      <button type="button" class="btn btn-ghost btn-small btn-block" style="margin-top:8px;" data-action="mostrar-prompt-manual">💬 Gerar sem custo (copiar prompt pra uma IA de graça)</button>` : `<button type="button" class="btn btn-ghost btn-small" data-action="gerar-devocional" ${ef.gerando?'disabled':''}>${ef.gerando?'Gerando de novo…':'🔄 Gerar de novo com IA'}</button>`}
     </div>
+    ${(!dias && ef.mostrarPromptManual) ? `
+    <div class="cartao" style="background:var(--rosa-suave);">
+      <div class="cartao-titulo">💬 Gerar numa IA gratuita</div>
+      <p class="hint" style="margin-bottom:8px;">Copie o texto abaixo e cole numa IA de graça (ex.: <strong>claude.ai</strong> ou <strong>chatgpt.com</strong>).${ef.pdfNome ? ' Anexe lá também o mesmo PDF ("' + esc(ef.pdfNome) + '").' : ''} Depois cole a resposta dela no campo logo abaixo.</p>
+      <textarea id="prompt-ia-texto" rows="8" readonly style="font-size:12px; font-family:monospace;">${esc(montarPromptCopiavel(ef))}</textarea>
+      <button type="button" class="btn btn-secondary btn-small" style="margin-top:8px;" data-action="copiar-prompt-ia">📋 Copiar prompt</button>
+      <div class="campo" style="margin-top:14px;">
+        <label>Cole aqui a resposta da IA</label>
+        <textarea name="respostaIA" rows="6" placeholder="Cole a resposta (o bloco de JSON) que a IA te der aqui...">${esc(ef.respostaIA||'')}</textarea>
+      </div>
+      <button type="button" class="btn btn-primary btn-block" data-action="usar-resposta-ia">📥 Usar esse resultado</button>
+    </div>` : ''}
     ${dias ? dias.map((dd,i) => diaFormCartao(dd,i)).join('') : ''}
     ${dias ? `<button type="button" class="btn btn-primary btn-block" data-action="publicar-estudo">📅 Publicar semana</button>
       <p class="hint" style="text-align:center; margin-top:8px;">Revise os versículos e o texto antes de publicar — a IA pode errar referências.</p>` : ''}
@@ -1029,14 +1092,14 @@ async function handleClick(e){
     }
     else if (a === 'checar-aprovacao'){ await verificarAprovacao(); }
     else if (a === 'criar-estudo-semana'){
-      state.estudoForm = { segunda: d.segunda, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false };
+      state.estudoForm = novoEstudoForm(d.segunda);
       state.subTelaVoltarPara = 'hoje';
       state.aba = 'estudo-form';
       render();
     }
     else if (a === 'novo-estudo'){
       const livre = proximaSegundaLivre(state.estudosLista||[]);
-      state.estudoForm = { segunda: livre, titulo:'', texto:'', pdfBase64:null, pdfNome:null, dias:null, gerando:false };
+      state.estudoForm = novoEstudoForm(livre);
       state.subTelaVoltarPara = 'estudos';
       state.aba = 'estudo-form';
       render();
@@ -1044,7 +1107,7 @@ async function handleClick(e){
     else if (a === 'editar-estudo'){
       const s = (state.estudosLista||[]).find(x => x.id === d.id);
       if (!s) return;
-      state.estudoForm = { segunda: s.id, titulo: s.titulo||'', texto: s.temaTexto||'', pdfBase64:null, pdfNome:null, dias: (s.dias||[]).map(x => ({...x})), gerando:false };
+      state.estudoForm = novoEstudoForm(s.id, { titulo: s.titulo||'', texto: s.temaTexto||'', dias: (s.dias||[]).map(x => ({...x})) });
       state.subTelaVoltarPara = 'estudos';
       state.aba = 'estudo-form';
       render();
@@ -1059,6 +1122,32 @@ async function handleClick(e){
     else if (a === 'escrever-manual'){
       state.estudoForm.dias = datasDaSemana(state.estudoForm.segunda).map(novoDiaVazio);
       render();
+    }
+    else if (a === 'mostrar-prompt-manual'){
+      const ef = state.estudoForm;
+      if (!ef.titulo.trim()){ showToast('Preencha o título primeiro.'); return; }
+      ef.mostrarPromptManual = true;
+      render();
+    }
+    else if (a === 'copiar-prompt-ia'){
+      const txt = document.getElementById('prompt-ia-texto');
+      if (txt){
+        try{ await navigator.clipboard.writeText(txt.value); showToast('📋 Prompt copiado! Cole numa IA gratuita e depois volte com a resposta.'); }
+        catch(err2){ showToast('Não deu pra copiar automaticamente — selecione o texto e copie manualmente.'); }
+      }
+    }
+    else if (a === 'usar-resposta-ia'){
+      try{
+        const ef = state.estudoForm;
+        const datas = datasDaSemana(ef.segunda);
+        const dias = extrairDiasDeRespostaIA(ef.respostaIA).map((dd, i) => ({ ...dd, data: datas[i] }));
+        ef.dias = dias;
+        ef.mostrarPromptManual = false;
+        showToast('✨ Devocional interpretado! Revise antes de publicar.');
+        render();
+      }catch(err2){
+        showToast('Ops: ' + err2.message);
+      }
     }
     else if (a === 'publicar-estudo'){ await publicarEstudo(); }
   }catch(err){
@@ -1076,7 +1165,7 @@ function handleInput(e){
   if (tipo === 'nome' && (el.name in state.nomeForm)) state.nomeForm[el.name] = el.value;
   else if (tipo === 'estudo' && state.estudoForm){
     const ef = state.estudoForm;
-    if (el.name === 'titulo' || el.name === 'texto') ef[el.name] = el.value;
+    if (el.name === 'titulo' || el.name === 'texto' || el.name === 'respostaIA') ef[el.name] = el.value;
     else {
       const m = el.name.match(/^dia(\d)_(\w+)$/);
       if (m && ef.dias) ef.dias[Number(m[1])][m[2]] = el.value;
