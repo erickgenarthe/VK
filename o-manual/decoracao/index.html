@@ -66,6 +66,8 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .stage-frame .cap { position: absolute; left: .6rem; top: .5rem; padding: .1rem .6rem; border-radius: .3rem; background: var(--yellow); color: var(--ink); font: 800 .95rem var(--display); letter-spacing: .06em; text-transform: uppercase; }
 .piece { cursor: pointer; transition: opacity .6s ease, transform .7s cubic-bezier(.2, 1.3, .4, 1), filter .2s; transform-box: fill-box; transform-origin: center; }
 .piece.hidden { opacity: 0; transform: translateY(-40px); pointer-events: none; }
+.lt { transition: transform .8s cubic-bezier(.2, 1.4, .4, 1) calc(var(--i) * .13s); }
+.piece.hidden .lt { transform: translateY(-90px); }
 .piece:hover { filter: brightness(1.12); }
 .piece.sel { filter: drop-shadow(0 0 7px #F4BC1C) drop-shadow(0 0 2px #F4BC1C); }
 .hot { opacity: 0; transition: opacity .2s; }
@@ -134,6 +136,14 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .qr { background: #fff; padding: .35em; border-radius: .3em; display: grid; place-items: center; }
 .qr canvas, .qr img { display: block; width: 100% !important; height: auto !important; }
 .qr.ph { border: .1em dashed #999; color: #666; text-align: center; font-size: .9em; font-weight: 700; }
+
+
+/* letras para recortar */
+.lgrid { --lw: 190mm; display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; }
+.ltile { --w: min(var(--lw), 340px); width: var(--w); aspect-ratio: 78 / 82; border-radius: calc(var(--w) * .13); background: linear-gradient(135deg, rgba(255,255,255,.45), rgba(255,255,255,0) 50%), var(--c); display: grid; place-items: center; position: relative; box-shadow: 0 .5rem 1.2rem var(--shadow); font: 900 calc(var(--w) * .9) / 1 var(--display); color: var(--on); text-transform: uppercase; break-inside: avoid; }
+.ltile::before { content: ""; position: absolute; inset: 6.4%; border: calc(var(--w) * .032) solid rgba(255,255,255,.55); border-radius: calc(var(--w) * .08); }
+.ltile::after { content: attr(data-cor); position: absolute; left: 0; right: 0; bottom: 2%; text-align: center; font: 700 calc(var(--w) * .05) var(--body); letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.ltile span { position: relative; top: -2%; }
 
 /* cartões do varal */
 .vgrid { --cw: 105mm; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; justify-content: center; }
@@ -222,10 +232,12 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
   .printsec { margin: 0; display: block !important; }
   .printsec > *:not(.pane) { display: none !important; }
   .pane { display: none !important; }
-  html[data-print="varal"] #p-varal, html[data-print="parede"] #p-parede, html[data-print="caixa"] #p-caixa, html[data-print="mini"] #p-mini { display: block !important; }
+  html[data-print="varal"] #p-varal, html[data-print="letras"] #p-letras, html[data-print="caixa"] #p-caixa, html[data-print="mini"] #p-mini { display: block !important; }
   html[data-print="varal"] #p-varal, html[data-print="caixa"] #p-caixa, html[data-print="mini"] #p-mini { page: land; }
   .pane-head, .opts { display: none !important; }
   .vgrid { gap: 4mm; justify-content: flex-start; }
+  .ltile { --w: var(--lw); box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .lgrid { gap: 6mm; }
   .vcard, .poster, .kraft, .labelcard, .pg { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .poster { width: 194mm; font-size: 6.4mm; margin: 0; }
   .blk, .bigt, .kraft, .stamp, .vcard, .poster, .labelcard, .qr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -259,12 +271,13 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
     <div class="stage-box" style="margin-top:1rem">
       <div class="stage-frame" id="frame">
         <span class="cap">Fig. 1</span>
-        <svg id="stage" viewBox="0 0 1000 780" role="img" aria-label="Ilustração do palco com a decoração da série O Manual: um manual gigante aberto à esquerda, lanternas penduradas à direita, cartões pendurados ao redor da TV, caixas, marcas de passos no chão e setas.">
+        <svg id="stage" viewBox="0 0 1000 780" role="img" aria-label="Ilustração do palco com a decoração da série O Manual: as letras O M A N U A L penduradas dos dois lados da TV, cartões pendurados ao redor da TV, caixas, marcas de passos no chão e setas.">
           <defs>
             <linearGradient id="wallg" x1="0" x2="1"><stop offset="0" stop-color="#15131A"/><stop offset=".2" stop-color="#201E27"/><stop offset=".8" stop-color="#201E27"/><stop offset="1" stop-color="#15131A"/></linearGradient>
             <linearGradient id="floorg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A9BA2"/><stop offset="1" stop-color="#7E7F86"/></linearGradient>
             <linearGradient id="coneg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9B0" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9B0" stop-opacity="0"/></linearGradient>
             <radialGradient id="amber"><stop offset="0" stop-color="#FFA028" stop-opacity=".5"/><stop offset="1" stop-color="#FFA028" stop-opacity="0"/></radialGradient>
+            <linearGradient id="shine" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".45"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient>
             <linearGradient id="kraftg" x1="0" x2="1"><stop offset="0" stop-color="#C9A26B"/><stop offset="1" stop-color="#B98E55"/></linearGradient>
             <linearGradient id="tvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF9EC"/><stop offset="1" stop-color="#F3E8D2"/></linearGradient>
           </defs>
@@ -280,7 +293,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
           <ellipse cx="960" cy="540" rx="110" ry="130" fill="url(#amber)"/>
           <rect x="190" y="215" width="70" height="86" rx="3" fill="#0B0B0E" stroke="#232329" stroke-width="2"/>
           <!-- varão, refletores e TV -->
-          <rect x="225" y="168" width="735" height="9" rx="4" fill="#070709"/>
+          <rect x="225" y="168" width="660" height="9" rx="4" fill="#070709"/>
           <g id="spots">
             <g transform="translate(280 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
             <g transform="translate(400 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
@@ -295,63 +308,81 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
           <!-- pedestal de microfone, para lembrar de deixar livre -->
           <g stroke="#111" stroke-width="3" fill="none"><path d="M668 470 V590 M668 590 L640 610 M668 590 L696 610"/></g><circle cx="668" cy="466" r="6" fill="#222"/>
 
-          <!-- 1 manual gigante, aberto no chão -->
-          <g class="piece" data-id="1" tabindex="0" role="button" aria-label="Peça 1, manual gigante aberto">
-            <ellipse cx="100" cy="580" rx="95" ry="12" fill="#000" opacity=".35"/>
-            <polygon points="14,282 100,300 100,584 14,566" fill="#7A3FC0"/>
-            <polygon points="186,282 100,300 100,584 186,566" fill="#5E2E96"/>
-            <polygon points="22,276 100,292 100,574 22,558" fill="#FFF9EC"/>
-            <polygon points="178,276 100,292 100,574 178,558" fill="#F3E8D2"/>
-            <path d="M100 292 V574" stroke="#C9B997" stroke-width="3"/>
-            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" fill="#241F31">
-              <text x="60" y="326" text-anchor="middle" font-size="22" textLength="56" lengthAdjust="spacingAndGlyphs">COMO USAR</text>
-              <g transform="skewY(3.5)">
-                <rect x="32" y="332" width="20" height="20" rx="4" fill="#1F7FD6"/><text x="42" y="342" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">1</text><text x="58" y="349" font-size="15">LER</text>
-                <rect x="32" y="362" width="20" height="20" rx="4" fill="#F28A1A"/><text x="42" y="372" text-anchor="middle" dominant-baseline="central" font-size="15">2</text><text x="58" y="379" font-size="13" textLength="36" lengthAdjust="spacingAndGlyphs">CONVERSAR</text>
-                <rect x="32" y="392" width="20" height="20" rx="4" fill="#2F9E44"/><text x="42" y="402" text-anchor="middle" dominant-baseline="central" font-size="15">3</text><text x="58" y="409" font-size="15">FAZER</text>
-                <rect x="32" y="422" width="20" height="20" rx="4" fill="#7A3FC0"/><text x="42" y="432" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">4</text><text x="58" y="439" font-size="15">ORAR</text>
-              </g>
-              <rect x="36" y="478" width="46" height="46" fill="#fff" stroke="#241F31" stroke-width="2" transform="skewY(3.5)"/>
-              <g fill="#241F31" transform="skewY(3.5)"><rect x="40" y="482" width="12" height="12"/><rect x="66" y="482" width="12" height="12"/><rect x="40" y="508" width="12" height="12"/><rect x="58" y="496" width="5" height="5"/><rect x="66" y="506" width="7" height="7"/></g>
-              <g transform="skewY(-3.5)">
-                <text x="140" y="328" text-anchor="middle" font-family="Figtree, sans-serif" font-size="10" font-weight="700" fill="#5F586F" letter-spacing="1">SEMANA 1</text>
-                <text x="140" y="372" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">TODO</text>
-                <text x="140" y="404" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">BRINQUEDO</text>
-                <text x="140" y="436" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">VEM COM</text>
-                <text x="140" y="468" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">MANUAL</text>
-                <text x="140" y="502" text-anchor="middle" font-family="Figtree, sans-serif" font-size="9.5" font-weight="700" fill="#241F31">Salmos 119:105</text>
-              </g>
-            </g>
-            <path d="M158 270 V330 L150 322 L142 330 V268" fill="#DD3B32"/>
-            <g class="hot"><circle cx="100" cy="440" r="20"/><text x="100" y="441">1</text></g>
-          </g>
-          <!-- 2 lanternas penduradas -->
-          <g class="piece" data-id="2" tabindex="0" role="button" aria-label="Peça 2, lanternas penduradas no varão">
-            <g stroke="#C9C4B5" stroke-width="1.2"><path d="M845 177 V250 M895 177 V322 M945 177 V284"/></g>
-            <g>
-              <polygon class="beam" points="830,300 860,300 900,572 790,572" fill="url(#coneg)"/>
-              <polygon class="beam" points="880,372 910,372 960,572 850,572" fill="url(#coneg)"/>
-              <polygon class="beam" points="930,334 960,334 990,572 900,572" fill="url(#coneg)"/>
-              <ellipse class="beam" cx="845" cy="574" rx="48" ry="8" fill="#FFE9B0"/>
-              <ellipse class="beam" cx="905" cy="574" rx="38" ry="7" fill="#FFE9B0"/>
-              <ellipse class="beam" cx="945" cy="574" rx="32" ry="6" fill="#FFE9B0"/>
-            </g>
-            <g id="lant1" transform="translate(845 250)"><path d="M-12 0 Q0 -14 12 0" fill="none" stroke="#241F31" stroke-width="3"/><rect x="-16" y="0" width="32" height="8" rx="3" fill="#241F31"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#F4BC1C"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#FFF3B8" opacity=".55"/><circle cx="0" cy="30" r="9" fill="#FFFBE0"/><rect x="-16" y="50" width="32" height="7" rx="3" fill="#241F31"/></g>
-            <g transform="translate(895 322)"><path d="M-12 0 Q0 -14 12 0" fill="none" stroke="#241F31" stroke-width="3"/><rect x="-16" y="0" width="32" height="8" rx="3" fill="#241F31"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#F28A1A"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#FFE2A8" opacity=".5"/><circle cx="0" cy="30" r="9" fill="#FFFBE0"/><rect x="-16" y="50" width="32" height="7" rx="3" fill="#241F31"/></g>
-            <g transform="translate(945 284)"><path d="M-12 0 Q0 -14 12 0" fill="none" stroke="#241F31" stroke-width="3"/><rect x="-16" y="0" width="32" height="8" rx="3" fill="#241F31"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#F4BC1C"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#FFF3B8" opacity=".55"/><circle cx="0" cy="30" r="9" fill="#FFFBE0"/><rect x="-16" y="50" width="32" height="7" rx="3" fill="#241F31"/></g>
-            <g class="hot"><circle cx="895" cy="450" r="20"/><text x="895" y="451">2</text></g>
-          </g>
           <!-- 3 cartões do varal -->
           <g class="piece" data-id="3" tabindex="0" role="button" aria-label="Peça 3, cartões do varal">
-            <g stroke="#C9C4B5" stroke-width="1.2" opacity=".85"><path d="M260 177 L258 226 M340 177 L340 226 M660 177 L660 226 M740 177 L742 226"/></g>
-            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" text-anchor="middle">
+            
+            <g stroke="#C9C4B5" stroke-width="1.2" opacity=".85"><path d="M306 177 L306 338 M372 177 L372 338 M628 177 L628 338 M694 177 L694 338"/></g>
+            <g transform="translate(100 160.8) scale(.8)" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" text-anchor="middle">
               <g transform="rotate(-3 258 280)"><rect x="218" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="226" y="232" width="26" height="26" rx="6" fill="#1F7FD6"/><text x="239" y="246" dominant-baseline="central" font-size="19" fill="#fff">1</text><text x="258" y="304" font-size="28" fill="#241F31">LER</text><text x="258" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">3 min</text></g>
               <g transform="rotate(2 340 280)"><rect x="300" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="308" y="232" width="26" height="26" rx="6" fill="#F28A1A"/><text x="321" y="246" dominant-baseline="central" font-size="19" fill="#241F31">2</text><text x="340" y="304" font-size="19" fill="#241F31" textLength="68" lengthAdjust="spacingAndGlyphs">CONVERSAR</text><text x="340" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">4 min</text></g>
               <g transform="rotate(-2 660 280)"><rect x="620" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="628" y="232" width="26" height="26" rx="6" fill="#2F9E44"/><text x="641" y="246" dominant-baseline="central" font-size="19" fill="#241F31">3</text><text x="660" y="304" font-size="28" fill="#241F31">FAZER</text><text x="660" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">6 min</text></g>
               <g transform="rotate(3 742 280)"><rect x="702" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="710" y="232" width="26" height="26" rx="6" fill="#7A3FC0"/><text x="723" y="246" dominant-baseline="central" font-size="19" fill="#fff">4</text><text x="742" y="304" font-size="28" fill="#241F31">ORAR</text><text x="742" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">2 min</text></g>
             </g>
-            <g fill="#8A5A2B"><rect x="254" y="220" width="8" height="14" rx="2"/><rect x="336" y="220" width="8" height="14" rx="2"/><rect x="656" y="220" width="8" height="14" rx="2"/><rect x="738" y="220" width="8" height="14" rx="2"/></g>
-            <g class="hot"><circle cx="338" cy="380" r="20"/><text x="338" y="381">3</text></g>
+            <g class="hot"><circle cx="500" cy="395" r="20"/><text x="500" y="396">3</text></g>
+          </g>
+          <!-- 1 letras da esquerda -->
+          <g class="piece" data-id="1" tabindex="0" role="button" aria-label="Peça 1, letras O M A N penduradas">
+              <g class="lt" style="--i:0" transform="translate(40 200) rotate(-2 39 41)">
+                <path d="M14 -23 L14 4 M64 -23 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+                <rect width="78" height="82" rx="10" fill="#DD3B32"/>
+                <rect width="78" height="82" rx="10" fill="url(#shine)"/>
+                <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
+                <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+                <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">O</text>
+              </g>
+              <g class="lt" style="--i:1" transform="translate(128 222) rotate(1.5 39 41)">
+                <path d="M14 -45 L14 4 M64 -45 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+                <rect width="78" height="82" rx="10" fill="#F28A1A"/>
+                <rect width="78" height="82" rx="10" fill="url(#shine)"/>
+                <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
+                <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+                <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#241F31">M</text>
+              </g>
+              <g class="lt" style="--i:2" transform="translate(216 198) rotate(-1.5 39 41)">
+                <path d="M14 -21 L14 4 M64 -21 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+                <rect width="78" height="82" rx="10" fill="#F4BC1C"/>
+                <rect width="78" height="82" rx="10" fill="url(#shine)"/>
+                <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
+                <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+                <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#241F31">A</text>
+              </g>
+              <g class="lt" style="--i:3" transform="translate(304 220) rotate(2 39 41)">
+                <path d="M14 -43 L14 4 M64 -43 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+                <rect width="78" height="82" rx="10" fill="#2F9E44"/>
+                <rect width="78" height="82" rx="10" fill="url(#shine)"/>
+                <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
+                <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+                <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#241F31">N</text>
+              </g>
+            <g class="hot"><circle cx="210" cy="310" r="20"/><text x="210" y="311">1</text></g>
+          </g>
+          <!-- 2 letras da direita -->
+          <g class="piece" data-id="2" tabindex="0" role="button" aria-label="Peça 2, letras U A L penduradas">
+              <g class="lt" style="--i:4" transform="translate(618 220) rotate(-2 39 41)">
+                <path d="M14 -43 L14 4 M64 -43 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+                <rect width="78" height="82" rx="10" fill="#1F7FD6"/>
+                <rect width="78" height="82" rx="10" fill="url(#shine)"/>
+                <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
+                <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+                <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">U</text>
+              </g>
+              <g class="lt" style="--i:5" transform="translate(706 198) rotate(1.5 39 41)">
+                <path d="M14 -21 L14 4 M64 -21 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+                <rect width="78" height="82" rx="10" fill="#7A3FC0"/>
+                <rect width="78" height="82" rx="10" fill="url(#shine)"/>
+                <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
+                <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+                <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">A</text>
+              </g>
+              <g class="lt" style="--i:6" transform="translate(794 222) rotate(-1.5 39 41)">
+                <path d="M14 -45 L14 4 M64 -45 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+                <rect width="78" height="82" rx="10" fill="#DD3B32"/>
+                <rect width="78" height="82" rx="10" fill="url(#shine)"/>
+                <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
+                <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
+                <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">L</text>
+              </g>
+            <g class="hot"><circle cx="745" cy="310" r="20"/><text x="745" y="311">2</text></g>
           </g>
           <!-- 4 caixa fechada -->
           <g class="piece" data-id="4" tabindex="0" role="button" aria-label="Peça 4, caixa fechada">
@@ -433,7 +464,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
         </ul></div>
       <div class="note"><h3>Ainda a conferir</h3>
         <ul>
-          <li>Medidas do manual gigante, lanternas, cartões e caixas: conferir no palco antes de imprimir.</li>
+          <li>Medidas das letras, cartões e caixas: conferir no palco antes de imprimir.</li>
           <li>Fontes oficiais (Blockletter e Azo Sans): aqui usamos substitutas parecidas.</li>
           <li>Testar o vinil removível num canto do carpete.</li>
           <li>Versículos e temas das semanas: alinhar com o material oficial da série.</li>
@@ -455,7 +486,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
 
     <div class="tabs screen-only" role="tablist" aria-label="Peças para imprimir" id="ptabs">
       <button type="button" role="tab" aria-selected="true" data-p="varal">Varal de passos</button>
-      <button type="button" role="tab" aria-selected="false" data-p="parede">Página do livro</button>
+      <button type="button" role="tab" aria-selected="false" data-p="letras">Letras para recortar</button>
       <button type="button" role="tab" aria-selected="false" data-p="caixa">Caixa na entrada</button>
       <button type="button" role="tab" aria-selected="false" data-p="mini">Mini manual de bolso</button>
     </div>
@@ -467,11 +498,11 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
       <div class="vgrid" id="vgrid"></div>
     </div>
 
-    <div class="pane" id="p-parede" role="tabpanel" hidden>
-      <div class="pane-head"><p>Uma página por semana, para a página da direita do manual gigante (ou para a parede da entrada). Escolham a semana e imprimam em A4 ou ampliem na gráfica.</p>
-        <div class="opts" id="wsel" role="group" aria-label="Semana do cartaz"><button type="button" aria-pressed="true" data-w="0">Semana 1</button><button type="button" aria-pressed="false" data-w="1">Semana 2</button><button type="button" aria-pressed="false" data-w="2">Semana 3</button><button type="button" aria-pressed="false" data-w="3">Semana 4</button>
-        <button type="button" class="btn go" data-print="parede">Imprimir</button></div></div>
-      <div class="poster" id="poster"></div>
+    <div class="pane" id="p-letras" role="tabpanel" hidden>
+      <div class="pane-head"><p>Molde de cada letra de O MANUAL. Imprimam, recortem o E.V.A. na cor indicada e colem a moldura clara e a letra preta por cima. Cubram com celofane para o brilho.</p>
+        <div class="opts" id="lsize" role="group" aria-label="Tamanho da letra"><button type="button" aria-pressed="false" data-w="95mm">Média</button><button type="button" aria-pressed="true" data-w="190mm">Grande (1 por folha)</button>
+        <button type="button" class="btn go" data-print="letras">Imprimir</button></div></div>
+      <div class="lgrid" id="lgrid"></div>
     </div>
 
     <div class="pane" id="p-caixa" role="tabpanel" hidden>
@@ -517,9 +548,9 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
 
   /* ---------- dados ---------- */
   var PARTS = [
-    { n: 1, t: 'Manual gigante aberto', q: 1, c: 'c-blue', mat: 'Papelão grosso ou isopor, forrado de E.V.A. e papel kraft, com apoio por trás para ficar em pé. Capa roxa, páginas creme.', desc: 'Na página da esquerda ficam os 4 passos e o QR code. A da direita troca a cada semana (aba "Página do livro").', tip: 'A página da direita fica presa com velcro ou fita removível. No começo de cada semana, uma criança escolhida vira a página no culto.' },
-    { n: 2, t: 'Lanternas no varão', q: 3, c: 'c-orange', mat: 'Tubos de papelão ou copos forrados com celofane amarelo e laranja, com LED de pilha por dentro, pendurados no varão com fio de pesca em alturas diferentes.', desc: 'Luz para o meu caminho (Salmos 119:105). Com as luzes apagadas, desenham pontos de luz no chão.', tip: 'Só LED de pilha, nunca lâmpada quente perto de papel e celofane. Combinem o peso no varão com a equipe de som e luz.' },
-    { n: 3, t: 'Cartões do varal, passos 1 a 4', q: 4, c: 'c-green', mat: 'Papelão forrado ou E.V.A., pendurados no varão das luzes com fio de pesca e pregador de madeira.', desc: 'Dois de cada lado da TV.', tip: 'Combinem o peso no varão com a equipe de som e luz antes de pendurar.' },
+    { n: 1, t: 'Letras O M A N', q: 4, c: 'c-red', mat: 'Placas de papelão grosso ou isopor forradas de E.V.A. colorido, com moldura mais clara por cima e letra preta recortada. Celofane por cima dá o brilho de peça translúcida. Pendurar no varão com fio de pesca, em alturas diferentes.', desc: 'Cores do título da série: O vermelho, M laranja, A amarelo, N verde. Molde na aba "Letras para recortar".', tip: 'Cada letra tem de pesar pouco. Isopor de 1 cm ou papelão fino forrado já basta. Combinem o peso no varão com a equipe de som e luz.' },
+    { n: 2, t: 'Letras U A L', q: 3, c: 'c-blue', mat: 'Mesmo material das outras letras: U azul, A roxo, L vermelho.', desc: 'Junto com as letras da esquerda, escrevem O MANUAL dos dois lados da TV.', tip: 'Um truque para as crianças: no começo do culto, cada uma "encaixa" uma letra no varão, como se montasse o título.' },
+    { n: 3, t: 'Cartões do varal, passos 1 a 4', q: 4, c: 'c-green', mat: 'Papelão forrado ou E.V.A., pendurados no varão das luzes com fio de pesca e pregador de madeira.', desc: 'Dois de cada lado da TV, mais baixos que as letras.', tip: 'Combinem o peso no varão com a equipe de som e luz antes de pendurar.' },
     { n: 4, t: 'Caixa fechada, lado esquerdo', q: 1, c: 'c-purple', mat: 'Papelão forrado de kraft, fita larga no meio e carimbos "Contém 1 família, 4 passos" e "Este lado para cima".', desc: 'Lembra a embalagem de um brinquedo de montar.', tip: 'Deixem a caixa fora do caminho dos cabos e dos pedestais de microfone.' },
     { n: 5, t: 'Caixa aberta, lado direito', q: 1, c: 'c-red', mat: 'Papelão com os mini manuais impressos saindo de dentro.', desc: 'Cada família pega o seu na saída.', tip: 'Reponham os mini manuais antes de cada culto.' },
     { n: 6, t: 'Marcas de passos no chão', q: 4, c: 'c-yellow', mat: 'Papel contact ou vinil removível, numeradas de 1 a 4, com setas pontilhadas entre elas.', desc: 'As crianças caminham pelos 4 passos.', tip: 'Testem o vinil num canto do carpete antes de colar tudo.' },
@@ -689,21 +720,16 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
   $$('#vsize button[data-w]').forEach(function (b) { b.addEventListener('click', function () { setTimeout(fitWords, 0); }); });
   fitWords();
 
-  /* ---------- parede-manual ---------- */
-  function renderPoster(i) {
-    var w = WEEKS[i];
-    $('#poster').innerHTML = '<div class="ph"><span>Página ' + (i + 1) + ' de 4</span><span>' + esc(w[0]) + '</span></div><h3>' + esc(w[1]) + '</h3>' +
-      '<div class="vs"><q>' + esc(w[2]) + '</q><b>' + esc(w[3]) + '</b></div><div class="rows">' +
-      STEPS.map(function (s, k) { return '<div class="row"><div class="bigt blk ' + s.c + '">' + (k + 1) + '</div><div><h4>' + s.k + '</h4><p>' + esc(s.d) + '</p></div></div>'; }).join('') +
-      '</div><div class="foot"><div class="qr" data-qr></div><p>Escaneie e faça o devocional da semana em casa, com seus filhos.</p></div>';
-    qrAll();
-  }
-  $$('#wsel button[data-w]').forEach(function (b) {
+  /* ---------- letras para recortar ---------- */
+  var LET = [['O', 'Vermelho', 'c-red'], ['M', 'Laranja', 'c-orange'], ['A', 'Amarelo', 'c-yellow'], ['N', 'Verde', 'c-green'], ['U', 'Azul', 'c-blue'], ['A', 'Roxo', 'c-purple'], ['L', 'Vermelho', 'c-red']];
+  $('#lgrid').innerHTML = LET.map(function (l) { return '<div class="ltile ' + l[2] + '" data-cor="E.V.A. ' + l[1] + '" role="img" aria-label="Letra ' + l[0] + ', ' + l[1] + '"><span>' + l[0] + '</span></div>'; }).join('');
+  $$('#lsize button[data-w]').forEach(function (b) {
     b.addEventListener('click', function () {
-      $$('#wsel button[data-w]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-      renderPoster(Number(b.dataset.w));
+      $$('#lsize button[data-w]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      $('#lgrid').style.setProperty('--lw', b.dataset.w);
     });
   });
+  $('#lgrid').style.setProperty('--lw', '190mm');
 
   /* ---------- mini manual ---------- */
   var titleLetters = ['O', 'M', 'A', 'N', 'U', 'A', 'L'], tcol = ['c-red', 'c-orange', 'c-yellow', 'c-green', 'c-blue', 'c-purple', 'c-red'];
@@ -755,7 +781,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
 
   /* ---------- início ---------- */
   cur = 8; sel = 0;
-  applyStep(); renderList(); renderPoster(0); qrAll();
+  applyStep(); renderList(); qrAll();
   if (!reduce) { cur = 0; applyStep(); setTimeout(function () { if (!timer && cur === 0) auto(); }, 700); }
 })();
 </script>
