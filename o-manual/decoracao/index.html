@@ -656,6 +656,18 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
   });
   $('#vgrid').style.setProperty('--cw', '148mm');
 
+  /* encolhe a palavra do cartão até caber, qualquer que seja a fonte carregada */
+  function fitWords() {
+    $$('.vcard .word').forEach(function (w) {
+      var f = 2.7; w.style.fontSize = f + 'em';
+      while (w.scrollWidth > w.clientWidth + 1 && f > 1.2) { f -= .1; w.style.fontSize = f.toFixed(2) + 'em'; }
+    });
+  }
+  window.addEventListener('load', fitWords); window.addEventListener('resize', fitWords);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitWords);
+  $$('#vsize button[data-w]').forEach(function (b) { b.addEventListener('click', function () { setTimeout(fitWords, 0); }); });
+  fitWords();
+
   /* ---------- parede-manual ---------- */
   function renderPoster(i) {
     var w = WEEKS[i];
