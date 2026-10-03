@@ -27,6 +27,7 @@
 - Quadro de decoração: https://claude.ai/artifact/Uki8X3E7Mx73Sc4LwARFKd
 
 ## Decisões e pendências
+- Decoração sem faixas: no lugar dos dois banners laterais, um manual gigante aberto de pé (página direita troca por semana, uma criança vira a página) e três lanternas LED penduradas no varão (Salmos 119:105). Cartões do varal, caixas, marcas no chão, setas e abertura na TV continuam.
 - Os 4 temas e versículos são sugestão, no texto da Almeida Corrigida: semana 1 "Todo brinquedo vem com manual" (Salmos 119:105), semana 2 "Quem escreveu o manual?" (2 Timóteo 3:16), semana 3 "Um passo de cada vez" (Provérbios 3:5-6), semana 4 "Montar de verdade" (Tiago 1:22). Alinhar com o material oficial da série e com a versão bíblica da igreja.
 - O QR code das imagens é só um marcador. Trocar pelo QR real quando o link do devocional estiver compartilhado.
 - Medidas dos banners, cartões e caixas não foram definidas. Conferir no palco.

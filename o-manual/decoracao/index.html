@@ -73,6 +73,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .hot circle { fill: #F4BC1C; stroke: #241F31; stroke-width: 3; }
 .hot text { font: 900 22px var(--display); fill: #241F31; text-anchor: middle; dominant-baseline: central; }
 .cone { transition: opacity .5s; opacity: .22; } .dim .cone { opacity: .55; }
+.beam { transition: opacity .6s; opacity: .22; } .dim .beam { opacity: .8; }
 .shade { fill: #000; opacity: 0; transition: opacity .6s; pointer-events: none; } .dim .shade { opacity: .55; }
 .tvglow { transition: opacity .6s; opacity: 0; } .tv-on .tvglow { opacity: 1; }
 
@@ -258,7 +259,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
     <div class="stage-box" style="margin-top:1rem">
       <div class="stage-frame" id="frame">
         <span class="cap">Fig. 1</span>
-        <svg id="stage" viewBox="0 0 1000 780" role="img" aria-label="Ilustração do palco com a decoração da série O Manual: banners nas laterais, cartões pendurados ao redor da TV, caixas, marcas de passos no chão e setas.">
+        <svg id="stage" viewBox="0 0 1000 780" role="img" aria-label="Ilustração do palco com a decoração da série O Manual: um manual gigante aberto à esquerda, lanternas penduradas à direita, cartões pendurados ao redor da TV, caixas, marcas de passos no chão e setas.">
           <defs>
             <linearGradient id="wallg" x1="0" x2="1"><stop offset="0" stop-color="#15131A"/><stop offset=".2" stop-color="#201E27"/><stop offset=".8" stop-color="#201E27"/><stop offset="1" stop-color="#15131A"/></linearGradient>
             <linearGradient id="floorg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A9BA2"/><stop offset="1" stop-color="#7E7F86"/></linearGradient>
@@ -279,7 +280,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
           <ellipse cx="960" cy="540" rx="110" ry="130" fill="url(#amber)"/>
           <rect x="190" y="215" width="70" height="86" rx="3" fill="#0B0B0E" stroke="#232329" stroke-width="2"/>
           <!-- varão, refletores e TV -->
-          <rect x="225" y="168" width="570" height="9" rx="4" fill="#070709"/>
+          <rect x="225" y="168" width="735" height="9" rx="4" fill="#070709"/>
           <g id="spots">
             <g transform="translate(280 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
             <g transform="translate(400 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
@@ -294,31 +295,51 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
           <!-- pedestal de microfone, para lembrar de deixar livre -->
           <g stroke="#111" stroke-width="3" fill="none"><path d="M668 470 V590 M668 590 L640 610 M668 590 L696 610"/></g><circle cx="668" cy="466" r="6" fill="#222"/>
 
-          <!-- 1 banner esquerdo -->
-          <g class="piece" data-id="1" tabindex="0" role="button" aria-label="Peça 1, banner da esquerda">
-            <rect x="38" y="98" width="116" height="10" rx="4" fill="#3A2C1B"/>
-            <rect x="42" y="106" width="108" height="470" fill="#F1E3C7"/>
-            <rect x="42" y="106" width="108" height="470" fill="url(#coneg)" opacity=".12"/>
-            <text transform="translate(110 138) rotate(90)" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="80" fill="#241F31" textLength="330" lengthAdjust="spacingAndGlyphs">O MANUAL</text>
-            <text transform="translate(66 138) rotate(90)" font-family="Figtree, sans-serif" font-weight="700" font-size="15" fill="#241F31" textLength="190" lengthAdjust="spacingAndGlyphs">A Bíblia mostra o caminho</text>
-            <path d="M52 556 H140" stroke="#241F31" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>
-            <g class="hot"><circle cx="96" cy="330" r="20"/><text x="96" y="331">1</text></g>
+          <!-- 1 manual gigante, aberto no chão -->
+          <g class="piece" data-id="1" tabindex="0" role="button" aria-label="Peça 1, manual gigante aberto">
+            <ellipse cx="100" cy="580" rx="95" ry="12" fill="#000" opacity=".35"/>
+            <polygon points="14,282 100,300 100,584 14,566" fill="#7A3FC0"/>
+            <polygon points="186,282 100,300 100,584 186,566" fill="#5E2E96"/>
+            <polygon points="22,276 100,292 100,574 22,558" fill="#FFF9EC"/>
+            <polygon points="178,276 100,292 100,574 178,558" fill="#F3E8D2"/>
+            <path d="M100 292 V574" stroke="#C9B997" stroke-width="3"/>
+            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" fill="#241F31">
+              <text x="60" y="326" text-anchor="middle" font-size="22" textLength="56" lengthAdjust="spacingAndGlyphs">COMO USAR</text>
+              <g transform="skewY(3.5)">
+                <rect x="32" y="332" width="20" height="20" rx="4" fill="#1F7FD6"/><text x="42" y="342" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">1</text><text x="58" y="349" font-size="15">LER</text>
+                <rect x="32" y="362" width="20" height="20" rx="4" fill="#F28A1A"/><text x="42" y="372" text-anchor="middle" dominant-baseline="central" font-size="15">2</text><text x="58" y="379" font-size="13" textLength="36" lengthAdjust="spacingAndGlyphs">CONVERSAR</text>
+                <rect x="32" y="392" width="20" height="20" rx="4" fill="#2F9E44"/><text x="42" y="402" text-anchor="middle" dominant-baseline="central" font-size="15">3</text><text x="58" y="409" font-size="15">FAZER</text>
+                <rect x="32" y="422" width="20" height="20" rx="4" fill="#7A3FC0"/><text x="42" y="432" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#fff">4</text><text x="58" y="439" font-size="15">ORAR</text>
+              </g>
+              <rect x="36" y="478" width="46" height="46" fill="#fff" stroke="#241F31" stroke-width="2" transform="skewY(3.5)"/>
+              <g fill="#241F31" transform="skewY(3.5)"><rect x="40" y="482" width="12" height="12"/><rect x="66" y="482" width="12" height="12"/><rect x="40" y="508" width="12" height="12"/><rect x="58" y="496" width="5" height="5"/><rect x="66" y="506" width="7" height="7"/></g>
+              <g transform="skewY(-3.5)">
+                <text x="140" y="328" text-anchor="middle" font-family="Figtree, sans-serif" font-size="10" font-weight="700" fill="#5F586F" letter-spacing="1">SEMANA 1</text>
+                <text x="140" y="372" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">TODO</text>
+                <text x="140" y="404" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">BRINQUEDO</text>
+                <text x="140" y="436" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">VEM COM</text>
+                <text x="140" y="468" text-anchor="middle" font-size="34" textLength="66" lengthAdjust="spacingAndGlyphs">MANUAL</text>
+                <text x="140" y="502" text-anchor="middle" font-family="Figtree, sans-serif" font-size="9.5" font-weight="700" fill="#241F31">Salmos 119:105</text>
+              </g>
+            </g>
+            <path d="M158 270 V330 L150 322 L142 330 V268" fill="#DD3B32"/>
+            <g class="hot"><circle cx="100" cy="440" r="20"/><text x="100" y="441">1</text></g>
           </g>
-          <!-- 2 banner direito -->
-          <g class="piece" data-id="2" tabindex="0" role="button" aria-label="Peça 2, banner da direita, como usar">
-            <rect x="846" y="98" width="116" height="10" rx="4" fill="#3A2C1B"/>
-            <rect x="850" y="106" width="108" height="470" fill="#F1E3C7"/>
-            <text x="904" y="140" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="30" fill="#241F31" textLength="92" lengthAdjust="spacingAndGlyphs">COMO USAR</text>
-            <text x="904" y="158" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="600" font-size="11" fill="#5F586F">4 passos, 15 minutos</text>
-            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900">
-              <rect x="858" y="176" width="28" height="30" rx="6" fill="#1F7FD6"/><text x="872" y="192" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#fff">1</text><text x="892" y="198" font-size="22" fill="#241F31">LER</text>
-              <rect x="858" y="222" width="28" height="30" rx="6" fill="#F28A1A"/><text x="872" y="238" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#241F31">2</text><text x="892" y="244" font-size="22" fill="#241F31" textLength="64" lengthAdjust="spacingAndGlyphs">CONVERSAR</text>
-              <rect x="858" y="268" width="28" height="30" rx="6" fill="#2F9E44"/><text x="872" y="284" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#241F31">3</text><text x="892" y="290" font-size="22" fill="#241F31">FAZER</text>
-              <rect x="858" y="314" width="28" height="30" rx="6" fill="#7A3FC0"/><text x="872" y="330" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#fff">4</text><text x="892" y="336" font-size="22" fill="#241F31">ORAR</text></g>
-            <rect x="876" y="384" width="56" height="56" fill="#fff" stroke="#241F31" stroke-width="2"/>
-            <g fill="#241F31"><rect x="882" y="390" width="14" height="14"/><rect x="912" y="390" width="14" height="14"/><rect x="882" y="420" width="14" height="14"/><rect x="900" y="408" width="6" height="6"/><rect x="910" y="418" width="8" height="8"/><rect x="920" y="428" width="6" height="6"/></g>
-            <text x="904" y="462" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="700" font-size="11" fill="#241F31">Devocional da semana</text>
-            <g class="hot"><circle cx="904" cy="520" r="20"/><text x="904" y="521">2</text></g>
+          <!-- 2 lanternas penduradas -->
+          <g class="piece" data-id="2" tabindex="0" role="button" aria-label="Peça 2, lanternas penduradas no varão">
+            <g stroke="#C9C4B5" stroke-width="1.2"><path d="M845 177 V250 M895 177 V322 M945 177 V284"/></g>
+            <g>
+              <polygon class="beam" points="830,300 860,300 900,572 790,572" fill="url(#coneg)"/>
+              <polygon class="beam" points="880,372 910,372 960,572 850,572" fill="url(#coneg)"/>
+              <polygon class="beam" points="930,334 960,334 990,572 900,572" fill="url(#coneg)"/>
+              <ellipse class="beam" cx="845" cy="574" rx="48" ry="8" fill="#FFE9B0"/>
+              <ellipse class="beam" cx="905" cy="574" rx="38" ry="7" fill="#FFE9B0"/>
+              <ellipse class="beam" cx="945" cy="574" rx="32" ry="6" fill="#FFE9B0"/>
+            </g>
+            <g id="lant1" transform="translate(845 250)"><path d="M-12 0 Q0 -14 12 0" fill="none" stroke="#241F31" stroke-width="3"/><rect x="-16" y="0" width="32" height="8" rx="3" fill="#241F31"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#F4BC1C"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#FFF3B8" opacity=".55"/><circle cx="0" cy="30" r="9" fill="#FFFBE0"/><rect x="-16" y="50" width="32" height="7" rx="3" fill="#241F31"/></g>
+            <g transform="translate(895 322)"><path d="M-12 0 Q0 -14 12 0" fill="none" stroke="#241F31" stroke-width="3"/><rect x="-16" y="0" width="32" height="8" rx="3" fill="#241F31"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#F28A1A"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#FFE2A8" opacity=".5"/><circle cx="0" cy="30" r="9" fill="#FFFBE0"/><rect x="-16" y="50" width="32" height="7" rx="3" fill="#241F31"/></g>
+            <g transform="translate(945 284)"><path d="M-12 0 Q0 -14 12 0" fill="none" stroke="#241F31" stroke-width="3"/><rect x="-16" y="0" width="32" height="8" rx="3" fill="#241F31"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#F4BC1C"/><rect x="-18" y="8" width="36" height="42" rx="7" fill="#FFF3B8" opacity=".55"/><circle cx="0" cy="30" r="9" fill="#FFFBE0"/><rect x="-16" y="50" width="32" height="7" rx="3" fill="#241F31"/></g>
+            <g class="hot"><circle cx="895" cy="450" r="20"/><text x="895" y="451">2</text></g>
           </g>
           <!-- 3 cartões do varal -->
           <g class="piece" data-id="3" tabindex="0" role="button" aria-label="Peça 3, cartões do varal">
@@ -405,14 +426,14 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
     <div class="two">
       <div class="note"><h3>Antes de montar</h3>
         <ul>
-          <li><b>Retirar:</b> banners, cortinas laranja e azul e os cubos atuais.</li>
+          <li><b>Retirar:</b> banners antigos, cortinas laranja e azul e os cubos atuais.</li>
           <li><b>Fixação:</b> sem fita forte na parede preta. Usar fio de pesca, pregadores e o varão das luzes.</li>
           <li><b>Peso no varão:</b> combinar com a equipe de som e luz antes de pendurar.</li>
           <li><b>Segurança:</b> deixar livres os cabos e os pedestais de microfone.</li>
         </ul></div>
       <div class="note"><h3>Ainda a conferir</h3>
         <ul>
-          <li>Medidas dos banners, cartões e caixas: conferir no palco antes de imprimir.</li>
+          <li>Medidas do manual gigante, lanternas, cartões e caixas: conferir no palco antes de imprimir.</li>
           <li>Fontes oficiais (Blockletter e Azo Sans): aqui usamos substitutas parecidas.</li>
           <li>Testar o vinil removível num canto do carpete.</li>
           <li>Versículos e temas das semanas: alinhar com o material oficial da série.</li>
@@ -434,7 +455,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
 
     <div class="tabs screen-only" role="tablist" aria-label="Peças para imprimir" id="ptabs">
       <button type="button" role="tab" aria-selected="true" data-p="varal">Varal de passos</button>
-      <button type="button" role="tab" aria-selected="false" data-p="parede">Parede-manual</button>
+      <button type="button" role="tab" aria-selected="false" data-p="parede">Página do livro</button>
       <button type="button" role="tab" aria-selected="false" data-p="caixa">Caixa na entrada</button>
       <button type="button" role="tab" aria-selected="false" data-p="mini">Mini manual de bolso</button>
     </div>
@@ -447,7 +468,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
     </div>
 
     <div class="pane" id="p-parede" role="tabpanel" hidden>
-      <div class="pane-head"><p>Uma página por semana, para a parede da entrada. Escolham a semana e imprimam em A4 ou ampliem na gráfica.</p>
+      <div class="pane-head"><p>Uma página por semana, para a página da direita do manual gigante (ou para a parede da entrada). Escolham a semana e imprimam em A4 ou ampliem na gráfica.</p>
         <div class="opts" id="wsel" role="group" aria-label="Semana do cartaz"><button type="button" aria-pressed="true" data-w="0">Semana 1</button><button type="button" aria-pressed="false" data-w="1">Semana 2</button><button type="button" aria-pressed="false" data-w="2">Semana 3</button><button type="button" aria-pressed="false" data-w="3">Semana 4</button>
         <button type="button" class="btn go" data-print="parede">Imprimir</button></div></div>
       <div class="poster" id="poster"></div>
@@ -496,8 +517,8 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
 
   /* ---------- dados ---------- */
   var PARTS = [
-    { n: 1, t: 'Banner da esquerda', q: 1, c: 'c-blue', mat: 'Lona ou tecido impresso, com bastão no topo.', desc: 'Título "O Manual" na vertical e a frase da série.', tip: 'Prendam o bastão no varão e deixem o banner reto, sem encostar na caixa de som.' },
-    { n: 2, t: 'Banner da direita, "Como usar"', q: 1, c: 'c-orange', mat: 'Mesmo material do outro banner.', desc: 'Mostra os 4 passos e o QR code do devocional.', tip: 'O QR code tem de ficar na altura dos olhos de um adulto. Testem a leitura com o celular antes do culto.' },
+    { n: 1, t: 'Manual gigante aberto', q: 1, c: 'c-blue', mat: 'Papelão grosso ou isopor, forrado de E.V.A. e papel kraft, com apoio por trás para ficar em pé. Capa roxa, páginas creme.', desc: 'Na página da esquerda ficam os 4 passos e o QR code. A da direita troca a cada semana (aba "Página do livro").', tip: 'A página da direita fica presa com velcro ou fita removível. No começo de cada semana, uma criança escolhida vira a página no culto.' },
+    { n: 2, t: 'Lanternas no varão', q: 3, c: 'c-orange', mat: 'Tubos de papelão ou copos forrados com celofane amarelo e laranja, com LED de pilha por dentro, pendurados no varão com fio de pesca em alturas diferentes.', desc: 'Luz para o meu caminho (Salmos 119:105). Com as luzes apagadas, desenham pontos de luz no chão.', tip: 'Só LED de pilha, nunca lâmpada quente perto de papel e celofane. Combinem o peso no varão com a equipe de som e luz.' },
     { n: 3, t: 'Cartões do varal, passos 1 a 4', q: 4, c: 'c-green', mat: 'Papelão forrado ou E.V.A., pendurados no varão das luzes com fio de pesca e pregador de madeira.', desc: 'Dois de cada lado da TV.', tip: 'Combinem o peso no varão com a equipe de som e luz antes de pendurar.' },
     { n: 4, t: 'Caixa fechada, lado esquerdo', q: 1, c: 'c-purple', mat: 'Papelão forrado de kraft, fita larga no meio e carimbos "Contém 1 família, 4 passos" e "Este lado para cima".', desc: 'Lembra a embalagem de um brinquedo de montar.', tip: 'Deixem a caixa fora do caminho dos cabos e dos pedestais de microfone.' },
     { n: 5, t: 'Caixa aberta, lado direito', q: 1, c: 'c-red', mat: 'Papelão com os mini manuais impressos saindo de dentro.', desc: 'Cada família pega o seu na saída.', tip: 'Reponham os mini manuais antes de cada culto.' },
@@ -545,7 +566,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
     var showId = sel || cur;
     if (!showId) {
       html = '<div class="badge"><div class="bigt blk c-yellow" aria-hidden="true">0</div><div><p class="kick">Passo 0 de 8</p><h3>Antes de montar</h3></div></div>' +
-        '<p class="mat"><b>Retirar:</b> banners, cortinas laranja e azul e os cubos atuais. A decoração que aparece na foto atual deve ser ignorada.</p>' +
+        '<p class="mat"><b>Retirar:</b> banners antigos, cortinas laranja e azul e os cubos atuais. A decoração que aparece na foto atual deve ser ignorada.</p>' +
         '<p class="mat"><b>Fixação:</b> sem fita forte na parede preta. Usar fio de pesca, pregadores e o varão das luzes.</p>' +
         '<div class="tip">' + MANU + '<span>Palco limpo, tudo certo. Toquem em <b>Próximo passo</b> para ver a primeira peça chegar.</span></div>';
     } else {
