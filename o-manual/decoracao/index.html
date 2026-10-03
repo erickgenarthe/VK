@@ -67,7 +67,7 @@ button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visibl
 .piece { cursor: pointer; transition: opacity .6s ease, transform .7s cubic-bezier(.2, 1.3, .4, 1), filter .2s; transform-box: fill-box; transform-origin: center; }
 .piece.hidden { opacity: 0; transform: translateY(-40px); pointer-events: none; }
 .lt { transition: transform .8s cubic-bezier(.2, 1.4, .4, 1) calc(var(--i) * .13s); }
-.piece.hidden .lt { transform: translateY(-90px); }
+.piece.hidden .lt { transform: translateY(-50px); }
 .piece:hover { filter: brightness(1.12); }
 .piece.sel { filter: drop-shadow(0 0 7px #F4BC1C) drop-shadow(0 0 2px #F4BC1C); }
 .hot { opacity: 0; transition: opacity .2s; }
@@ -271,7 +271,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
     <div class="stage-box" style="margin-top:1rem">
       <div class="stage-frame" id="frame">
         <span class="cap">Fig. 1</span>
-        <svg id="stage" viewBox="0 0 1000 780" role="img" aria-label="Ilustração do palco com a decoração da série O Manual: as letras O M A N U A L penduradas dos dois lados da TV, cartões pendurados ao redor da TV, caixas, marcas de passos no chão e setas.">
+        <svg id="stage" viewBox="0 0 1000 780" role="img" aria-label="Ilustração do palco com a decoração da série O Manual: o nome O MANUAL em letras penduradas embaixo da TV, cartões pendurados ao redor da TV, caixas, marcas de passos no chão e setas.">
           <defs>
             <linearGradient id="wallg" x1="0" x2="1"><stop offset="0" stop-color="#15131A"/><stop offset=".2" stop-color="#201E27"/><stop offset=".8" stop-color="#201E27"/><stop offset="1" stop-color="#15131A"/></linearGradient>
             <linearGradient id="floorg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A9BA2"/><stop offset="1" stop-color="#7E7F86"/></linearGradient>
@@ -293,7 +293,7 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
           <ellipse cx="960" cy="540" rx="110" ry="130" fill="url(#amber)"/>
           <rect x="190" y="215" width="70" height="86" rx="3" fill="#0B0B0E" stroke="#232329" stroke-width="2"/>
           <!-- varão, refletores e TV -->
-          <rect x="225" y="168" width="660" height="9" rx="4" fill="#070709"/>
+          <rect x="190" y="168" width="620" height="9" rx="4" fill="#070709"/>
           <g id="spots">
             <g transform="translate(280 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
             <g transform="translate(400 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
@@ -310,79 +310,81 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
 
           <!-- 3 cartões do varal -->
           <g class="piece" data-id="3" tabindex="0" role="button" aria-label="Peça 3, cartões do varal">
-            
-            <g stroke="#C9C4B5" stroke-width="1.2" opacity=".85"><path d="M306 177 L306 338 M372 177 L372 338 M628 177 L628 338 M694 177 L694 338"/></g>
-            <g transform="translate(100 160.8) scale(.8)" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" text-anchor="middle">
+            <g stroke="#C9C4B5" stroke-width="1.2" opacity=".85"><path d="M260 177 L258 226 M340 177 L340 226 M660 177 L660 226 M740 177 L742 226"/></g>
+            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" text-anchor="middle">
               <g transform="rotate(-3 258 280)"><rect x="218" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="226" y="232" width="26" height="26" rx="6" fill="#1F7FD6"/><text x="239" y="246" dominant-baseline="central" font-size="19" fill="#fff">1</text><text x="258" y="304" font-size="28" fill="#241F31">LER</text><text x="258" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">3 min</text></g>
               <g transform="rotate(2 340 280)"><rect x="300" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="308" y="232" width="26" height="26" rx="6" fill="#F28A1A"/><text x="321" y="246" dominant-baseline="central" font-size="19" fill="#241F31">2</text><text x="340" y="304" font-size="19" fill="#241F31" textLength="68" lengthAdjust="spacingAndGlyphs">CONVERSAR</text><text x="340" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">4 min</text></g>
               <g transform="rotate(-2 660 280)"><rect x="620" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="628" y="232" width="26" height="26" rx="6" fill="#2F9E44"/><text x="641" y="246" dominant-baseline="central" font-size="19" fill="#241F31">3</text><text x="660" y="304" font-size="28" fill="#241F31">FAZER</text><text x="660" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">6 min</text></g>
               <g transform="rotate(3 742 280)"><rect x="702" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="710" y="232" width="26" height="26" rx="6" fill="#7A3FC0"/><text x="723" y="246" dominant-baseline="central" font-size="19" fill="#fff">4</text><text x="742" y="304" font-size="28" fill="#241F31">ORAR</text><text x="742" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">2 min</text></g>
             </g>
-            <g class="hot"><circle cx="500" cy="395" r="20"/><text x="500" y="396">3</text></g>
+            <g fill="#8A5A2B"><rect x="254" y="220" width="8" height="14" rx="2"/><rect x="336" y="220" width="8" height="14" rx="2"/><rect x="656" y="220" width="8" height="14" rx="2"/><rect x="738" y="220" width="8" height="14" rx="2"/></g>
+            <g class="hot"><circle cx="338" cy="286" r="20"/><text x="338" y="287">3</text></g>
           </g>
-          <!-- 1 letras da esquerda -->
-          <g class="piece" data-id="1" tabindex="0" role="button" aria-label="Peça 1, letras O M A N penduradas">
-              <g class="lt" style="--i:0" transform="translate(40 200) rotate(-2 39 41)">
-                <path d="M14 -23 L14 4 M64 -23 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+          <!-- 1 varão baixo -->
+          <g class="piece" data-id="1" tabindex="0" role="button" aria-label="Peça 1, varão baixo embaixo da TV">
+            <g stroke="#C9C4B5" stroke-width="1.4"><path d="M200 177 V350 M800 177 V350"/></g>
+            <rect x="188" y="347" width="624" height="9" rx="4.5" fill="#070709" stroke="#26262C" stroke-width="1.5"/>
+            <g class="hot"><circle cx="500" cy="352" r="20"/><text x="500" y="353">1</text></g>
+          </g>
+          <!-- 2 letras O MANUAL -->
+          <g class="piece" data-id="2" tabindex="0" role="button" aria-label="Peça 2, letras O MANUAL embaixo da TV">
+              <g class="lt" style="--i:0" transform="translate(196 366) rotate(-2 39 41)">
+                <path d="M14 -14 L14 4 M64 -14 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
                 <rect width="78" height="82" rx="10" fill="#DD3B32"/>
                 <rect width="78" height="82" rx="10" fill="url(#shine)"/>
                 <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
                 <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
                 <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">O</text>
               </g>
-              <g class="lt" style="--i:1" transform="translate(128 222) rotate(1.5 39 41)">
-                <path d="M14 -45 L14 4 M64 -45 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+              <g class="lt" style="--i:1" transform="translate(296 372) rotate(1.5 39 41)">
+                <path d="M14 -20 L14 4 M64 -20 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
                 <rect width="78" height="82" rx="10" fill="#F28A1A"/>
                 <rect width="78" height="82" rx="10" fill="url(#shine)"/>
                 <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
                 <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
                 <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#241F31">M</text>
               </g>
-              <g class="lt" style="--i:2" transform="translate(216 198) rotate(-1.5 39 41)">
-                <path d="M14 -21 L14 4 M64 -21 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+              <g class="lt" style="--i:2" transform="translate(382 364) rotate(-1.5 39 41)">
+                <path d="M14 -12 L14 4 M64 -12 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
                 <rect width="78" height="82" rx="10" fill="#F4BC1C"/>
                 <rect width="78" height="82" rx="10" fill="url(#shine)"/>
                 <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
                 <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
                 <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#241F31">A</text>
               </g>
-              <g class="lt" style="--i:3" transform="translate(304 220) rotate(2 39 41)">
-                <path d="M14 -43 L14 4 M64 -43 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+              <g class="lt" style="--i:3" transform="translate(468 372) rotate(2 39 41)">
+                <path d="M14 -20 L14 4 M64 -20 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
                 <rect width="78" height="82" rx="10" fill="#2F9E44"/>
                 <rect width="78" height="82" rx="10" fill="url(#shine)"/>
                 <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
                 <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
                 <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#241F31">N</text>
               </g>
-            <g class="hot"><circle cx="210" cy="310" r="20"/><text x="210" y="311">1</text></g>
-          </g>
-          <!-- 2 letras da direita -->
-          <g class="piece" data-id="2" tabindex="0" role="button" aria-label="Peça 2, letras U A L penduradas">
-              <g class="lt" style="--i:4" transform="translate(618 220) rotate(-2 39 41)">
-                <path d="M14 -43 L14 4 M64 -43 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+              <g class="lt" style="--i:4" transform="translate(554 364) rotate(-2 39 41)">
+                <path d="M14 -12 L14 4 M64 -12 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
                 <rect width="78" height="82" rx="10" fill="#1F7FD6"/>
                 <rect width="78" height="82" rx="10" fill="url(#shine)"/>
                 <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
                 <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
                 <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">U</text>
               </g>
-              <g class="lt" style="--i:5" transform="translate(706 198) rotate(1.5 39 41)">
-                <path d="M14 -21 L14 4 M64 -21 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+              <g class="lt" style="--i:5" transform="translate(640 372) rotate(1.5 39 41)">
+                <path d="M14 -20 L14 4 M64 -20 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
                 <rect width="78" height="82" rx="10" fill="#7A3FC0"/>
                 <rect width="78" height="82" rx="10" fill="url(#shine)"/>
                 <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
                 <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
                 <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">A</text>
               </g>
-              <g class="lt" style="--i:6" transform="translate(794 222) rotate(-1.5 39 41)">
-                <path d="M14 -45 L14 4 M64 -45 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
+              <g class="lt" style="--i:6" transform="translate(726 366) rotate(-1.5 39 41)">
+                <path d="M14 -14 L14 4 M64 -14 L64 4" stroke="#C9C4B5" stroke-width="1.4" fill="none"/>
                 <rect width="78" height="82" rx="10" fill="#DD3B32"/>
                 <rect width="78" height="82" rx="10" fill="url(#shine)"/>
                 <rect x="5" y="5" width="68" height="72" rx="6" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="2.5"/>
                 <path d="M4 76 H74" stroke="#000" stroke-opacity=".18" stroke-width="5" stroke-linecap="round"/>
                 <text x="39" y="43" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="70" fill="#fff">L</text>
               </g>
-            <g class="hot"><circle cx="745" cy="310" r="20"/><text x="745" y="311">2</text></g>
+            <g class="hot"><circle cx="500" cy="470" r="20"/><text x="500" y="471">2</text></g>
           </g>
           <!-- 4 caixa fechada -->
           <g class="piece" data-id="4" tabindex="0" role="button" aria-label="Peça 4, caixa fechada">
@@ -427,12 +429,10 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
             <g class="hot"><circle cx="512" cy="730" r="20"/><text x="512" y="731">6</text></g>
           </g>
           <!-- 7 setas e etiqueta Fig. 1 -->
-          <g class="piece" data-id="7" tabindex="0" role="button" aria-label="Peça 7, setas e etiqueta Fig. 1">
-            <g stroke="#F3E8D2" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round" fill="none"><path d="M455 440 C455 400 465 375 470 352"/><path d="M545 440 C545 400 535 375 530 352"/></g>
-            <g fill="none" stroke="#F3E8D2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M459 362 L470 348 L481 360"/><path d="M541 362 L530 348 L519 360"/></g>
+          <g class="piece" data-id="7" tabindex="0" role="button" aria-label="Peça 7, etiqueta Fig. 1">
             <rect x="454" y="196" width="92" height="30" rx="6" fill="#F4BC1C"/>
             <text x="500" y="212" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="24" fill="#241F31" letter-spacing="1">FIG. 1</text>
-            <g class="hot"><circle cx="500" cy="420" r="20"/><text x="500" y="421">7</text></g>
+            <g class="hot"><circle cx="500" cy="211" r="20"/><text x="500" y="212">7</text></g>
           </g>
           <!-- 8 abertura na TV -->
           <g class="piece" data-id="8" tabindex="0" role="button" aria-label="Peça 8, abertura na TV" id="p8">
@@ -548,13 +548,13 @@ footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line)
 
   /* ---------- dados ---------- */
   var PARTS = [
-    { n: 1, t: 'Letras O M A N', q: 4, c: 'c-red', mat: 'Placas de papelão grosso ou isopor forradas de E.V.A. colorido, com moldura mais clara por cima e letra preta recortada. Celofane por cima dá o brilho de peça translúcida. Pendurar no varão com fio de pesca, em alturas diferentes.', desc: 'Cores do título da série: O vermelho, M laranja, A amarelo, N verde. Molde na aba "Letras para recortar".', tip: 'Cada letra tem de pesar pouco. Isopor de 1 cm ou papelão fino forrado já basta. Combinem o peso no varão com a equipe de som e luz.' },
-    { n: 2, t: 'Letras U A L', q: 3, c: 'c-blue', mat: 'Mesmo material das outras letras: U azul, A roxo, L vermelho.', desc: 'Junto com as letras da esquerda, escrevem O MANUAL dos dois lados da TV.', tip: 'Um truque para as crianças: no começo do culto, cada uma "encaixa" uma letra no varão, como se montasse o título.' },
-    { n: 3, t: 'Cartões do varal, passos 1 a 4', q: 4, c: 'c-green', mat: 'Papelão forrado ou E.V.A., pendurados no varão das luzes com fio de pesca e pregador de madeira.', desc: 'Dois de cada lado da TV, mais baixos que as letras.', tip: 'Combinem o peso no varão com a equipe de som e luz antes de pendurar.' },
+    { n: 1, t: 'Varão baixo embaixo da TV', q: 1, c: 'c-blue', mat: 'Cano de PVC preto ou cabo de vassoura pintado de preto, pendurado no varão das luzes por dois fios de pesca nas pontas.', desc: 'Sustenta as letras de O MANUAL logo abaixo da TV.', tip: 'Prendam os fios fora da linha das letras e dos cartões. Combinem o peso no varão com a equipe de som e luz.' },
+    { n: 2, t: 'Letras O MANUAL', q: 7, c: 'c-red', mat: 'Placas de papelão grosso ou isopor forradas de E.V.A. colorido, com moldura mais clara por cima e letra preta recortada. Celofane por cima dá o brilho de peça translúcida. Presas ao varão baixo com fio de pesca curto, em alturas levemente diferentes.', desc: 'O vermelho, M laranja, A amarelo, N verde, U azul, A roxo, L vermelho. Moldes na aba "Letras para recortar".', tip: 'No começo do culto, cada criança encaixa uma letra no varão, como se montasse o título. Mantenham as letras leves.' },
+    { n: 3, t: 'Cartões do varal, passos 1 a 4', q: 4, c: 'c-green', mat: 'Papelão forrado ou E.V.A., pendurados no varão das luzes com fio de pesca e pregador de madeira.', desc: 'Dois de cada lado da TV, na altura dela.', tip: 'Combinem o peso no varão com a equipe de som e luz antes de pendurar.' },
     { n: 4, t: 'Caixa fechada, lado esquerdo', q: 1, c: 'c-purple', mat: 'Papelão forrado de kraft, fita larga no meio e carimbos "Contém 1 família, 4 passos" e "Este lado para cima".', desc: 'Lembra a embalagem de um brinquedo de montar.', tip: 'Deixem a caixa fora do caminho dos cabos e dos pedestais de microfone.' },
     { n: 5, t: 'Caixa aberta, lado direito', q: 1, c: 'c-red', mat: 'Papelão com os mini manuais impressos saindo de dentro.', desc: 'Cada família pega o seu na saída.', tip: 'Reponham os mini manuais antes de cada culto.' },
     { n: 6, t: 'Marcas de passos no chão', q: 4, c: 'c-yellow', mat: 'Papel contact ou vinil removível, numeradas de 1 a 4, com setas pontilhadas entre elas.', desc: 'As crianças caminham pelos 4 passos.', tip: 'Testem o vinil num canto do carpete antes de colar tudo.' },
-    { n: 7, t: 'Setas na parede e etiqueta "Fig. 1"', q: 3, c: 'c-blue', mat: 'Duas setas pontilhadas em vinil removível cor creme, apontando para a TV, e a etiqueta em E.V.A. ao lado dela.', desc: 'Faz o palco parecer a figura de um manual.', tip: 'Nada de fita forte na parede preta. Vinil removível ou fio de pesca.' },
+    { n: 7, t: 'Etiqueta "Fig. 1"', q: 1, c: 'c-blue', mat: 'Etiqueta em E.V.A. amarelo, em cima da TV, presa com fio de pesca ou vinil removível.', desc: 'Faz o palco parecer a figura de um manual.', tip: 'Nada de fita forte na parede preta. Vinil removível ou fio de pesca.' },
     { n: 8, t: 'Abertura na TV', q: 1, c: 'c-orange', mat: 'Slide com o título da série, exibido antes do culto e entre os momentos.', desc: 'A TV abre a série como a capa de um manual.', tip: 'Peçam o slide para quem opera a TV e testem a tela cheia.' }
   ];
   var WEEKS = [

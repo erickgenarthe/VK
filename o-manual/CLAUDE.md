@@ -27,7 +27,7 @@
 - Quadro de decoração: https://claude.ai/artifact/Uki8X3E7Mx73Sc4LwARFKd
 
 ## Decisões e pendências
-- Decoração sem faixas (pedido do Erick, depois de gostar das letras-peça do título do devocional): as letras O M A N U A L, em placas de E.V.A. coloridas com moldura clara e celofane, penduradas no varão dos dois lados da TV, cada uma com a cor do título. Cartões do varal ficam abaixo das letras. Moldes das letras na aba "Letras para recortar". Isso substitui a restrição original de não usar blocos/formas na decoração.
+- Decoração sem faixas (pedido do Erick, depois de gostar das letras-peça do título do devocional): as letras O M A N U A L, em placas de E.V.A. coloridas com moldura clara e celofane, penduradas embaixo da TV num varão baixo (cano preto preso ao varão das luzes por dois fios). Os cartões do varal ficam um par de cada lado da TV, na altura dela. Moldes das letras na aba "Letras para recortar". Isso substitui a restrição original de não usar blocos/formas na decoração.
 - Os 4 temas e versículos são sugestão, no texto da Almeida Corrigida: semana 1 "Todo brinquedo vem com manual" (Salmos 119:105), semana 2 "Quem escreveu o manual?" (2 Timóteo 3:16), semana 3 "Um passo de cada vez" (Provérbios 3:5-6), semana 4 "Montar de verdade" (Tiago 1:22). Alinhar com o material oficial da série e com a versão bíblica da igreja.
 - O QR code das imagens é só um marcador. Trocar pelo QR real quando o link do devocional estiver compartilhado.
 - Medidas dos banners, cartões e caixas não foram definidas. Conferir no palco.
