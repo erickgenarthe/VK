@@ -902,7 +902,8 @@ dialog.cert::backdrop { background: rgba(20, 16, 30, .65); }
   $('#certInput').addEventListener('input', function (e) { state.name = e.target.value.trim(); $('#fam').value = state.name; save(); renderCert(); renderBoard(); });
   $('#certPrint').addEventListener('click', function () {
     document.documentElement.classList.add('print-cert');
-    window.print();
+    try { window.print(); } catch (e) {}
+    toast('Para imprimir, abra o devocional no navegador do celular ou computador.');
   });
   window.addEventListener('afterprint', function () { document.documentElement.classList.remove('print-cert'); });
 
@@ -914,11 +915,23 @@ dialog.cert::backdrop { background: rgba(20, 16, 30, .65); }
     var url = location.href.split('#')[0];
     var text = 'O Manual em Família: devocional do Videira Kids para fazer em casa, em quatro semanas.';
     if (navigator.share) { navigator.share({ title: 'O Manual em Família', text: text, url: url }).catch(function () {}); }
-    else { window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank', 'noopener'); }
+    else {
+      var w = null;
+      try { w = window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank', 'noopener'); } catch (e) {}
+      if (!w) {
+        try { navigator.clipboard.writeText(url).then(function () { toast('Link copiado. Cole no WhatsApp.'); }, function () { toast(url); }); } catch (e) { toast(url); }
+      }
+    }
   });
   $('#fam').addEventListener('input', function (e) { state.name = e.target.value.trim(); save(); renderBoard(); });
   $('#reset').addEventListener('click', function () {
-    if (!confirm('Apagar todas as peças e estrelas deste aparelho e recomeçar?')) return;
+    var rb = $('#reset');
+    if (!rb.dataset.arm) {
+      rb.dataset.arm = '1'; rb.textContent = 'Toque de novo para apagar tudo';
+      setTimeout(function () { delete rb.dataset.arm; rb.textContent = 'Recomeçar do zero'; }, 4000);
+      return;
+    }
+    delete rb.dataset.arm; rb.textContent = 'Recomeçar do zero';
     state.steps = {}; state.verse = {}; save();
     for (var w = 1; w <= 4; w++) refreshWeek(w);
     $$('.game').forEach(function (g, i) { $('.resetb', g).click(); });
