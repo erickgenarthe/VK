@@ -1,0 +1,967 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O Manual em Família</title>
+<meta name="description" content="Devocional interativo do Videira Kids para fazer em casa: quatro semanas, quatro passos, e uma peça encaixada a cada passo.">
+<meta name="theme-color" content="#FBF3E4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Ideia: um manual de montar de verdade. Cada passo feito encaixa uma peça colorida no
+   "brinquedo da família" (quadro 4x4), cada versículo vira um jogo de montar palavras,
+   e no fim a família ganha o certificado de Montador do Manual. */
+:root {
+  --bg: #FBF3E4;
+  --paper: #FFFBF2;
+  --wash: #F3E8D2;
+  --ink: #241F31;
+  --muted: #5F586F;
+  --line-strong: #C9B997;
+  --focus: #1F7FD6;
+  --shadow: rgba(60, 38, 10, .18);
+
+  --green: #2F9E44;
+  --purple: #7A3FC0;
+  --yellow: #F4BC1C;
+  --red: #DD3B32;
+  --blue: #1F7FD6;
+  --orange: #F28A1A;
+
+  --on-green: #241F31;
+  --on-purple: #FFFFFF;
+  --on-yellow: #241F31;
+  --on-red: #FFFFFF;
+  --on-blue: #FFFFFF;
+  --on-orange: #241F31;
+
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #17141F; --paper: #221D2D; --wash: #2C2639; --ink: #F4EEDF; --muted: #B6AEC6;
+    --line-strong: #4A4260; --focus: #6DB4F7; --shadow: rgba(0, 0, 0, .45);
+    --green: #4CC264; --purple: #A774E8; --yellow: #F7C948; --red: #F0625A; --blue: #4DA3F2; --orange: #F7A042;
+    --on-green: #17141F; --on-purple: #17141F; --on-yellow: #17141F; --on-red: #17141F; --on-blue: #17141F; --on-orange: #17141F;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #17141F; --paper: #221D2D; --wash: #2C2639; --ink: #F4EEDF; --muted: #B6AEC6;
+  --line-strong: #4A4260; --focus: #6DB4F7; --shadow: rgba(0, 0, 0, .45);
+  --green: #4CC264; --purple: #A774E8; --yellow: #F7C948; --red: #F0625A; --blue: #4DA3F2; --orange: #F7A042;
+  --on-green: #17141F; --on-purple: #17141F; --on-yellow: #17141F; --on-red: #17141F; --on-blue: #17141F; --on-orange: #17141F;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  padding-block: 1rem 3rem;
+  padding-inline: max(16px, 4vw);
+  /* papel de manual: pontinhos de grade bem leves */
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--line-strong) 35%, transparent) 1px, transparent 1.4px);
+  background-size: 22px 22px;
+}
+.wrap { max-width: 46rem; margin-inline: auto; position: relative; }
+p { margin: 0 0 .8rem; }
+button { font-family: inherit; }
+button:focus-visible, summary:focus-visible, input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* cores por passo e por letra */
+[data-step="ler"], .c-blue { --c: var(--blue); --on: var(--on-blue); }
+[data-step="conversar"], .c-orange { --c: var(--orange); --on: var(--on-orange); }
+[data-step="fazer"], .c-green { --c: var(--green); --on: var(--on-green); }
+[data-step="orar"], .c-purple { --c: var(--purple); --on: var(--on-purple); }
+.c-red { --c: var(--red); --on: var(--on-red); }
+.c-yellow { --c: var(--yellow); --on: var(--on-yellow); }
+[data-week="1"] { --week: var(--red); --week-ink: var(--on-red); }
+[data-week="2"] { --week: var(--yellow); --week-ink: var(--on-yellow); }
+[data-week="3"] { --week: var(--blue); --week-ink: var(--on-blue); }
+[data-week="4"] { --week: var(--green); --week-ink: var(--on-green); }
+
+/* peça de montar: translúcida, com moldura interna, como as da identidade da série */
+.blk {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.42) 0%, rgba(255,255,255,0) 46%),
+    var(--c);
+  color: var(--on);
+  box-shadow: inset 0 0 0 .07em rgba(255,255,255,.55), inset 0 -.12em 0 rgba(0,0,0,.16), 0 .12em .3em var(--shadow);
+}
+.blk::after {
+  content: "";
+  position: absolute;
+  inset: .2em;
+  border: .05em solid rgba(255,255,255,.45);
+  border-radius: .12em;
+  pointer-events: none;
+}
+
+/* barra de ferramentas */
+.toolbar { display: flex; justify-content: flex-end; gap: .4rem; margin-bottom: .2rem; }
+.tool {
+  min-height: 40px;
+  padding: .3rem .8rem;
+  border: 2px solid var(--line-strong);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--ink);
+  font-weight: 600;
+  font-size: .85rem;
+  cursor: pointer;
+}
+.tool[aria-pressed="false"] { color: var(--muted); }
+
+/* cabeçalho */
+.eyebrow { margin: 0; font-weight: 700; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.logo {
+  margin: .7rem 0 1rem;
+  display: flex; flex-wrap: wrap; align-items: center; gap: .12em .38em;
+  font-family: var(--font-display); font-weight: 900;
+  font-size: clamp(2.6rem, 12.5vw, 5rem);
+  line-height: 1; text-transform: uppercase;
+}
+.logo .word { display: flex; gap: .07em; }
+.logo .t { display: grid; place-items: center; width: .86em; height: 1.1em; border-radius: .14em; font-size: 1em; }
+.logo .t::after { inset: .07em; border-radius: .1em; opacity: .7; }
+.logo .t span { position: relative; z-index: 1; text-shadow: 0 1px 0 rgba(0,0,0,.18); }
+@media (prefers-reduced-motion: no-preference) {
+  .logo .t { animation: bob 3.4s ease-in-out infinite; animation-delay: calc(var(--i) * .18s); }
+  @keyframes bob { 0%, 100% { transform: translateY(0) rotate(0); } 50% { transform: translateY(-.07em) rotate(-2deg); } }
+}
+.tagline { max-width: 34rem; font-size: 1.15rem; line-height: 1.5; margin-bottom: .6rem; }
+.how { max-width: 34rem; color: var(--muted); font-size: .98rem; margin: 0; }
+
+/* quadro: o brinquedo da família */
+.build {
+  margin: 1.6rem 0 1.4rem;
+  padding: 1.1rem;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  border-radius: 1.1rem;
+  box-shadow: 0 .35rem 0 var(--ink);
+}
+.build-top { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: .6rem 1rem; margin-bottom: .9rem; }
+.build h2 { margin: 0; font-family: var(--font-display); font-weight: 900; font-size: 1.9rem; line-height: 1; text-transform: uppercase; }
+.build .rank { margin: .25rem 0 0; font-size: .95rem; color: var(--muted); }
+.build .rank b { color: var(--ink); }
+.who { display: grid; gap: .15rem; min-width: min(100%, 15rem); flex: 1 1 14rem; max-width: 20rem; }
+.who label { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.who input {
+  min-height: 44px; padding: .4rem .7rem; font: inherit; color: var(--ink);
+  background: var(--bg); border: 2px solid var(--line-strong); border-radius: .6rem;
+}
+.grid { display: grid; grid-template-columns: 2.6rem repeat(4, minmax(0, 1fr)); gap: .4rem; align-items: stretch; }
+.grid .colh, .grid .rowh { font-size: .72rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: grid; place-items: center; text-align: center; }
+.rowh { font-family: var(--font-display); font-size: 1.15rem !important; }
+.cell {
+  position: relative; aspect-ratio: 1 / .78; min-height: 44px;
+  display: grid; place-items: center;
+  border: 2px dashed var(--line-strong); border-radius: .6rem;
+  background: transparent; color: var(--muted);
+  font-family: var(--font-display); font-weight: 900; font-size: 1.5rem; cursor: pointer;
+  padding: 0;
+}
+.cell.on { border: 0; font-size: 1.6rem; animation: none; }
+.cell.on.blk { border-radius: .6rem; font-size: 1.6rem; }
+.cell.on.blk::after { border-radius: .38rem; inset: .22rem; }
+.cell.snap { animation: snap .55s cubic-bezier(.2, 1.6, .4, 1); }
+@keyframes snap { 0% { transform: translateY(-1.4rem) scale(1.2); opacity: 0; } 70% { transform: translateY(.1rem) scale(.96); opacity: 1; } 100% { transform: none; } }
+.row-done .rowh { color: var(--ink); }
+.row-done .rowh::after { content: "★"; display: block; font-size: .8rem; color: var(--yellow); }
+.stars-line { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: center; justify-content: space-between; margin-top: .9rem; font-size: .92rem; color: var(--muted); }
+.meter { flex: 1 1 10rem; height: .9rem; border-radius: 999px; background: var(--wash); border: 2px solid var(--line-strong); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--blue), var(--green), var(--yellow), var(--orange), var(--red)); transition: width .5s ease; }
+.cert-btn {
+  min-height: 44px; padding: .5rem 1rem; border: 2px solid var(--ink); border-radius: .6rem;
+  background: var(--yellow); color: var(--on-yellow); font-weight: 700; cursor: pointer;
+}
+.cert-btn[disabled] { background: transparent; color: var(--muted); border-color: var(--line-strong); cursor: not-allowed; }
+
+/* abas de semana */
+.weeks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .4rem; margin: 0 0 1.8rem; }
+.weeks button {
+  font: inherit; text-align: left; display: grid; gap: .1rem; min-height: 44px;
+  padding: .55rem .6rem .6rem; border: 2px solid var(--line-strong); border-radius: .6rem;
+  background: transparent; color: var(--ink); cursor: pointer; position: relative;
+}
+.weeks button::before { content: ""; height: .45rem; border-radius: .2rem; background: var(--week); margin-bottom: .35rem; }
+.weeks .n { font-weight: 700; font-size: .9rem; line-height: 1.2; }
+.weeks .d { font-size: .78rem; line-height: 1.2; color: var(--muted); }
+.weeks .ck { position: absolute; top: .45rem; right: .45rem; font-size: .8rem; color: var(--yellow); display: none; text-shadow: 0 0 1px var(--ink); }
+.weeks button.full .ck { display: block; }
+.weeks button[aria-selected="true"] { background: var(--paper); border-color: var(--ink); box-shadow: 0 .2rem 0 var(--ink); }
+
+/* semana */
+.dates { margin: 0; font-weight: 600; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.now-tag { display: none; margin-left: .5rem; padding: .1rem .5rem; border-radius: .35rem; background: var(--week); color: var(--week-ink); letter-spacing: .06em; }
+.is-now .now-tag { display: inline-block; }
+.week-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 1rem; align-items: start; }
+.week-head .art { grid-row: 1 / span 3; grid-column: 2; width: 6.5rem; height: 6.5rem; color: var(--ink); }
+.week-head h2 {
+  margin: .3rem 0 .7rem; font-family: var(--font-display); font-weight: 900;
+  font-size: clamp(2.1rem, 9vw, 3.1rem); line-height: 1; text-transform: uppercase; text-wrap: balance;
+}
+.lead { max-width: 60ch; margin-bottom: 1.2rem; grid-column: 1 / -1; }
+@media (max-width: 30rem) { .week-head .art { width: 4.4rem; height: 4.4rem; } }
+
+.verse {
+  margin: 0 0 1.2rem; padding: 1.1rem 1.1rem 1.2rem; display: grid; gap: .7rem;
+  background: var(--paper); border: 2px solid var(--ink); border-radius: 1rem;
+}
+.verse .chip {
+  justify-self: start; padding: .25rem .6rem; border-radius: .4rem; background: var(--week); color: var(--week-ink);
+  font-weight: 700; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase;
+}
+.verse blockquote { margin: 0; max-width: 40ch; font-weight: 600; font-size: 1.3rem; line-height: 1.4; }
+.verse .ref { margin: 0; font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; letter-spacing: .04em; text-transform: uppercase; }
+.verse .kid { margin: 0; color: var(--muted); font-size: .98rem; }
+.verse .kid b { color: var(--ink); }
+.verse .acts { display: flex; flex-wrap: wrap; gap: .5rem; }
+.pill {
+  min-height: 44px; padding: .4rem 1rem; border: 2px solid var(--ink); border-radius: 999px;
+  background: transparent; color: var(--ink); font-weight: 600; font-size: .92rem; cursor: pointer;
+}
+.pill.solid { background: var(--week); border-color: var(--week); color: var(--week-ink); }
+.pill[disabled] { opacity: .5; cursor: default; }
+
+/* jogo: monte o versículo */
+.game { margin: 0 0 1.6rem; padding: 1rem; border: 2px dashed var(--line-strong); border-radius: 1rem; background: color-mix(in srgb, var(--wash) 55%, transparent); }
+.game h3 { margin: 0 0 .2rem; font-family: var(--font-display); font-weight: 900; font-size: 1.5rem; line-height: 1; text-transform: uppercase; }
+.game .sub { margin: 0 0 .8rem; color: var(--muted); font-size: .95rem; }
+.built, .bank { display: flex; flex-wrap: wrap; gap: .35rem; }
+.built { min-height: 3rem; padding: .5rem; margin-bottom: .8rem; background: var(--paper); border-radius: .7rem; border: 2px solid var(--line-strong); align-content: flex-start; }
+.built .w { padding: .2rem .55rem; border-radius: .4rem; font-weight: 700; --c: var(--week); --on: var(--week-ink); animation: snap .4s cubic-bezier(.2, 1.6, .4, 1); font-size: 1rem; line-height: 1.5; }
+.built .w::after { inset: .12em; border-radius: .25em; }
+.built .ph { color: var(--muted); font-size: .92rem; padding: .2rem; }
+.bank button {
+  min-height: 40px; padding: .25rem .7rem; font-size: 1rem; font-weight: 600;
+  background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: .5rem; cursor: pointer;
+  box-shadow: 0 .15rem 0 var(--ink);
+}
+.bank button:active { transform: translateY(.1rem); box-shadow: 0 .05rem 0 var(--ink); }
+.bank button[disabled] { visibility: hidden; }
+.bank button.hint { background: var(--yellow); color: var(--on-yellow); }
+.bank button.wrong { animation: shake .35s; border-color: var(--red); }
+@keyframes shake { 20%, 60% { transform: translateX(-5px); } 40%, 80% { transform: translateX(5px); } }
+.game .gbar { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .9rem; }
+.game .msg { font-weight: 700; margin: 0; }
+.game.won { border-style: solid; border-color: var(--week); }
+
+/* progresso da semana */
+.progress { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem; margin-bottom: 1.2rem; }
+.plabel { font-weight: 700; font-size: .85rem; letter-spacing: .06em; text-transform: uppercase; }
+.segs { display: flex; gap: .3rem; }
+.seg { display: block; width: 2rem; height: .9rem; border-radius: .3rem; border: 2px solid var(--line-strong); }
+.seg.on { background: var(--c); border-color: var(--c); }
+.count { font-size: .9rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.complete { margin: -.4rem 0 1.4rem; padding: .8rem 1rem; border-radius: .6rem; background: var(--wash); font-weight: 600; border-left: .4rem solid var(--week); }
+.complete .next { display: block; margin-top: .5rem; }
+.week-tools { display: flex; justify-content: flex-end; margin: -.4rem 0 1rem; }
+.link { background: none; border: 0; padding: .4rem 0; color: var(--muted); font-size: .9rem; text-decoration: underline; cursor: pointer; min-height: 44px; }
+
+/* passos */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.25rem; }
+.step { position: relative; display: grid; grid-template-columns: 3.5rem minmax(0, 1fr); gap: 1rem; scroll-margin-top: 1rem; }
+.step:not(:last-child)::before {
+  content: ""; position: absolute; left: 1.75rem; top: 3.75rem; bottom: -1.25rem;
+  border-left: 3px dotted var(--line-strong); transform: translateX(-1.5px);
+}
+.step.is-done:not(:last-child)::before { border-left-color: var(--c); }
+.tile {
+  width: 3.5rem; height: 3.5rem; display: grid; place-items: center; border-radius: .8rem;
+  font-family: var(--font-display); font-weight: 900; font-size: 2rem; line-height: 1; position: relative; z-index: 1;
+}
+.tile::after { border-radius: .5rem; inset: .28rem; }
+.tile span { position: relative; z-index: 1; }
+.step.is-done .num { display: none; }
+.step.is-done .tile::before { content: "\2713"; position: relative; z-index: 1; font-family: var(--font-body); font-weight: 700; }
+.step.just .tile { animation: snap .55s cubic-bezier(.2, 1.6, .4, 1); }
+.body { min-width: 0; padding-bottom: .4rem; }
+.body h3 {
+  display: flex; align-items: baseline; flex-wrap: wrap; gap: .2rem .6rem; margin: .2rem 0 .45rem;
+  font-family: var(--font-display); font-weight: 800; font-size: 1.75rem; line-height: 1; letter-spacing: .02em; text-transform: uppercase;
+}
+.body h3 .time { font-family: var(--font-body); font-weight: 500; font-size: .85rem; letter-spacing: 0; text-transform: none; color: var(--muted); }
+.body p { max-width: 60ch; }
+.act-title { font-weight: 700; margin-bottom: .3rem; }
+.mat { color: var(--muted); font-size: .98rem; }
+.mat b { color: var(--ink); }
+.q { list-style: none; margin: .3rem 0 .6rem; padding: 0; display: grid; gap: .6rem; max-width: 60ch; counter-reset: q; }
+.q li { position: relative; padding: .45rem .6rem .45rem 2.3rem; border-radius: .6rem; counter-increment: q; transition: background-color .2s; }
+.q li::before {
+  content: counter(q); position: absolute; left: .45rem; top: .5rem; width: 1.5rem; height: 1.5rem; display: grid; place-items: center;
+  border-radius: .35rem; background: var(--c); color: var(--on); font-family: var(--font-display); font-weight: 900; font-size: 1.05rem; line-height: 1;
+}
+.q li.picked { background: color-mix(in srgb, var(--c) 22%, transparent); outline: 2px solid var(--c); }
+.ages { margin: 0 0 .6rem; max-width: 60ch; }
+.ages summary { cursor: pointer; font-weight: 600; font-size: .95rem; padding: .3rem 0; min-height: 44px; display: flex; align-items: center; }
+.ages p { margin: .3rem 0; font-size: .98rem; color: var(--muted); }
+.ages p b { color: var(--ink); }
+.prayer { max-width: 60ch; margin: .4rem 0 .6rem; padding: .8rem 1rem; border-radius: .6rem; background: var(--wash); }
+.prayer small { display: block; margin-bottom: .2rem; font-weight: 700; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.prayer p { margin: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .3rem; }
+.timer {
+  min-height: 44px; padding: .4rem 1rem; border: 2px solid var(--c); border-radius: 999px; background: transparent; color: var(--ink);
+  font: 600 .92rem var(--font-body); font-variant-numeric: tabular-nums; cursor: pointer;
+}
+.timer.run { background: var(--c); color: var(--on); }
+.timer.end { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); }
+.done {
+  min-height: 44px; padding: .5rem 1rem; border: 2px solid var(--ink); border-radius: .6rem;
+  background: transparent; color: var(--ink); font: 700 .95rem var(--font-body); cursor: pointer;
+}
+.done[aria-pressed="true"] { background: var(--c); border-color: var(--c); color: var(--on); }
+
+footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 2px dotted var(--line-strong); color: var(--muted); font-size: .9rem; display: flex; flex-wrap: wrap; gap: .3rem 1.5rem; justify-content: space-between; }
+footer p { margin: 0 0 .3rem; }
+
+/* avisos e confete */
+.toast {
+  position: fixed; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); transform: translate(-50%, 150%);
+  z-index: 30; max-width: min(92vw, 26rem); padding: .7rem 1.1rem; border-radius: .8rem;
+  background: var(--ink); color: var(--bg); font-weight: 700; text-align: center; transition: transform .35s cubic-bezier(.2, 1.4, .4, 1);
+}
+.toast.show { transform: translate(-50%, 0); }
+canvas.confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 40; }
+
+/* certificado */
+dialog.cert { border: 0; padding: 0; background: transparent; max-width: min(94vw, 40rem); width: 100%; color: #241F31; }
+dialog.cert::backdrop { background: rgba(20, 16, 30, .65); }
+.sheet {
+  margin: 0; padding: 1.4rem 1.4rem 1.2rem; background: #FFF9EC; border-radius: 1rem; text-align: center;
+  border: .5rem solid #FFF9EC; outline: 3px solid #241F31; outline-offset: -.5rem;
+}
+.sheet .strip { display: flex; gap: .25rem; justify-content: center; margin-bottom: .8rem; }
+.sheet .strip i { width: 1.6rem; height: 1.3rem; border-radius: .25rem; }
+.sheet h2 { margin: 0; font-family: var(--font-display); font-weight: 900; font-size: clamp(1.8rem, 8vw, 2.8rem); line-height: 1; text-transform: uppercase; }
+.sheet .sub { margin: .4rem 0 .8rem; font-weight: 600; color: #5F586F; }
+.sheet .nm { margin: .2rem auto .8rem; padding: .1rem 1rem; font-family: var(--font-display); font-weight: 900; font-size: clamp(2rem, 9vw, 3.2rem); line-height: 1.1; border-bottom: 3px dotted #C9B997; max-width: 90%; overflow-wrap: anywhere; }
+.sheet .list { margin: 0 0 .8rem; padding: 0; list-style: none; display: grid; gap: .2rem; font-size: .95rem; }
+.sheet .list b { font-family: var(--font-display); font-size: 1.1rem; letter-spacing: .03em; text-transform: uppercase; }
+.sheet .fine { margin: 0; font-size: .85rem; color: #5F586F; }
+.cert-ctl { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: .8rem; }
+.cert-ctl .name { flex: 1 1 12rem; min-height: 44px; padding: .4rem .7rem; font: inherit; border: 2px solid #C9B997; border-radius: .6rem; background: #FFFBF2; color: #241F31; }
+.cert-ctl .pill { background: #FFF9EC; color: #241F31; border-color: #241F31; }
+.cert-ctl .pill.solid { background: #F4BC1C; border-color: #241F31; }
+
+@media (min-width: 40rem) {
+  .weeks .n { font-size: 1rem; }
+  .weeks .d { font-size: .85rem; }
+}
+@media (max-width: 30rem) {
+  .grid { grid-template-columns: 2rem repeat(4, minmax(0, 1fr)); gap: .3rem; }
+  .grid .colh { font-size: .62rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .cell.snap, .step.just .tile, .built .w { animation: none; }
+  .toast, .meter i { transition: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .done, .weeks button, .seg, .pill, .timer { transition: background-color .15s, border-color .15s, transform .15s; }
+  .done:active, .pill:active { transform: scale(.97); }
+}
+
+/* impressão: a semana aberta, sem botões, para colar na geladeira */
+@media print {
+  body { background: #fff; background-image: none; padding: 0; }
+  .toolbar, .build, .weeks, .game, .acts, .actions, .week-tools, footer, .toast, canvas.confetti, .progress, .complete { display: none !important; }
+  .verse, .prayer { break-inside: avoid; }
+  .step { break-inside: avoid; }
+  .week[hidden] { display: none !important; }
+  .blk, .tile { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html.print-cert .wrap { display: none !important; }
+  html.print-cert dialog.cert { display: block !important; position: static !important; margin: 0 auto !important; max-width: 100%; }
+  html.print-cert .cert-ctl { display: none !important; }
+  html.print-cert .sheet { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="toolbar">
+    <button type="button" class="tool" id="snd" aria-pressed="true">Som ligado</button>
+    <button type="button" class="tool" id="share">Compartilhar</button>
+  </div>
+
+  <header>
+    <p class="eyebrow">Série de outubro · Videira Kids</p>
+    <h1 class="logo" aria-label="O Manual em Família" id="logo"></h1>
+    <p class="tagline">A Bíblia mostra o caminho. Um devocional para fazer em casa, com seus filhos, ao longo de cada semana de outubro.</p>
+    <p class="how">Escolham um dia da semana (quarta ou sábado funcionam bem), separem 15 minutos e sigam os quatro passos na ordem: ler, conversar, fazer e orar. A cada passo, uma peça se encaixa no brinquedo da família.</p>
+  </header>
+
+  <section class="build" aria-labelledby="build-h">
+    <div class="build-top">
+      <div>
+        <h2 id="build-h">O brinquedo da família</h2>
+        <p class="rank" id="rank" aria-live="polite"></p>
+      </div>
+      <div class="who">
+        <label for="fam">Quem está montando?</label>
+        <input id="fam" type="text" maxlength="40" placeholder="Ex.: Família Silva ou Ana" autocomplete="off">
+      </div>
+    </div>
+    <div class="grid" id="grid" role="group" aria-label="Quadro de peças: uma linha por semana, uma coluna por passo"></div>
+    <div class="stars-line">
+      <span id="pieces">0 de 16 peças</span>
+      <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+      <button type="button" class="cert-btn" id="certBtn" disabled>Certificado</button>
+    </div>
+  </section>
+
+  <nav class="weeks" role="tablist" aria-label="Semanas do devocional" id="tabs"></nav>
+  <main id="main"></main>
+
+  <footer>
+    <div>
+      <p>Devocional da série de outubro do Videira Kids.</p>
+      <p>As peças e estrelas ficam salvas neste aparelho. Versículos na versão Almeida Corrigida.</p>
+    </div>
+    <button type="button" class="link" id="reset">Recomeçar do zero</button>
+  </footer>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+<dialog class="cert" id="cert" aria-labelledby="cert-h">
+  <div class="sheet">
+    <div class="strip" aria-hidden="true"><i style="background:#DD3B32"></i><i style="background:#F28A1A"></i><i style="background:#F4BC1C"></i><i style="background:#2F9E44"></i><i style="background:#1F7FD6"></i><i style="background:#7A3FC0"></i></div>
+    <h2 id="cert-h">Montador do Manual</h2>
+    <p class="sub">Este certificado é da família</p>
+    <p class="nm" id="certName">Sua família</p>
+    <ul class="list" id="certList"></ul>
+    <p class="fine" id="certDate"></p>
+    <p class="fine">Videira Kids · CC Videira · A Bíblia mostra o caminho. Deus fala e guia.</p>
+    <div class="strip" aria-hidden="true" style="margin:.8rem 0 0"><i style="background:#7A3FC0"></i><i style="background:#1F7FD6"></i><i style="background:#2F9E44"></i><i style="background:#F4BC1C"></i><i style="background:#F28A1A"></i><i style="background:#DD3B32"></i></div>
+    <div class="cert-ctl">
+      <input class="name" id="certInput" type="text" maxlength="40" placeholder="Nome da família ou da criança" aria-label="Nome no certificado">
+      <button type="button" class="pill solid" id="certPrint">Imprimir</button>
+      <button type="button" class="pill" id="certClose">Fechar</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- conteúdo ---------- */
+  var STEPS = [
+    { k: 'ler', label: 'Ler', min: 3, ok: 'Li!', letter: 'L' },
+    { k: 'conversar', label: 'Conversar', min: 4, ok: 'Conversamos!', letter: 'C' },
+    { k: 'fazer', label: 'Fazer', min: 6, ok: 'Fizemos!', letter: 'F' },
+    { k: 'orar', label: 'Orar', min: 2, ok: 'Oramos!', letter: 'O' }
+  ];
+
+  var ART = [
+    /* 1: lanterna que ilumina o caminho */
+    '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="52,56 112,26 112,94 52,64" fill="#F4BC1C" fill-opacity=".45" stroke="none"/><rect x="8" y="48" width="30" height="24" rx="6" fill="#1F7FD6" fill-opacity=".85"/><rect x="38" y="42" width="14" height="36" rx="4" fill="#241F31" fill-opacity=".85"/><ellipse cx="92" cy="50" rx="5" ry="3" fill="currentColor" stroke="none" opacity=".6"/><ellipse cx="96" cy="72" rx="5" ry="3" fill="currentColor" stroke="none" opacity=".6"/><ellipse cx="78" cy="62" rx="4" ry="2.4" fill="currentColor" stroke="none" opacity=".6"/></svg>',
+    /* 2: livro aberto com brilho */
+    '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 40 C32 32 48 34 60 44 C72 34 88 32 108 40 V96 C88 88 72 90 60 100 C48 90 32 88 12 96 Z" fill="#FFFBF2" fill-opacity=".9"/><path d="M60 44 V100"/><path d="M24 54 C34 50 42 51 50 55 M24 66 C34 62 42 63 50 67 M70 55 C78 51 86 50 96 54 M70 67 C78 63 86 62 96 66"/><path d="M60 8 L64 18 L74 20 L66 26 L68 36 L60 30 L52 36 L54 26 L46 20 L56 18 Z" fill="#F4BC1C" stroke="#241F31" stroke-width="2"/></svg>',
+    /* 3: pedras do caminho, uma por vez */
+    '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="84" width="28" height="22" rx="6" fill="#DD3B32" fill-opacity=".85"/><rect x="40" y="62" width="28" height="22" rx="6" fill="#F4BC1C" fill-opacity=".9"/><rect x="72" y="40" width="28" height="22" rx="6" fill="#2F9E44" fill-opacity=".85"/><path d="M36 92 C40 88 40 86 42 84 M68 70 C72 66 72 64 74 62" stroke-dasharray="2 6"/><path d="M104 16 V36 M96 24 L104 16 L112 24"/></svg>',
+    /* 4: martelo e visto: pôr em prática */
+    '<svg viewBox="0 0 120 120" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><g transform="rotate(-35 50 60)"><rect x="44" y="30" width="12" height="74" rx="4" fill="#F28A1A" fill-opacity=".9"/><rect x="24" y="16" width="52" height="24" rx="6" fill="#7A3FC0" fill-opacity=".9"/></g><circle cx="90" cy="86" r="22" fill="#2F9E44" fill-opacity=".9"/><path d="M79 86 L87 94 L102 77" stroke="#FFFBF2" stroke-width="5"/></svg>'
+  ];
+
+  var WEEKS = [
+    {
+      dates: '4 a 10 de outubro',
+      title: 'Todo brinquedo vem com manual',
+      lead: 'Peças de montar sem manual viram bagunça. Com a nossa vida acontece igual, e por isso Deus nos deixou um guia seguro: a Bíblia.',
+      verse: 'Lâmpada para os meus pés é a tua palavra e luz para o meu caminho.',
+      ref: 'Salmos 119:105',
+      kid: 'a Bíblia é como uma lanterna. Ela mostra por onde andar.',
+      ler: ['Leiam o versículo em voz alta duas vezes. Na primeira, um adulto lê. Na segunda, todos juntos.', 'Depois expliquem: uma lâmpada mostra onde pisar quando está escuro. A Bíblia mostra o que fazer quando a gente não sabe o caminho.'],
+      q: ['Já aconteceu de você montar alguma coisa sem olhar o manual? Como foi?', 'Quando você não sabe o que fazer, a quem você pergunta?', 'Por que será que Deus quis nos deixar um manual?'],
+      ages: [['2 a 4 anos.', 'Acenda uma lanterna no escuro e peça que apontem o que ela ilumina.'], ['8 a 11 anos.', 'Peça que cada um conte uma decisão da semana em que precisou de ajuda para escolher.']],
+      fazerT: 'Montar com e sem manual',
+      mat: 'um brinquedo de montar, um quebra-cabeça ou uma receita simples.',
+      fazer: ['Primeiro, tentem montar por 2 minutos sem olhar as instruções. Depois, abram o manual e tentem de novo. Conversem sobre o que ficou mais fácil.', 'Para fechar, combinem um horário desta semana para abrir a Bíblia juntos.'],
+      orar: ['Agradeçam a Deus por não nos deixar sozinhos e peçam ajuda para aprender a ler a Bíblia.'],
+      prayer: 'Pai, obrigado por nos dar a Bíblia. Ajuda a nossa família a seguir o teu caminho todos os dias. Amém.'
+    },
+    {
+      dates: '11 a 17 de outubro',
+      title: 'Quem escreveu o manual?',
+      lead: 'Quem sabe melhor como um brinquedo funciona é quem o criou, e o manual vem dele. A Bíblia vem de Deus, que nos criou e sabe o que é melhor para cada um de nós.',
+      verse: 'Toda a Escritura divinamente inspirada é proveitosa para ensinar, para repreender, para corrigir, para instruir em justiça.',
+      ref: '2 Timóteo 3:16',
+      kid: 'tudo o que está na Bíblia vem de Deus e serve para nos ensinar a viver bem.',
+      ler: ['Leiam o versículo e contem nos dedos o que a Bíblia faz, segundo ele: ensinar, repreender, corrigir e instruir.', 'Expliquem com palavras simples. Repreender é mostrar com amor quando estamos errando. Corrigir é ajudar a voltar para o caminho certo. Instruir em justiça é ensinar a viver do jeito de Deus.'],
+      q: ['Quem sabe melhor como um brinquedo funciona: quem o fabricou ou quem nunca o viu?', 'Por que podemos confiar no que a Bíblia diz?', 'Qual história da Bíblia você mais gosta? O que ela ensina?'],
+      ages: [['2 a 4 anos.', 'Use uma Bíblia ilustrada. Deixe a criança apontar as figuras enquanto você conta a história.'], ['8 a 11 anos.', 'Desafie a descobrir em qual livro está o versículo da semana e a encontrar o capítulo 3.']],
+      fazerT: 'Cartão do manual da família',
+      mat: 'papel, canetas ou lápis de cor e fita adesiva.',
+      fazer: ['Cada pessoa escreve o versículo (ou um pedaço dele) num cartão e desenha uma Bíblia aberta. Colem os cartões onde todos passam: geladeira, espelho ou porta do quarto.', 'Sempre que alguém passar por um cartão, pode ler em voz alta.'],
+      orar: ['Cada pessoa diz uma coisa que aprendeu da Bíblia e agradece por isso. Depois, um adulto encerra a oração.'],
+      prayer: 'Pai, obrigado por falar com a gente por meio da tua Palavra. Amém.'
+    },
+    {
+      dates: '18 a 24 de outubro',
+      title: 'Um passo de cada vez',
+      lead: 'Um manual mostra um passo por vez, e a gente nem sempre enxerga o brinquedo pronto. Confiar em Deus é seguir o próximo passo mesmo sem ver tudo.',
+      verse: 'Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento. Reconhece-o em todos os teus caminhos, e ele endireitará as tuas veredas.',
+      ref: 'Provérbios 3:5-6',
+      kid: 'confie em Deus em tudo, até quando você não entende. Ele guia os seus passos.',
+      ler: ['Leiam os dois versículos juntos.', 'Expliquem que estribar-se quer dizer apoiar-se, como quem se apoia num bastão. Deus pede que a gente se apoie nele, e não só no que acha certo. Veredas são caminhos pequenos, e ele promete deixá-los retos.'],
+      q: ['Quando foi a última vez que você confiou em alguém sem ver o que vinha pela frente?', 'O que acontece quando a gente pula passos do manual?', 'É difícil confiar em Deus quando a gente quer fazer do nosso jeito? Por quê?'],
+      ages: [['2 a 4 anos.', 'Brinquem de seguir o mestre com comandos curtos: pule, bata palma, gire. Elogie cada instrução seguida.'], ['8 a 11 anos.', 'Pergunte em que lugar é mais difícil confiar em Deus: na escola, com os amigos ou em casa.']],
+      fazerT: 'Guia de olhos vendados',
+      mat: 'um lenço e um espaço livre, sem degraus nem móveis no caminho.',
+      fazer: ['Um adulto venda os olhos de uma criança e a guia só com palavras: três passos para a frente, vire à direita, pare. Fiquem sempre perto. Depois, troquem: a criança guia o adulto.', 'Perguntem: foi fácil confiar na voz de quem guiava? O que ajudou? Conectem com a Bíblia, que é a voz de Deus que podemos seguir.'],
+      orar: ['Peçam a Deus coragem para confiar nele quando não entenderem tudo. Se alguém está preocupado com alguma coisa, orem por isso em voz alta.'],
+      prayer: 'Senhor, guia os nossos passos. Ajuda a gente a confiar em ti de todo o coração. Amém.'
+    },
+    {
+      dates: '25 a 31 de outubro',
+      title: 'Montar de verdade',
+      lead: 'Ter o manual na estante não monta castelo nenhum. A gente aprende quando abre, lê e faz. Esta semana é para colocar a Palavra em prática.',
+      verse: 'E sede cumpridores da palavra e não somente ouvintes, enganando-vos a vós mesmos.',
+      ref: 'Tiago 1:22',
+      kid: 'não basta ouvir ou ler a Bíblia. A gente precisa fazer o que ela diz.',
+      ler: ['Leiam o versículo e expliquem que cumprir a palavra é fazer o que ela diz.', 'Pergunte: se alguém lê o manual do brinquedo inteiro e nunca monta nada, o que acontece? O brinquedo continua na caixa. Com a Bíblia é parecido.'],
+      q: ['Qual é a diferença entre saber o que o manual diz e montar de verdade?', 'Qual ensinamento da Bíblia é o mais difícil de praticar? Os pais respondem primeiro.', 'O que a nossa família aprendeu nestas semanas sobre o manual de Deus?'],
+      ages: [['2 a 4 anos.', 'Peça que escolham ajudar em algo pequeno, como guardar os brinquedos, e comemorem quando fizerem.'], ['8 a 11 anos.', 'Combinem um jeito de lembrar do passo escolhido, como um bilhete no quarto, e conversem sobre ele no meio da semana.']],
+      fazerT: 'Receita passo a passo',
+      mat: 'uma receita simples, como pipoca, vitamina ou bolo de caneca. Um adulto cuida de tudo que for quente.',
+      fazer: ['Sigam cada passo da receita juntos, sem pular nada. Depois de provar, cada pessoa escolhe um passo de obediência para a semana, como ajudar em casa, pedir desculpas ou falar a verdade, e escreve num papel.', 'No próximo encontro da família, contem como foi.'],
+      orar: ['Orem pelo passo de obediência de cada pessoa, chamando cada uma pelo nome.'],
+      prayer: 'Pai, ajuda a nossa família a fazer o que a tua Palavra ensina. Obrigado por nos guiar em cada passo. Amém.'
+    }
+  ];
+
+  var RANKS = [
+    [0, 'Curioso(a) do manual'], [1, 'Aprendiz de montador'], [5, 'Montador(a)'],
+    [9, 'Construtor(a)'], [13, 'Engenheiro(a) do manual'], [16, 'Mestre do Manual']
+  ];
+  var COLORS = ['c-red', 'c-orange', 'c-yellow', 'c-green', 'c-blue', 'c-purple'];
+
+  /* ---------- estado ---------- */
+  var KEY = 'omanual-familia-v2';
+  var state = { steps: {}, verse: {}, name: '', sound: true };
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) { var p = JSON.parse(raw); if (p && typeof p === 'object') state = Object.assign(state, p); }
+    else {
+      var old = JSON.parse(localStorage.getItem('omanual-familia-v1') || 'null'); /* migra o progresso da versão anterior */
+      if (old && typeof old === 'object') state.steps = old;
+    }
+  } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  function isDone(w, s) { return !!(state.steps[w] && state.steps[w][s]); }
+  function weekCount(w) { var c = 0; for (var s = 0; s < 4; s++) if (isDone(w, s)) c++; return c; }
+  function total() { var c = 0; for (var w = 1; w <= 4; w++) c += weekCount(w); return c; }
+  function starCount() { var c = 0; for (var w = 1; w <= 4; w++) if (state.verse[w]) c++; return c; }
+
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function $(sel, root) { return (root || document).querySelector(sel); }
+  function $$(sel, root) { return [].slice.call((root || document).querySelectorAll(sel)); }
+  function el(tag, cls, text) { var n = document.createElement(tag); if (cls) n.className = cls; if (text != null) n.textContent = text; return n; }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+
+  /* ---------- som, aviso e confete ---------- */
+  var actx = null;
+  function tone(freq, dur, when, type, vol) {
+    if (!state.sound) return;
+    try {
+      actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+      var o = actx.createOscillator(), g = actx.createGain(), t = actx.currentTime + (when || 0);
+      o.type = type || 'triangle'; o.frequency.value = freq;
+      g.gain.setValueAtTime(vol || .12, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+      o.connect(g); g.connect(actx.destination); o.start(t); o.stop(t + dur + .02);
+    } catch (e) {}
+  }
+  function sndSnap() { tone(220, .09, 0, 'square', .07); tone(520, .12, .05, 'triangle', .12); }
+  function sndWin() { [523, 659, 784, 1046].forEach(function (f, i) { tone(f, .22, i * .11, 'triangle', .13); }); }
+  function sndWrong() { tone(140, .18, 0, 'sawtooth', .06); }
+  function sndTimer() { [880, 880, 1175].forEach(function (f, i) { tone(f, .2, i * .22, 'sine', .15); }); }
+
+  var toastEl = $('#toast'), toastT = 0;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add('show');
+    clearTimeout(toastT); toastT = setTimeout(function () { toastEl.classList.remove('show'); }, 2600);
+  }
+
+  var cv = $('#confetti'), cx = cv.getContext && cv.getContext('2d'), parts = [], raf = 0;
+  function confetti(n) {
+    if (reduce || !cx) return;
+    cv.width = innerWidth; cv.height = innerHeight;
+    var pal = ['#DD3B32', '#F28A1A', '#F4BC1C', '#2F9E44', '#1F7FD6', '#7A3FC0'];
+    for (var i = 0; i < (n || 90); i++) {
+      parts.push({ x: innerWidth / 2 + (Math.random() - .5) * 200, y: innerHeight * .55, vx: (Math.random() - .5) * 11, vy: -Math.random() * 13 - 4,
+        s: 7 + Math.random() * 8, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: pal[i % pal.length], life: 0 });
+    }
+    if (!raf) raf = requestAnimationFrame(tick);
+  }
+  function tick() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    parts = parts.filter(function (p) { return p.y < cv.height + 20 && p.life < 220; });
+    parts.forEach(function (p) {
+      p.vy += .32; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.life++;
+      cx.save(); cx.translate(p.x, p.y); cx.rotate(p.r); cx.globalAlpha = Math.max(0, 1 - p.life / 220);
+      cx.fillStyle = p.c; cx.fillRect(-p.s / 2, -p.s / 2, p.s, p.s * .75);
+      cx.strokeStyle = 'rgba(255,255,255,.6)'; cx.lineWidth = 1.5; cx.strokeRect(-p.s / 2 + 2, -p.s / 2 + 2, p.s - 4, p.s * .75 - 4);
+      cx.restore();
+    });
+    raf = parts.length ? requestAnimationFrame(tick) : 0;
+    if (!parts.length) cx.clearRect(0, 0, cv.width, cv.height);
+  }
+
+  /* ---------- logo ---------- */
+  (function () {
+    var h = $('#logo'), i = 0, html = '';
+    function word(txt, cols) {
+      var s = '<span class="word" aria-hidden="true">';
+      txt.split('').forEach(function (ch, j) { s += '<span class="t blk ' + cols[j % cols.length] + '" style="--i:' + (i++) + '"><span>' + ch + '</span></span>'; });
+      return s + '</span>';
+    }
+    html += word('O', ['c-red']) + word('MANUAL', ['c-orange', 'c-yellow', 'c-green', 'c-blue', 'c-purple', 'c-red']);
+    h.innerHTML = html;
+  })();
+
+  /* ---------- quadro de peças ---------- */
+  var grid = $('#grid');
+  function buildGrid() {
+    grid.innerHTML = '';
+    grid.appendChild(el('span'));
+    STEPS.forEach(function (s) { grid.appendChild(el('span', 'colh', s.label)); });
+    for (var w = 1; w <= 4; w++) {
+      var rh = el('span', 'rowh', 'S' + w); rh.dataset.row = w; grid.appendChild(rh);
+      STEPS.forEach(function (s, i) {
+        var b = el('button', 'cell'); b.type = 'button'; b.dataset.w = w; b.dataset.s = i; b.dataset.step = s.k;
+        b.addEventListener('click', function () { goTo(Number(b.dataset.w), Number(b.dataset.s)); });
+        grid.appendChild(b);
+      });
+    }
+  }
+  function renderBoard(justW, justS) {
+    $$('.cell', grid).forEach(function (b) {
+      var w = Number(b.dataset.w), s = Number(b.dataset.s), on = isDone(w, s);
+      b.className = 'cell' + (on ? ' on blk' : '');
+      b.textContent = on ? STEPS[s].letter : '';
+      b.setAttribute('aria-label', 'Semana ' + w + ', ' + STEPS[s].label + (on ? ': peça encaixada' : ': peça faltando'));
+      if (on && w === justW && s === justS) { void b.offsetWidth; b.classList.add('snap'); }
+    });
+    for (var w = 1; w <= 4; w++) {
+      var rh = $('[data-row="' + w + '"]', grid);
+      rh.classList.toggle('row-done', weekCount(w) === 4);
+      var tb = $('#tab-' + w); if (tb) tb.classList.toggle('full', weekCount(w) === 4);
+    }
+    var n = total();
+    $('#pieces').textContent = n + ' de 16 peças · ' + starCount() + ' de 4 estrelas';
+    $('#meter').style.width = (n / 16 * 100) + '%';
+    var rk = RANKS[0][1]; RANKS.forEach(function (r) { if (n >= r[0]) rk = r[1]; });
+    var who = state.name ? state.name + ': ' : '';
+    $('#rank').innerHTML = esc(who) + 'nível <b>' + esc(rk) + '</b>' + (n < 16 ? ' · faltam ' + (16 - n) + ' peças para o certificado' : ' · brinquedo completo!');
+    var cb = $('#certBtn'); cb.disabled = n < 16;
+    cb.textContent = n < 16 ? 'Certificado (' + n + '/16)' : 'Ver certificado';
+  }
+
+  /* ---------- semanas ---------- */
+  var main = $('#main'), tabsEl = $('#tabs');
+  function stepHtml(w, wk, s, i) {
+    var body = '';
+    var h = '<h3>' + s.label + ' <span class="time">' + s.min + ' min</span></h3>';
+    if (s.k === 'ler') body = wk.ler.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('');
+    if (s.k === 'conversar') {
+      body = '<ul class="q">' + wk.q.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' +
+        '<p><button type="button" class="pill draw">Sortear uma pergunta</button></p>' +
+        '<details class="ages"><summary>Adaptar por idade</summary>' + wk.ages.map(function (a) { return '<p><b>' + esc(a[0]) + '</b> ' + esc(a[1]) + '</p>'; }).join('') + '</details>';
+    }
+    if (s.k === 'fazer') {
+      body = '<p class="act-title">' + esc(wk.fazerT) + '</p><p class="mat"><b>Vão precisar de</b> ' + esc(wk.mat) + '</p>' + wk.fazer.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('');
+    }
+    if (s.k === 'orar') {
+      body = wk.orar.map(function (t) { return '<p>' + esc(t) + '</p>'; }).join('') + '<div class="prayer"><small>Sugestão de oração</small><p>' + esc(wk.prayer) + '</p></div>';
+    }
+    var acts = '<div class="actions"><button type="button" class="timer" data-min="' + s.min + '">Cronômetro ' + s.min + ':00</button>' +
+      '<button type="button" class="done" aria-pressed="false">Encaixar peça: ' + s.ok + '</button></div>';
+    return '<li class="step" data-step="' + s.k + '" data-i="' + i + '" id="w' + w + 's' + i + '"><div class="tile blk" aria-hidden="true"><span class="num">' + (i + 1) + '</span></div><div class="body">' + h + body + acts + '</div></li>';
+  }
+  function buildWeeks() {
+    WEEKS.forEach(function (wk, idx) {
+      var w = idx + 1;
+      var t = el('button'); t.type = 'button'; t.id = 'tab-' + w; t.dataset.week = w; t.setAttribute('role', 'tab');
+      t.setAttribute('aria-controls', 'semana-' + w); t.setAttribute('aria-selected', 'false'); t.tabIndex = -1;
+      t.innerHTML = '<span class="n">Semana ' + w + '</span><span class="d">' + esc(wk.dates.replace(' de outubro', ' out').replace('a ', 'a ')) + '</span><span class="ck" aria-hidden="true">★</span>';
+      tabsEl.appendChild(t);
+
+      var sec = el('section', 'week'); sec.id = 'semana-' + w; sec.dataset.week = w; sec.setAttribute('role', 'tabpanel');
+      sec.setAttribute('aria-labelledby', 'tab-' + w); sec.hidden = true;
+      sec.innerHTML =
+        '<div class="week-head"><p class="dates">' + esc(wk.dates) + '<span class="now-tag">Esta semana</span></p><h2>' + esc(wk.title) + '</h2><div class="art">' + ART[idx] + '</div><p class="lead">' + esc(wk.lead) + '</p></div>' +
+        '<figure class="verse"><span class="chip">Versículo da semana</span><blockquote>' + esc(wk.verse) + '</blockquote><figcaption class="ref">' + esc(wk.ref) + '</figcaption>' +
+        '<p class="kid"><b>Em palavras de criança:</b> ' + esc(wk.kid) + '</p>' +
+        '<div class="acts"><button type="button" class="pill speak">Ouvir o versículo</button></div></figure>' +
+        '<div class="game" id="game-' + w + '"><h3>Monte o versículo</h3><p class="sub">Toquem nas palavras na ordem certa. Quem acertar tudo ganha uma estrela.</p>' +
+        '<div class="built" aria-live="polite"></div><div class="bank"></div>' +
+        '<div class="gbar"><button type="button" class="pill hintb">Pista</button><button type="button" class="pill resetb">Embaralhar de novo</button><p class="msg"></p></div></div>' +
+        '<div class="progress" aria-live="polite"><span class="plabel">Passos da semana</span><span class="segs" aria-hidden="true">' +
+        STEPS.map(function (s) { return '<i class="seg" data-step="' + s.k + '"></i>'; }).join('') + '</span><span class="count">0 de 4</span></div>' +
+        '<div class="complete" hidden></div>' +
+        '<div class="week-tools"><button type="button" class="link print">Imprimir esta semana</button></div>' +
+        '<ol class="steps">' + STEPS.map(function (s, i) { return stepHtml(w, wk, s, i); }).join('') + '</ol>';
+      main.appendChild(sec);
+      setupGame(sec, w, wk);
+      setupSteps(sec, w);
+      $('.speak', sec).addEventListener('click', function () { speak(wk.verse + ' ' + wk.ref.replace(':', ', versículo ')); });
+      $('.print', sec).addEventListener('click', function () { window.print(); });
+    });
+  }
+
+  function seriesNow() { var d = new Date(); return d.getFullYear() === 2026 && d.getMonth() === 9 && d.getDate() >= 4; }
+  function currentWeek() {
+    var d = new Date();
+    if (d.getFullYear() === 2026 && d.getMonth() === 9) { var day = d.getDate(); return day >= 25 ? 4 : day >= 18 ? 3 : day >= 11 ? 2 : 1; }
+    return 1;
+  }
+  var activeWeek = 1;
+  function show(n, updateHash) {
+    activeWeek = n;
+    $$('.week').forEach(function (p, i) { p.hidden = (i + 1) !== n; });
+    $$('#tabs button').forEach(function (t, i) { var on = (i + 1) === n; t.setAttribute('aria-selected', on ? 'true' : 'false'); t.tabIndex = on ? 0 : -1; });
+    if (updateHash) { try { history.replaceState(null, '', '#semana-' + n); } catch (e) {} }
+  }
+  function goTo(w, s) {
+    show(w, true);
+    var t = $('#w' + w + 's' + s);
+    if (t) { t.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' }); }
+  }
+
+  function speak(text) {
+    if (!('speechSynthesis' in window)) { toast('Seu aparelho não lê em voz alta. Leiam juntos!'); return; }
+    try {
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text); u.lang = 'pt-BR'; u.rate = .9;
+      speechSynthesis.speak(u);
+    } catch (e) {}
+  }
+
+  /* passos: marcar, cronômetro, sortear pergunta */
+  var activeTimer = null;
+  function stopTimer() {
+    if (!activeTimer) return;
+    clearInterval(activeTimer.id);
+    activeTimer.btn.classList.remove('run');
+    activeTimer.btn.textContent = 'Cronômetro ' + activeTimer.btn.dataset.min + ':00';
+    activeTimer = null;
+  }
+  function fmt(sec) { var m = Math.floor(sec / 60), s = sec % 60; return m + ':' + (s < 10 ? '0' : '') + s; }
+  function toggleTimer(btn) {
+    if (activeTimer && activeTimer.btn === btn) { stopTimer(); return; }
+    stopTimer();
+    var end = Date.now() + Number(btn.dataset.min) * 60000;
+    btn.classList.remove('end'); btn.classList.add('run');
+    var id = setInterval(function () {
+      var left = Math.max(0, Math.round((end - Date.now()) / 1000));
+      btn.textContent = 'Parar · ' + fmt(left);
+      if (left === 0) {
+        stopTimer(); btn.classList.add('end'); btn.textContent = 'Tempo! Toquem para reiniciar';
+        sndTimer(); toast('Tempo! Se precisarem de mais, é só recomeçar.');
+        try { navigator.vibrate && navigator.vibrate([200, 100, 200]); } catch (e) {}
+      }
+    }, 250);
+    activeTimer = { id: id, btn: btn };
+    btn.textContent = 'Parar · ' + fmt(Number(btn.dataset.min) * 60);
+  }
+
+  function setupSteps(sec, w) {
+    $$('.step', sec).forEach(function (li, i) {
+      $('.done', li).addEventListener('click', function () {
+        if (!state.steps[w]) state.steps[w] = [0, 0, 0, 0];
+        var now = !state.steps[w][i];
+        state.steps[w][i] = now ? 1 : 0;
+        save();
+        refreshWeek(w);
+        renderBoard(now ? w : 0, i);
+        if (now) {
+          sndSnap();
+          li.classList.add('just'); setTimeout(function () { li.classList.remove('just'); }, 700);
+          var full = weekCount(w) === 4, all = total() === 16;
+          if (all) { sndWin(); confetti(220); toast('16 de 16! O brinquedo da família está montado.'); setTimeout(openCert, 1400); }
+          else if (full) { sndWin(); confetti(140); toast('Semana ' + w + ' completa! Uma fileira inteira encaixada.'); }
+          else { toast('Peça encaixada! ' + total() + ' de 16.'); }
+        }
+      });
+      var tm = $('.timer', li); tm.addEventListener('click', function () { toggleTimer(tm); });
+      var dr = $('.draw', li);
+      if (dr) {
+        var bag = [];
+        dr.addEventListener('click', function () {
+          var items = $$('.q li', li);
+          if (!bag.length) bag = items.map(function (_, k) { return k; });
+          var pick = bag.splice(Math.floor(Math.random() * bag.length), 1)[0];
+          items.forEach(function (x, k) { x.classList.toggle('picked', k === pick); });
+          tone(660, .1, 0, 'triangle', .1);
+          dr.textContent = bag.length ? 'Sortear outra pergunta' : 'Sortear de novo (todas já saíram)';
+        });
+      }
+    });
+  }
+
+  function refreshWeek(w) {
+    var panel = $('#semana-' + w), done = 0;
+    $$('.step', panel).forEach(function (s, i) {
+      var on = isDone(w, i); if (on) done++;
+      s.classList.toggle('is-done', on);
+      var b = $('.done', s); b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.textContent = on ? 'Peça encaixada' : 'Encaixar peça: ' + STEPS[i].ok;
+      $$('.seg', panel)[i].classList.toggle('on', on);
+    });
+    $('.count', panel).textContent = done + ' de 4';
+    var c = $('.complete', panel);
+    c.hidden = done !== 4;
+    if (done === 4) {
+      var nxt = w < 4 ? 'Na semana ' + (w + 1) + ' tem uma peça nova esperando por vocês.' : (total() === 16 ? 'O brinquedo da família está completo.' : 'Falta só fechar as semanas anteriores.');
+      c.innerHTML = 'Semana completa. Vocês seguiram o manual até o fim.<span class="next">' + esc(nxt) + '</span>' + (w < 4 ? '<button type="button" class="pill solid nextw" style="margin-top:.5rem">Ir para a semana ' + (w + 1) + '</button>' : '');
+      var nb = $('.nextw', c); if (nb) nb.addEventListener('click', function () { show(w + 1, true); window.scrollTo({ top: $('#tabs').offsetTop - 12, behavior: reduce ? 'auto' : 'smooth' }); });
+    }
+  }
+
+  /* jogo de montar o versículo */
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function setupGame(sec, w, wk) {
+    var game = $('.game', sec), built = $('.built', game), bank = $('.bank', game), msg = $('.msg', game);
+    var words = wk.verse.split(' '), idx = 0, order = [];
+    function reset() {
+      idx = 0; built.innerHTML = ''; msg.textContent = '';
+      var ph = el('span', 'ph', 'As palavras vão aparecendo aqui.'); built.appendChild(ph);
+      bank.innerHTML = ''; game.classList.toggle('won', !!state.verse[w]);
+      order = shuffle(words.map(function (_, i) { return i; }));
+      /* evita sair já na ordem certa */
+      if (order.every(function (v, i) { return v === i; })) order.reverse();
+      order.forEach(function (i) {
+        var b = el('button', '', words[i]); b.type = 'button'; b.dataset.i = i;
+        b.addEventListener('click', function () { pick(b); });
+        bank.appendChild(b);
+      });
+      if (state.verse[w]) msg.textContent = 'Estrela já conquistada. Dá para jogar de novo!';
+    }
+    function pick(b) {
+      if (idx >= words.length) return;
+      if (b.textContent === words[idx]) {
+        if (!idx) built.innerHTML = '';
+        var s = el('span', 'w blk', b.textContent); built.appendChild(s);
+        b.disabled = true; idx++; sndSnap();
+        $$('.hint', bank).forEach(function (x) { x.classList.remove('hint'); });
+        if (idx === words.length) win();
+      } else {
+        b.classList.remove('wrong'); void b.offsetWidth; b.classList.add('wrong'); sndWrong();
+        msg.textContent = 'Quase! Tentem outra palavra.';
+      }
+    }
+    function win() {
+      var first = !state.verse[w];
+      state.verse[w] = 1; save(); renderBoard();
+      game.classList.add('won');
+      msg.textContent = first ? 'Muito bem! Estrela conquistada.' : 'Muito bem! Versículo montado de novo.';
+      sndWin(); confetti(70);
+      if (first) toast('Estrela da semana ' + w + ' conquistada!');
+    }
+    $('.hintb', game).addEventListener('click', function () {
+      if (idx >= words.length) return;
+      var cand = $$('button', bank).filter(function (b) { return !b.disabled && b.textContent === words[idx]; })[0];
+      if (cand) { cand.classList.add('hint'); msg.textContent = 'A próxima palavra está destacada.'; }
+    });
+    $('.resetb', game).addEventListener('click', reset);
+    reset();
+  }
+
+  /* certificado */
+  var cert = $('#cert');
+  function openCert() {
+    if (total() < 16) return;
+    $('#certInput').value = state.name || '';
+    renderCert();
+    try { cert.showModal ? cert.showModal() : cert.setAttribute('open', ''); } catch (e) { cert.setAttribute('open', ''); }
+  }
+  function renderCert() {
+    $('#certName').textContent = state.name || 'Sua família';
+    $('#certList').innerHTML = WEEKS.map(function (wk, i) { return '<li><b>Semana ' + (i + 1) + '</b> · ' + esc(wk.title) + ' · ' + esc(wk.ref) + (state.verse[i + 1] ? ' ★' : '') + '</li>'; }).join('');
+    $('#certDate').textContent = 'Concluído em ' + new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }) + ' · ' + starCount() + ' de 4 estrelas';
+  }
+  $('#certBtn').addEventListener('click', openCert);
+  $('#certClose').addEventListener('click', function () { cert.close ? cert.close() : cert.removeAttribute('open'); });
+  $('#certInput').addEventListener('input', function (e) { state.name = e.target.value.trim(); $('#fam').value = state.name; save(); renderCert(); renderBoard(); });
+  $('#certPrint').addEventListener('click', function () {
+    document.documentElement.classList.add('print-cert');
+    try { window.print(); } catch (e) {}
+    toast('Para imprimir, abra o devocional no navegador do celular ou computador.');
+  });
+  window.addEventListener('afterprint', function () { document.documentElement.classList.remove('print-cert'); });
+
+  /* barra de ferramentas */
+  var snd = $('#snd');
+  function renderSnd() { snd.setAttribute('aria-pressed', state.sound ? 'true' : 'false'); snd.textContent = state.sound ? 'Som ligado' : 'Som desligado'; }
+  snd.addEventListener('click', function () { state.sound = !state.sound; save(); renderSnd(); if (state.sound) sndSnap(); });
+  $('#share').addEventListener('click', function () {
+    var url = location.href.split('#')[0];
+    var text = 'O Manual em Família: devocional do Videira Kids para fazer em casa, em quatro semanas.';
+    if (navigator.share) { navigator.share({ title: 'O Manual em Família', text: text, url: url }).catch(function () {}); }
+    else {
+      var w = null;
+      try { w = window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank', 'noopener'); } catch (e) {}
+      if (!w) {
+        try { navigator.clipboard.writeText(url).then(function () { toast('Link copiado. Cole no WhatsApp.'); }, function () { toast(url); }); } catch (e) { toast(url); }
+      }
+    }
+  });
+  $('#fam').addEventListener('input', function (e) { state.name = e.target.value.trim(); save(); renderBoard(); });
+  $('#reset').addEventListener('click', function () {
+    var rb = $('#reset');
+    if (!rb.dataset.arm) {
+      rb.dataset.arm = '1'; rb.textContent = 'Toque de novo para apagar tudo';
+      setTimeout(function () { delete rb.dataset.arm; rb.textContent = 'Recomeçar do zero'; }, 4000);
+      return;
+    }
+    delete rb.dataset.arm; rb.textContent = 'Recomeçar do zero';
+    state.steps = {}; state.verse = {}; save();
+    for (var w = 1; w <= 4; w++) refreshWeek(w);
+    $$('.game').forEach(function (g, i) { $('.resetb', g).click(); });
+    renderBoard(); toast('Tudo zerado. Boa montagem!');
+  });
+  window.addEventListener('keydown', function (e) { if (e.key === 'Escape') stopTimer(); });
+
+  /* abas */
+  tabsEl.addEventListener('click', function (e) { var b = e.target.closest('button'); if (b) show(Number(b.dataset.week), true); });
+  tabsEl.addEventListener('keydown', function (e) {
+    var tabs = $$('#tabs button'), i = tabs.indexOf(document.activeElement), next = null;
+    if (i < 0) return;
+    if (e.key === 'ArrowRight') next = (i + 1) % 4;
+    if (e.key === 'ArrowLeft') next = (i + 3) % 4;
+    if (next !== null) { e.preventDefault(); show(next + 1, true); tabs[next].focus(); }
+  });
+
+  /* início */
+  buildGrid(); buildWeeks();
+  $('#fam').value = state.name || '';
+  renderSnd();
+  WEEKS.forEach(function (_, i) {
+    var w = i + 1, p = $('#semana-' + w);
+    if (seriesNow() && currentWeek() === w) p.classList.add('is-now');
+    refreshWeek(w);
+  });
+  renderBoard();
+  var m = /^#semana-([1-4])$/.exec(location.hash || '');
+  show(m ? Number(m[1]) : currentWeek(), false);
+})();
+</script>
+</body>
+</html>
