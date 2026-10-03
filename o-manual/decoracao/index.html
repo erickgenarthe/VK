@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>O Manual · Decoração</title>
+<meta name="description" content="Manual de montagem do palco do Videira Kids: passo a passo animado, lista de peças e arquivos para imprimir da série O Manual.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Ideia: a própria decoração é montada como um manual de brinquedo. O palco é a "Fig. 1",
+   cada peça tem número, quantidade e material, e o passo a passo faz as peças aparecerem no
+   palco uma por vez. Sem blocos nem formas geométricas na decoração, como o pedido original. */
+:root {
+  --bg: #FBF3E4; --paper: #FFFBF2; --wash: #F3E8D2; --kraft: #C9A26B; --ink: #241F31; --muted: #5F586F; --line: #C9B997;
+  --green: #2F9E44; --purple: #7A3FC0; --yellow: #F4BC1C; --red: #DD3B32; --blue: #1F7FD6; --orange: #F28A1A;
+  --shadow: rgba(60, 38, 10, .2);
+  --display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --body: 'Figtree', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 1.0625rem; line-height: 1.55;
+  background-image: radial-gradient(circle, rgba(201, 185, 151, .5) 1px, transparent 1.4px); background-size: 22px 22px;
+}
+.wrap { max-width: 62rem; margin-inline: auto; padding: 1rem max(16px, 3vw) 4rem; }
+h1, h2, h3 { font-family: var(--display); text-transform: uppercase; line-height: 1; margin: 0; }
+p { margin: 0 0 .8rem; }
+button { font-family: inherit; }
+button:focus-visible, input:focus-visible, summary:focus-visible, a:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.eyebrow { margin: 0; font-weight: 700; font-size: .8rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+
+.blk {
+  position: relative; background: linear-gradient(135deg, rgba(255,255,255,.4), rgba(255,255,255,0) 46%), var(--c); color: var(--on, #fff);
+  box-shadow: inset 0 0 0 2px rgba(255,255,255,.55), inset 0 -5px 0 rgba(0,0,0,.15), 0 3px 8px var(--shadow);
+}
+.c-blue { --c: var(--blue); --on: #fff; } .c-orange { --c: var(--orange); --on: var(--ink); } .c-green { --c: var(--green); --on: var(--ink); }
+.c-purple { --c: var(--purple); --on: #fff; } .c-red { --c: var(--red); --on: #fff; } .c-yellow { --c: var(--yellow); --on: var(--ink); }
+
+/* topo */
+.hero { padding: 1.4rem 0 1rem; }
+.hero h1 { font-weight: 900; font-size: clamp(2.4rem, 9vw, 4.4rem); margin: .5rem 0 .6rem; text-wrap: balance; }
+.hero h1 .fig { display: inline-block; padding: 0 .25em; border: 3px solid var(--ink); border-radius: .2em; background: var(--yellow); transform: rotate(-2deg); }
+.hero p.lead { max-width: 42rem; font-size: 1.12rem; }
+.nav { position: sticky; top: 0; z-index: 20; display: flex; gap: .4rem; overflow-x: auto; padding: .5rem 0; margin: 0 0 1.2rem; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(6px); }
+.nav a {
+  flex: 0 0 auto; min-height: 44px; display: inline-flex; align-items: center; padding: .3rem 1rem; border: 2px solid var(--ink); border-radius: 999px;
+  background: var(--paper); color: var(--ink); text-decoration: none; font-weight: 700; font-size: .92rem;
+}
+.nav a:hover { background: var(--yellow); }
+
+.sec { margin-top: 2.6rem; scroll-margin-top: 4rem; }
+.sec > h2 { font-weight: 900; font-size: clamp(1.9rem, 6vw, 2.8rem); display: flex; align-items: center; gap: .6rem; margin-bottom: .4rem; }
+.sec > h2 .n { display: inline-grid; place-items: center; width: 1.3em; height: 1.3em; border-radius: .25em; font-size: .8em; }
+.sec > p.sub { max-width: 46rem; color: var(--muted); }
+
+/* palco */
+.stage-box { display: grid; gap: 1rem; grid-template-columns: minmax(0, 1.6fr) minmax(16rem, 1fr); align-items: start; }
+@media (max-width: 52rem) { .stage-box { grid-template-columns: 1fr; } }
+.stage-frame { border: 3px solid var(--ink); border-radius: 1rem; overflow: hidden; background: #0C0B10; box-shadow: 0 .35rem 0 var(--ink); position: relative; }
+.stage-frame svg { display: block; width: 100%; height: auto; }
+.stage-frame .cap { position: absolute; left: .6rem; top: .5rem; padding: .1rem .6rem; border-radius: .3rem; background: var(--yellow); color: var(--ink); font: 800 .95rem var(--display); letter-spacing: .06em; text-transform: uppercase; }
+.piece { cursor: pointer; transition: opacity .6s ease, transform .7s cubic-bezier(.2, 1.3, .4, 1), filter .2s; transform-box: fill-box; transform-origin: center; }
+.piece.hidden { opacity: 0; transform: translateY(-40px); pointer-events: none; }
+.piece:hover { filter: brightness(1.12); }
+.piece.sel { filter: drop-shadow(0 0 7px #F4BC1C) drop-shadow(0 0 2px #F4BC1C); }
+.hot { opacity: 0; transition: opacity .2s; }
+.numbers .hot { opacity: 1; }
+.hot circle { fill: #F4BC1C; stroke: #241F31; stroke-width: 3; }
+.hot text { font: 900 22px var(--display); fill: #241F31; text-anchor: middle; dominant-baseline: central; }
+.cone { transition: opacity .5s; opacity: .22; } .dim .cone { opacity: .55; }
+.shade { fill: #000; opacity: 0; transition: opacity .6s; pointer-events: none; } .dim .shade { opacity: .55; }
+.tvglow { transition: opacity .6s; opacity: 0; } .tv-on .tvglow { opacity: 1; }
+
+.panel { background: var(--paper); border: 3px solid var(--ink); border-radius: 1rem; padding: 1rem; box-shadow: 0 .35rem 0 var(--ink); }
+.panel .badge { display: flex; align-items: center; gap: .8rem; margin-bottom: .6rem; }
+.panel .bigt { width: 4rem; height: 4rem; display: grid; place-items: center; border-radius: .9rem; font: 900 2.6rem var(--display); flex: none; }
+.panel .kick { margin: 0; font-weight: 700; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.panel h3 { font-weight: 900; font-size: 1.7rem; }
+.panel .qty { display: inline-block; margin: .2rem 0 .6rem; padding: .1rem .6rem; border-radius: 999px; background: var(--wash); font-weight: 800; font-size: .9rem; }
+.panel .mat { font-size: .98rem; }
+.panel .mat b { color: var(--ink); }
+.panel .tip { display: flex; gap: .7rem; align-items: flex-start; margin-top: .8rem; padding: .7rem; border-radius: .8rem; background: var(--wash); font-size: .94rem; }
+.manu { flex: none; width: 2.6rem; height: 2.6rem; }
+.ctrls { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .9rem; align-items: center; }
+.btn { min-height: 44px; padding: .45rem 1rem; border: 2px solid var(--ink); border-radius: .6rem; background: var(--paper); color: var(--ink); font-weight: 700; font-size: .95rem; cursor: pointer; box-shadow: 0 .15rem 0 var(--ink); }
+.btn:active { transform: translateY(.1rem); box-shadow: 0 .05rem 0 var(--ink); }
+.btn.go { background: var(--green); color: var(--ink); }
+.btn[disabled] { opacity: .45; cursor: default; }
+.btn[aria-pressed="true"] { background: var(--yellow); }
+.steps-bar { display: flex; gap: .3rem; flex-wrap: wrap; margin: .8rem 0 0; padding: 0; list-style: none; }
+.steps-bar button { width: 2.75rem; height: 2.75rem; border: 2px solid var(--ink); border-radius: .5rem; background: var(--paper); font: 900 1.25rem var(--display); color: var(--ink); cursor: pointer; padding: 0; }
+.steps-bar button.past { background: var(--green); }
+.steps-bar button.cur { background: var(--yellow); transform: translateY(-3px); box-shadow: 0 3px 0 var(--ink); }
+.toggles { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: .7rem; }
+
+/* lista de peças */
+.parts { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .6rem; grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr)); }
+.part { display: grid; grid-template-columns: auto 1fr; gap: .2rem .8rem; align-items: start; padding: .8rem; background: var(--paper); border: 2px solid var(--ink); border-radius: .8rem; }
+.part.sel { outline: 3px solid var(--yellow); outline-offset: 2px; }
+.part .num { width: 2.6rem; height: 2.6rem; display: grid; place-items: center; border-radius: .6rem; font: 900 1.6rem var(--display); grid-row: 1 / span 3; }
+.part h3 { font-size: 1.25rem; font-weight: 800; letter-spacing: .02em; }
+.part .m { font-size: .92rem; color: var(--muted); margin: 0; }
+.part label { display: flex; align-items: center; gap: .5rem; min-height: 44px; font-weight: 700; font-size: .92rem; cursor: pointer; }
+.part input { width: 1.4rem; height: 1.4rem; accent-color: var(--green); }
+.part.have { background: color-mix(in srgb, var(--green) 14%, var(--paper)); }
+.part .q { margin-left: auto; font: 900 1.2rem var(--display); }
+.meter { height: 1rem; margin-top: 1rem; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); overflow: hidden; }
+.meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--blue), var(--green), var(--yellow)); transition: width .4s; }
+.two { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr)); margin-top: 1.2rem; }
+.note { padding: 1rem; background: var(--paper); border: 2px dashed var(--line); border-radius: .8rem; }
+.note h3 { font-size: 1.4rem; font-weight: 900; margin-bottom: .4rem; }
+.note ul { margin: 0; padding-left: 1.2rem; } .note li { margin-bottom: .3rem; }
+
+/* impressão */
+.qrbar { display: flex; flex-wrap: wrap; gap: .5rem 1rem; align-items: end; margin: 1rem 0; padding: .9rem; background: var(--paper); border: 2px solid var(--ink); border-radius: .8rem; }
+.qrbar label { display: grid; gap: .15rem; flex: 1 1 18rem; font-size: .78rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.qrbar input { min-height: 44px; padding: .4rem .7rem; font: 500 1rem var(--body); letter-spacing: 0; text-transform: none; color: var(--ink); border: 2px solid var(--line); border-radius: .6rem; background: var(--bg); }
+.qrbar small { flex-basis: 100%; color: var(--muted); }
+.tabs { display: flex; flex-wrap: wrap; gap: .4rem; margin-bottom: 1rem; }
+.tabs button { min-height: 44px; padding: .4rem 1rem; border: 2px solid var(--ink); border-radius: 999px; background: var(--paper); color: var(--ink); font-weight: 700; cursor: pointer; }
+.tabs button[aria-selected="true"] { background: var(--ink); color: var(--bg); }
+.pane[hidden] { display: none; }
+.pane-head { display: flex; flex-wrap: wrap; gap: .6rem 1rem; align-items: center; justify-content: space-between; margin-bottom: .8rem; }
+.pane-head p { margin: 0; color: var(--muted); max-width: 36rem; font-size: .95rem; }
+.opts { display: flex; flex-wrap: wrap; gap: .4rem; }
+.opts button { min-height: 44px; padding: .3rem .9rem; border: 2px solid var(--ink); border-radius: .6rem; background: var(--paper); color: var(--ink); font-weight: 700; cursor: pointer; }
+.opts button[aria-pressed="true"] { background: var(--yellow); }
+.qr { background: #fff; padding: .35em; border-radius: .3em; display: grid; place-items: center; }
+.qr canvas, .qr img { display: block; width: 100% !important; height: auto !important; }
+.qr.ph { border: .1em dashed #999; color: #666; text-align: center; font-size: .9em; font-weight: 700; }
+
+/* cartões do varal */
+.vgrid { --cw: 105mm; display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-start; justify-content: center; }
+.vcard { --w: min(var(--cw), 340px); width: var(--w); aspect-ratio: 105 / 148; font-size: calc(var(--w) / 20); padding: 1.3em 1.3em 1em; background: #FFF9EC; border-radius: .6em; box-shadow: 0 .5em 1.2em var(--shadow); position: relative; display: flex; flex-direction: column; border: .08em solid #E4D6B8; }
+.vcard .hole { position: absolute; left: 50%; top: .6em; width: .9em; height: .9em; margin-left: -.45em; border-radius: 50%; background: var(--bg); box-shadow: inset 0 .1em .2em rgba(0,0,0,.3); }
+.vcard .top { display: flex; justify-content: space-between; align-items: center; margin-top: .8em; }
+.vcard .bigt { width: 3.4em; height: 3.4em; display: grid; place-items: center; border-radius: .7em; font: 900 2.5em var(--display); }
+.vcard svg { width: 2.6em; height: 2.6em; }
+.vcard .kick { margin: 1em 0 0; font-weight: 700; font-size: .8em; letter-spacing: .12em; text-transform: uppercase; color: #4A4358; }
+.vcard .word { font: 900 3.3em var(--display); line-height: .95; text-transform: uppercase; }
+.vcard .desc { margin: .4em 0 0; font-size: 1.05em; line-height: 1.3; }
+.vcard .time { margin-top: auto; align-self: flex-start; padding: .15em .7em; border-radius: 999px; background: var(--wash); font-weight: 800; font-size: .85em; }
+
+/* parede-manual */
+.poster { --pw: 300mm; width: min(100%, var(--pw)); margin-inline: auto; aspect-ratio: 210 / 297; font-size: calc(min(100vw - 32px, var(--pw), 640px) / 30); padding: 2.4em; background: #FFF9EC; border-radius: .6em; box-shadow: 0 .5em 1.4em var(--shadow); display: flex; flex-direction: column; gap: 1em; border: .1em solid #E4D6B8; position: relative; }
+.poster .ph { display: flex; justify-content: space-between; font-weight: 700; font-size: .8em; letter-spacing: .1em; text-transform: uppercase; color: #4A4358; }
+.poster h3 { font: 900 4.4em var(--display); line-height: .95; text-transform: uppercase; text-wrap: balance; }
+.poster .vs { padding: 1em 1.2em; border: .14em solid var(--ink); border-radius: .8em; background: #fff; }
+.poster .vs q { display: block; font-weight: 600; font-size: 1.25em; line-height: 1.35; quotes: none; }
+.poster .vs b { display: block; margin-top: .4em; font: 800 1.4em var(--display); letter-spacing: .05em; text-transform: uppercase; }
+.poster .rows { display: grid; gap: .7em; }
+.poster .row { display: flex; align-items: center; gap: .9em; }
+.poster .row .bigt { flex: none; width: 3em; height: 3em; display: grid; place-items: center; border-radius: .6em; font: 900 2em var(--display); }
+.poster .row h4 { margin: 0; font: 900 1.9em var(--display); text-transform: uppercase; line-height: 1; }
+.poster .row p { margin: 0; font-size: 1em; }
+.poster .foot { margin-top: auto; display: flex; gap: 1em; align-items: center; }
+.poster .foot .qr { width: 7.5em; flex: none; font-size: .7em; }
+.poster .foot p { margin: 0; font-weight: 600; font-size: 1.05em; }
+
+/* caixa */
+.caixa { width: min(100%, 60rem); margin-inline: auto; display: grid; gap: 1rem; grid-template-columns: 1.4fr 1fr; font-size: 1rem; }
+@media (max-width: 40rem) { .caixa { grid-template-columns: 1fr; } }
+.kraft { background: var(--kraft); background-image: repeating-linear-gradient(90deg, rgba(0,0,0,.025) 0 2px, transparent 2px 5px); border-radius: .5rem; padding: 1.4rem; position: relative; box-shadow: 0 .5rem 1.2rem var(--shadow); color: #2A1F12; overflow: hidden; }
+.kraft .tape { position: absolute; left: 50%; top: 0; bottom: 0; width: 4.2rem; margin-left: -2.1rem; background: rgba(240, 225, 190, .85); display: grid; place-items: center; }
+.kraft .tape span { writing-mode: vertical-rl; font: 900 1.4rem var(--display); letter-spacing: .12em; text-transform: uppercase; color: rgba(60, 38, 10, .6); white-space: nowrap; }
+.kraft .lbl { position: relative; z-index: 1; max-width: 40%; }
+.kraft .lbl.r { margin-left: auto; text-align: right; }
+.kraft .lbl small { display: block; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-size: .75rem; }
+.kraft .lbl h3 { font-weight: 900; font-size: 2.6rem; line-height: .95; margin: .3rem 0; }
+.stamp { display: inline-block; margin: .4rem 0; padding: .35rem .8rem; border: .2rem solid #7A2A1B; border-radius: .4rem; color: #7A2A1B; font: 900 1.25rem var(--display); letter-spacing: .06em; text-transform: uppercase; transform: rotate(-4deg); opacity: .85; line-height: 1.05; }
+.stamp.b { transform: rotate(3deg); border-color: #1D3D6B; color: #1D3D6B; }
+.labelcard { background: #FFF9EC; border-radius: .5rem; padding: 1.2rem; text-align: center; box-shadow: 0 .5rem 1.2rem var(--shadow); display: flex; flex-direction: column; align-items: center; gap: .5rem; color: var(--ink); }
+.labelcard h3 { font-weight: 900; font-size: 2.2rem; }
+.labelcard .qr { width: 8rem; font-size: .75rem; }
+
+/* mini manual */
+.bookwrap { overflow-x: auto; padding: .5rem 0 1rem; }
+.book { --pw: min(290px, 43vw); width: calc(var(--pw) * 2); height: calc(var(--pw) * 1.41); margin: 0 auto; position: relative; perspective: 1400px; transition: transform .8s cubic-bezier(.3, .8, .3, 1); font-size: calc(var(--pw) / 19); }
+.book.closed { transform: translateX(calc(var(--pw) * -.5)); }
+.pg { position: absolute; top: 0; width: var(--pw); height: 100%; padding: 1.3em; background: #FFF9EC; overflow: hidden; display: flex; flex-direction: column; gap: .6em; border: .08em solid #E4D6B8; box-shadow: 0 .6em 1.2em var(--shadow); }
+.pg.right { left: var(--pw); border-radius: 0 .6em .6em 0; }
+.leaf { position: absolute; left: var(--pw); top: 0; width: var(--pw); height: 100%; transform-origin: left center; transform-style: preserve-3d; transition: transform 1s cubic-bezier(.4, .1, .2, 1); cursor: pointer; z-index: 3; }
+.book.open .leaf { transform: rotateY(-180deg); }
+.leaf .face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; padding: 1.3em; background: #FFF9EC; display: flex; flex-direction: column; gap: .6em; overflow: hidden; border: .08em solid #E4D6B8; }
+.leaf .front { border-radius: 0 .6em .6em 0; }
+.leaf .back { transform: rotateY(180deg); border-radius: .6em 0 0 .6em; }
+.mm h4 { margin: 0; font: 900 2.2em var(--display); text-transform: uppercase; line-height: 1; }
+.mm .small { font-size: .9em; margin: 0; }
+.mm .lst { list-style: none; margin: 0; padding: 0; display: grid; gap: .5em; }
+.mm .lst li { display: flex; gap: .6em; align-items: center; font-size: .95em; line-height: 1.2; }
+.mm .lst .bigt { flex: none; width: 2.3em; height: 2.3em; display: grid; place-items: center; border-radius: .5em; font: 900 1.5em var(--display); }
+.mm .lst b { display: block; font: 800 1.2em var(--display); text-transform: uppercase; }
+.mm .wk { display: grid; grid-template-columns: auto 1fr; gap: .1em .6em; align-items: center; margin: 0 0 .5em; font-size: .88em; line-height: 1.2; }
+.mm .wk i { grid-row: span 2; width: 1.8em; height: 1.8em; display: grid; place-items: center; border-radius: .4em; font: 900 1.3em var(--display); font-style: normal; }
+.mm .wk em { font-style: normal; color: #4A4358; }
+.cov { align-items: center; text-align: center; justify-content: space-between; }
+.cov .tt { font: 900 3.6em var(--display); line-height: .9; letter-spacing: .02em; display: flex; flex-wrap: wrap; justify-content: center; gap: 0 .2em; text-transform: uppercase; }
+.cov .tt span { display: inline-block; }
+.cov .line { width: 70%; border-bottom: .12em dotted var(--ink); margin-top: 1.6em; }
+.mm .qr { width: 5.5em; font-size: .6em; margin-top: auto; }
+.flatprint { display: none; }
+
+footer { margin-top: 3rem; padding-top: 1rem; border-top: 2px dotted var(--line); color: var(--muted); font-size: .92rem; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .piece, .cone, .shade, .tvglow, .book, .leaf, .meter i { transition: none; }
+}
+
+/* impressão: só o bloco escolhido, em tamanho real */
+@page { size: A4 portrait; margin: 8mm; }
+@page land { size: A4 landscape; margin: 8mm; }
+@media print {
+  body { background: #fff; background-image: none; }
+  .screen-only, .nav, .hero, .sec:not(.printsec), footer { display: none !important; }
+  .printsec { margin: 0; display: block !important; }
+  .printsec > *:not(.pane) { display: none !important; }
+  .pane { display: none !important; }
+  html[data-print="varal"] #p-varal, html[data-print="parede"] #p-parede, html[data-print="caixa"] #p-caixa, html[data-print="mini"] #p-mini { display: block !important; }
+  html[data-print="varal"] #p-varal, html[data-print="caixa"] #p-caixa, html[data-print="mini"] #p-mini { page: land; }
+  .pane-head, .opts { display: none !important; }
+  .vgrid { gap: 4mm; justify-content: flex-start; }
+  .vcard, .poster, .kraft, .labelcard, .pg { box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .poster { width: 194mm; font-size: 6.4mm; margin: 0; }
+  .blk, .bigt, .kraft, .stamp, .vcard, .poster, .labelcard, .qr { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .vcard { --w: var(--cw); break-inside: avoid; }
+  .bookwrap { display: none !important; }
+  .flatprint { display: flex !important; gap: 6mm; justify-content: center; }
+  .flatprint .book { transform: none !important; width: auto; height: auto; display: contents; }
+  .caixa { width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero screen-only">
+    <p class="eyebrow">Videira Kids · série de outubro de 2026</p>
+    <h1>O Manual · <span class="fig">Fig. 1</span> o palco</h1>
+    <p class="lead">A decoração segue a ideia da série: a Bíblia é o manual de instruções. Aqui o palco vem com o próprio manual de montagem. Passem os passos, vejam cada peça aparecer, marquem o que já está separado e imprimam o que precisa de papel.</p>
+  </header>
+
+  <nav class="nav screen-only" aria-label="Seções">
+    <a href="#palco">1 · Montagem do palco</a>
+    <a href="#pecas">2 · Lista de peças</a>
+    <a href="#imprimir">3 · Para imprimir</a>
+  </nav>
+
+  <!-- 1 · PALCO -->
+  <section class="sec screen-only" id="palco" aria-labelledby="h-palco">
+    <h2 id="h-palco"><span class="n blk c-blue" aria-hidden="true">1</span> Montagem do palco</h2>
+    <p class="sub">Toquem nas peças do desenho para ver detalhes, ou usem os botões para montar na ordem sugerida. O desenho é uma ilustração aproximada feita a partir da foto do palco, não uma montagem sobre a foto real.</p>
+    <div class="stage-box" style="margin-top:1rem">
+      <div class="stage-frame" id="frame">
+        <span class="cap">Fig. 1</span>
+        <svg id="stage" viewBox="0 0 1000 780" role="img" aria-label="Ilustração do palco com a decoração da série O Manual: banners nas laterais, cartões pendurados ao redor da TV, caixas, marcas de passos no chão e setas.">
+          <defs>
+            <linearGradient id="wallg" x1="0" x2="1"><stop offset="0" stop-color="#15131A"/><stop offset=".2" stop-color="#201E27"/><stop offset=".8" stop-color="#201E27"/><stop offset="1" stop-color="#15131A"/></linearGradient>
+            <linearGradient id="floorg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9A9BA2"/><stop offset="1" stop-color="#7E7F86"/></linearGradient>
+            <linearGradient id="coneg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE9B0" stop-opacity=".9"/><stop offset="1" stop-color="#FFE9B0" stop-opacity="0"/></linearGradient>
+            <radialGradient id="amber"><stop offset="0" stop-color="#FFA028" stop-opacity=".5"/><stop offset="1" stop-color="#FFA028" stop-opacity="0"/></radialGradient>
+            <linearGradient id="kraftg" x1="0" x2="1"><stop offset="0" stop-color="#C9A26B"/><stop offset="1" stop-color="#B98E55"/></linearGradient>
+            <linearGradient id="tvg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFF9EC"/><stop offset="1" stop-color="#F3E8D2"/></linearGradient>
+          </defs>
+          <!-- sala -->
+          <rect width="1000" height="780" fill="#0C0B10"/>
+          <rect width="1000" height="110" fill="#121117"/>
+          <rect x="60" y="14" width="140" height="62" rx="5" fill="#EEECE6"/>
+          <rect y="105" width="1000" height="470" fill="url(#wallg)"/>
+          <rect y="575" width="1000" height="170" fill="url(#floorg)"/>
+          <rect y="745" width="1000" height="10" fill="#B8B8BD"/>
+          <rect y="755" width="1000" height="25" fill="#4A4A50"/>
+          <ellipse cx="40" cy="540" rx="110" ry="130" fill="url(#amber)"/>
+          <ellipse cx="960" cy="540" rx="110" ry="130" fill="url(#amber)"/>
+          <rect x="190" y="215" width="70" height="86" rx="3" fill="#0B0B0E" stroke="#232329" stroke-width="2"/>
+          <!-- varão, refletores e TV -->
+          <rect x="225" y="168" width="570" height="9" rx="4" fill="#070709"/>
+          <g id="spots">
+            <g transform="translate(280 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
+            <g transform="translate(400 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
+            <g transform="translate(600 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
+            <g transform="translate(720 177)"><polygon class="cone" points="-18,38 18,38 90,340 -90,340" fill="url(#coneg)"/><rect x="-26" y="0" width="52" height="38" rx="9" fill="#0E0E12" stroke="#26262C" stroke-width="2"/><circle cx="0" cy="20" r="12" fill="#E6D2A0"/></g>
+          </g>
+          <g id="tv"><rect x="415" y="238" width="170" height="100" rx="3" fill="#05060A" stroke="#CFCFD3" stroke-width="3"/>
+            <g class="tvglow"><rect x="418" y="241" width="164" height="94" fill="url(#tvg)"/>
+              <text x="500" y="283" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="34" fill="#241F31" textLength="140" lengthAdjust="spacingAndGlyphs">O MANUAL</text>
+              <text x="500" y="308" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="700" font-size="10.5" fill="#5F586F">A Bíblia mostra o caminho</text>
+              <g><rect x="448" y="316" width="16" height="6" rx="3" fill="#DD3B32"/><rect x="468" y="316" width="16" height="6" rx="3" fill="#F28A1A"/><rect x="488" y="316" width="16" height="6" rx="3" fill="#F4BC1C"/><rect x="508" y="316" width="16" height="6" rx="3" fill="#2F9E44"/><rect x="528" y="316" width="16" height="6" rx="3" fill="#1F7FD6"/><rect x="548" y="316" width="16" height="6" rx="3" fill="#7A3FC0"/></g></g></g>
+          <!-- pedestal de microfone, para lembrar de deixar livre -->
+          <g stroke="#111" stroke-width="3" fill="none"><path d="M668 470 V590 M668 590 L640 610 M668 590 L696 610"/></g><circle cx="668" cy="466" r="6" fill="#222"/>
+
+          <!-- 1 banner esquerdo -->
+          <g class="piece" data-id="1" tabindex="0" role="button" aria-label="Peça 1, banner da esquerda">
+            <rect x="38" y="98" width="116" height="10" rx="4" fill="#3A2C1B"/>
+            <rect x="42" y="106" width="108" height="470" fill="#F1E3C7"/>
+            <rect x="42" y="106" width="108" height="470" fill="url(#coneg)" opacity=".12"/>
+            <text transform="translate(110 138) rotate(90)" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="80" fill="#241F31" textLength="330" lengthAdjust="spacingAndGlyphs">O MANUAL</text>
+            <text transform="translate(66 138) rotate(90)" font-family="Figtree, sans-serif" font-weight="700" font-size="15" fill="#241F31" textLength="190" lengthAdjust="spacingAndGlyphs">A Bíblia mostra o caminho</text>
+            <path d="M52 556 H140" stroke="#241F31" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>
+            <g class="hot"><circle cx="96" cy="330" r="20"/><text x="96" y="331">1</text></g>
+          </g>
+          <!-- 2 banner direito -->
+          <g class="piece" data-id="2" tabindex="0" role="button" aria-label="Peça 2, banner da direita, como usar">
+            <rect x="846" y="98" width="116" height="10" rx="4" fill="#3A2C1B"/>
+            <rect x="850" y="106" width="108" height="470" fill="#F1E3C7"/>
+            <text x="904" y="140" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="30" fill="#241F31" textLength="92" lengthAdjust="spacingAndGlyphs">COMO USAR</text>
+            <text x="904" y="158" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="600" font-size="11" fill="#5F586F">4 passos, 15 minutos</text>
+            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900">
+              <rect x="858" y="176" width="28" height="30" rx="6" fill="#1F7FD6"/><text x="872" y="192" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#fff">1</text><text x="892" y="198" font-size="22" fill="#241F31">LER</text>
+              <rect x="858" y="222" width="28" height="30" rx="6" fill="#F28A1A"/><text x="872" y="238" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#241F31">2</text><text x="892" y="244" font-size="22" fill="#241F31" textLength="64" lengthAdjust="spacingAndGlyphs">CONVERSAR</text>
+              <rect x="858" y="268" width="28" height="30" rx="6" fill="#2F9E44"/><text x="872" y="284" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#241F31">3</text><text x="892" y="290" font-size="22" fill="#241F31">FAZER</text>
+              <rect x="858" y="314" width="28" height="30" rx="6" fill="#7A3FC0"/><text x="872" y="330" text-anchor="middle" dominant-baseline="central" font-size="22" fill="#fff">4</text><text x="892" y="336" font-size="22" fill="#241F31">ORAR</text></g>
+            <rect x="876" y="384" width="56" height="56" fill="#fff" stroke="#241F31" stroke-width="2"/>
+            <g fill="#241F31"><rect x="882" y="390" width="14" height="14"/><rect x="912" y="390" width="14" height="14"/><rect x="882" y="420" width="14" height="14"/><rect x="900" y="408" width="6" height="6"/><rect x="910" y="418" width="8" height="8"/><rect x="920" y="428" width="6" height="6"/></g>
+            <text x="904" y="462" text-anchor="middle" font-family="Figtree, sans-serif" font-weight="700" font-size="11" fill="#241F31">Devocional da semana</text>
+            <g class="hot"><circle cx="904" cy="520" r="20"/><text x="904" y="521">2</text></g>
+          </g>
+          <!-- 3 cartões do varal -->
+          <g class="piece" data-id="3" tabindex="0" role="button" aria-label="Peça 3, cartões do varal">
+            <g stroke="#C9C4B5" stroke-width="1.2" opacity=".85"><path d="M260 177 L258 226 M340 177 L340 226 M660 177 L660 226 M740 177 L742 226"/></g>
+            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" text-anchor="middle">
+              <g transform="rotate(-3 258 280)"><rect x="218" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="226" y="232" width="26" height="26" rx="6" fill="#1F7FD6"/><text x="239" y="246" dominant-baseline="central" font-size="19" fill="#fff">1</text><text x="258" y="304" font-size="28" fill="#241F31">LER</text><text x="258" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">3 min</text></g>
+              <g transform="rotate(2 340 280)"><rect x="300" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="308" y="232" width="26" height="26" rx="6" fill="#F28A1A"/><text x="321" y="246" dominant-baseline="central" font-size="19" fill="#241F31">2</text><text x="340" y="304" font-size="19" fill="#241F31" textLength="68" lengthAdjust="spacingAndGlyphs">CONVERSAR</text><text x="340" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">4 min</text></g>
+              <g transform="rotate(-2 660 280)"><rect x="620" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="628" y="232" width="26" height="26" rx="6" fill="#2F9E44"/><text x="641" y="246" dominant-baseline="central" font-size="19" fill="#241F31">3</text><text x="660" y="304" font-size="28" fill="#241F31">FAZER</text><text x="660" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">6 min</text></g>
+              <g transform="rotate(3 742 280)"><rect x="702" y="224" width="80" height="112" rx="5" fill="#FFF9EC"/><rect x="710" y="232" width="26" height="26" rx="6" fill="#7A3FC0"/><text x="723" y="246" dominant-baseline="central" font-size="19" fill="#fff">4</text><text x="742" y="304" font-size="28" fill="#241F31">ORAR</text><text x="742" y="322" font-size="11" fill="#5F586F" font-family="Figtree, sans-serif" font-weight="700">2 min</text></g>
+            </g>
+            <g fill="#8A5A2B"><rect x="254" y="220" width="8" height="14" rx="2"/><rect x="336" y="220" width="8" height="14" rx="2"/><rect x="656" y="220" width="8" height="14" rx="2"/><rect x="738" y="220" width="8" height="14" rx="2"/></g>
+            <g class="hot"><circle cx="338" cy="380" r="20"/><text x="338" y="381">3</text></g>
+          </g>
+          <!-- 4 caixa fechada -->
+          <g class="piece" data-id="4" tabindex="0" role="button" aria-label="Peça 4, caixa fechada">
+            <polygon points="190,530 340,530 366,506 216,506" fill="#D8B882"/>
+            <polygon points="340,530 366,506 366,590 340,616" fill="#A27A44"/>
+            <rect x="190" y="530" width="150" height="86" fill="url(#kraftg)"/>
+            <rect x="248" y="530" width="30" height="86" fill="#EFE0BC" opacity=".9"/>
+            <polygon points="248,530 278,530 304,506 274,506" fill="#EFE0BC" opacity=".9"/>
+            <text x="219" y="560" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="15" fill="#7A2A1B" transform="rotate(-6 219 560)">CONTÉM</text>
+            <text x="219" y="576" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="13" fill="#7A2A1B" transform="rotate(-6 219 576)">1 FAMÍLIA</text>
+            <text x="309" y="560" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="15" fill="#1D3D6B" transform="rotate(4 309 560)">ESTE LADO</text>
+            <text x="309" y="577" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="15" fill="#1D3D6B" transform="rotate(4 309 577)">PARA CIMA ↑</text>
+            <text x="263" y="602" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="11" fill="#6B4E24">O MANUAL</text>
+            <g class="hot"><circle cx="262" cy="470" r="20"/><text x="262" y="471">4</text></g>
+          </g>
+          <!-- 5 caixa aberta -->
+          <g class="piece" data-id="5" tabindex="0" role="button" aria-label="Peça 5, caixa aberta com mini manuais">
+            <g transform="translate(0 0)">
+              <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" text-anchor="middle">
+                <g transform="rotate(-10 738 520)"><rect x="716" y="454" width="44" height="64" rx="3" fill="#FFF9EC"/><rect x="716" y="454" width="44" height="64" rx="3" fill="none" stroke="#C9B997"/><text x="738" y="486" font-size="13" fill="#241F31">O MANUAL</text><rect x="724" y="496" width="28" height="4" fill="#1F7FD6"/></g>
+                <g transform="rotate(2 790 520)"><rect x="768" y="446" width="44" height="64" rx="3" fill="#FFF9EC"/><rect x="768" y="446" width="44" height="64" rx="3" fill="none" stroke="#C9B997"/><text x="790" y="478" font-size="13" fill="#241F31">O MANUAL</text><rect x="776" y="488" width="28" height="4" fill="#F28A1A"/></g>
+                <g transform="rotate(12 842 520)"><rect x="820" y="458" width="44" height="64" rx="3" fill="#FFF9EC"/><rect x="820" y="458" width="44" height="64" rx="3" fill="none" stroke="#C9B997"/><text x="842" y="490" font-size="13" fill="#241F31">O MANUAL</text><rect x="828" y="500" width="28" height="4" fill="#2F9E44"/></g>
+              </g>
+              <polygon points="700,520 700,470 676,500 676,540" fill="#B98E55" opacity=".9"/>
+              <polygon points="872,520 872,470 896,500 896,540" fill="#A27A44" opacity=".9"/>
+              <rect x="700" y="530" width="172" height="86" fill="url(#kraftg)"/>
+              <rect x="690" y="522" width="192" height="14" fill="#A27A44"/>
+              <rect x="728" y="552" width="116" height="48" rx="3" fill="#FFF9EC"/>
+              <text x="786" y="574" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="19" fill="#241F31">PEGUE O SEU</text>
+              <text x="786" y="593" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="19" fill="#241F31">MANUAL</text>
+            </g>
+            <g class="hot"><circle cx="786" cy="420" r="20"/><text x="786" y="421">5</text></g>
+          </g>
+          <!-- 6 marcas de passos no chão -->
+          <g class="piece" data-id="6" tabindex="0" role="button" aria-label="Peça 6, marcas de passos no chão">
+            <path d="M388 676 H410 M484 676 H506 M580 676 H602" stroke="#F3E8D2" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round" fill="none"/>
+            <g font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" text-anchor="middle">
+              <rect x="340" y="646" width="56" height="60" rx="9" fill="#1F7FD6" stroke="#FFF9EC" stroke-width="3"/><text x="368" y="677" dominant-baseline="central" font-size="42" fill="#fff">1</text>
+              <rect x="436" y="646" width="56" height="60" rx="9" fill="#F28A1A" stroke="#FFF9EC" stroke-width="3"/><text x="464" y="677" dominant-baseline="central" font-size="42" fill="#241F31">2</text>
+              <rect x="532" y="646" width="56" height="60" rx="9" fill="#2F9E44" stroke="#FFF9EC" stroke-width="3"/><text x="560" y="677" dominant-baseline="central" font-size="42" fill="#241F31">3</text>
+              <rect x="628" y="646" width="56" height="60" rx="9" fill="#7A3FC0" stroke="#FFF9EC" stroke-width="3"/><text x="656" y="677" dominant-baseline="central" font-size="42" fill="#fff">4</text></g>
+            <g class="hot"><circle cx="512" cy="730" r="20"/><text x="512" y="731">6</text></g>
+          </g>
+          <!-- 7 setas e etiqueta Fig. 1 -->
+          <g class="piece" data-id="7" tabindex="0" role="button" aria-label="Peça 7, setas e etiqueta Fig. 1">
+            <g stroke="#F3E8D2" stroke-width="4" stroke-dasharray="2 9" stroke-linecap="round" fill="none"><path d="M455 440 C455 400 465 375 470 352"/><path d="M545 440 C545 400 535 375 530 352"/></g>
+            <g fill="none" stroke="#F3E8D2" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M459 362 L470 348 L481 360"/><path d="M541 362 L530 348 L519 360"/></g>
+            <rect x="454" y="196" width="92" height="30" rx="6" fill="#F4BC1C"/>
+            <text x="500" y="212" text-anchor="middle" dominant-baseline="central" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="900" font-size="24" fill="#241F31" letter-spacing="1">FIG. 1</text>
+            <g class="hot"><circle cx="500" cy="420" r="20"/><text x="500" y="421">7</text></g>
+          </g>
+          <!-- 8 abertura na TV -->
+          <g class="piece" data-id="8" tabindex="0" role="button" aria-label="Peça 8, abertura na TV" id="p8">
+            <rect x="415" y="238" width="170" height="100" fill="transparent"/>
+            <g class="hot"><circle cx="500" cy="288" r="20"/><text x="500" y="289">8</text></g>
+          </g>
+          <rect class="shade" width="1000" height="780"/>
+        </svg>
+      </div>
+
+      <div class="side"><aside class="panel" aria-live="polite" id="panel"></aside></div>
+    </div>
+  </section>
+
+  <!-- 2 · PEÇAS -->
+  <section class="sec screen-only" id="pecas" aria-labelledby="h-pecas">
+    <h2 id="h-pecas"><span class="n blk c-orange" aria-hidden="true">2</span> Lista de peças</h2>
+    <p class="sub">Marquem cada peça que já está separada. A marcação fica salva neste aparelho. Tocar numa peça também destaca ela no desenho.</p>
+    <div class="meter" aria-hidden="true"><i id="meter"></i></div>
+    <p id="meterTxt" style="margin-top:.4rem;font-weight:700"></p>
+    <ul class="parts" id="parts"></ul>
+    <div class="two">
+      <div class="note"><h3>Antes de montar</h3>
+        <ul>
+          <li><b>Retirar:</b> banners, cortinas laranja e azul e os cubos atuais.</li>
+          <li><b>Fixação:</b> sem fita forte na parede preta. Usar fio de pesca, pregadores e o varão das luzes.</li>
+          <li><b>Peso no varão:</b> combinar com a equipe de som e luz antes de pendurar.</li>
+          <li><b>Segurança:</b> deixar livres os cabos e os pedestais de microfone.</li>
+        </ul></div>
+      <div class="note"><h3>Ainda a conferir</h3>
+        <ul>
+          <li>Medidas dos banners, cartões e caixas: conferir no palco antes de imprimir.</li>
+          <li>Fontes oficiais (Blockletter e Azo Sans): aqui usamos substitutas parecidas.</li>
+          <li>Testar o vinil removível num canto do carpete.</li>
+          <li>Versículos e temas das semanas: alinhar com o material oficial da série.</li>
+        </ul></div>
+    </div>
+  </section>
+
+  <!-- 3 · IMPRIMIR -->
+  <section class="sec printsec" id="imprimir" aria-labelledby="h-imp">
+    <h2 id="h-imp" class="screen-only"><span class="n blk c-green" aria-hidden="true">3</span> Para imprimir</h2>
+    <p class="sub screen-only">Escolham a peça, ajustem o tamanho e toquem em Imprimir. Dá para salvar em PDF pelo próprio navegador (escolham "Salvar como PDF" e desliguem cabeçalhos e rodapés). Os tamanhos são sugestões a conferir no palco.</p>
+
+    <div class="qrbar screen-only">
+      <label>Endereço do devocional online (vira QR code nas peças)
+        <input id="qrUrl" type="url" inputmode="url" placeholder="https://seu-site.com/o-manual/devocional/" autocomplete="off">
+      </label>
+      <small id="qrNote"></small>
+    </div>
+
+    <div class="tabs screen-only" role="tablist" aria-label="Peças para imprimir" id="ptabs">
+      <button type="button" role="tab" aria-selected="true" data-p="varal">Varal de passos</button>
+      <button type="button" role="tab" aria-selected="false" data-p="parede">Parede-manual</button>
+      <button type="button" role="tab" aria-selected="false" data-p="caixa">Caixa na entrada</button>
+      <button type="button" role="tab" aria-selected="false" data-p="mini">Mini manual de bolso</button>
+    </div>
+
+    <div class="pane" id="p-varal" role="tabpanel">
+      <div class="pane-head"><p>Quatro cartões para pendurar no varão com fio de pesca e pregador. Imprimir em papel mais grosso, de preferência.</p>
+        <div class="opts" id="vsize" role="group" aria-label="Tamanho do cartão"><button type="button" aria-pressed="false" data-w="105mm">A6</button><button type="button" aria-pressed="true" data-w="148mm">A5</button><button type="button" aria-pressed="false" data-w="210mm">A4</button>
+        <button type="button" class="btn go" data-print="varal">Imprimir</button></div></div>
+      <div class="vgrid" id="vgrid"></div>
+    </div>
+
+    <div class="pane" id="p-parede" role="tabpanel" hidden>
+      <div class="pane-head"><p>Uma página por semana, para a parede da entrada. Escolham a semana e imprimam em A4 ou ampliem na gráfica.</p>
+        <div class="opts" id="wsel" role="group" aria-label="Semana do cartaz"><button type="button" aria-pressed="true" data-w="0">Semana 1</button><button type="button" aria-pressed="false" data-w="1">Semana 2</button><button type="button" aria-pressed="false" data-w="2">Semana 3</button><button type="button" aria-pressed="false" data-w="3">Semana 4</button>
+        <button type="button" class="btn go" data-print="parede">Imprimir</button></div></div>
+      <div class="poster" id="poster"></div>
+    </div>
+
+    <div class="pane" id="p-caixa" role="tabpanel" hidden>
+      <div class="pane-head"><p>Etiquetas e carimbos para forrar a caixa de papelão com papel kraft. O cartão ao lado vai na frente da caixa aberta.</p>
+        <div class="opts"><button type="button" class="btn go" data-print="caixa">Imprimir</button></div></div>
+      <div class="caixa">
+        <div class="kraft" style="min-height:15rem">
+          <div class="tape" aria-hidden="true"><span>O Manual · O Manual · O Manual</span></div>
+          <div class="lbl"><small>Entrada · Série de outubro</small><h3>O Manual</h3><span class="stamp">Contém<br>1 família<br>4 passos</span></div>
+          <div class="lbl r" style="margin-top:2rem"><span class="stamp b">Este lado<br>para cima ↑</span><small>Devocional da família</small></div>
+        </div>
+        <div class="labelcard"><small style="font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#5F586F">Entrada</small><h3>Pegue o<br>seu manual</h3><div class="qr" data-qr></div><p style="margin:0;font-weight:600">Devocional da semana para fazer em casa</p></div>
+      </div>
+    </div>
+
+    <div class="pane" id="p-mini" role="tabpanel" hidden>
+      <div class="pane-head"><p>Mini manual de bolso: capa e miolo. Imprimir em A4 paisagem, dobrar ao meio e grampear. Toquem na capa para abrir.</p>
+        <div class="opts"><button type="button" class="btn" id="flip" aria-pressed="false">Abrir / fechar</button><button type="button" class="btn go" data-print="mini">Imprimir</button></div></div>
+      <div class="bookwrap"><div class="book closed" id="book">
+        <div class="pg right mm" id="bookRight"></div>
+        <div class="leaf" id="leaf" tabindex="0" role="button" aria-label="Abrir o mini manual"><div class="face front cov mm" id="coverF"></div><div class="face back mm" id="howF"></div></div>
+      </div></div>
+      <div class="flatprint" id="flat"></div>
+    </div>
+  </section>
+
+  <footer class="screen-only">
+    <p>Decoração da série de outubro do Videira Kids, com a identidade criada por Paulo Roberto. Os arquivos originais das pranchas ficam em <code>decoracao/original</code>.</p>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" async></script>
+<script>
+(function () {
+  'use strict';
+  function $(s, r) { return (r || document).querySelector(s); }
+  function $$(s, r) { return [].slice.call((r || document).querySelectorAll(s)); }
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var KEY = 'omanual-decoracao-v1', st = { have: {}, qr: '' };
+  try { var r = JSON.parse(localStorage.getItem(KEY) || 'null'); if (r) st = Object.assign(st, r); } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} }
+
+  /* ---------- dados ---------- */
+  var PARTS = [
+    { n: 1, t: 'Banner da esquerda', q: 1, c: 'c-blue', mat: 'Lona ou tecido impresso, com bastão no topo.', desc: 'Título "O Manual" na vertical e a frase da série.', tip: 'Prendam o bastão no varão e deixem o banner reto, sem encostar na caixa de som.' },
+    { n: 2, t: 'Banner da direita, "Como usar"', q: 1, c: 'c-orange', mat: 'Mesmo material do outro banner.', desc: 'Mostra os 4 passos e o QR code do devocional.', tip: 'O QR code tem de ficar na altura dos olhos de um adulto. Testem a leitura com o celular antes do culto.' },
+    { n: 3, t: 'Cartões do varal, passos 1 a 4', q: 4, c: 'c-green', mat: 'Papelão forrado ou E.V.A., pendurados no varão das luzes com fio de pesca e pregador de madeira.', desc: 'Dois de cada lado da TV.', tip: 'Combinem o peso no varão com a equipe de som e luz antes de pendurar.' },
+    { n: 4, t: 'Caixa fechada, lado esquerdo', q: 1, c: 'c-purple', mat: 'Papelão forrado de kraft, fita larga no meio e carimbos "Contém 1 família, 4 passos" e "Este lado para cima".', desc: 'Lembra a embalagem de um brinquedo de montar.', tip: 'Deixem a caixa fora do caminho dos cabos e dos pedestais de microfone.' },
+    { n: 5, t: 'Caixa aberta, lado direito', q: 1, c: 'c-red', mat: 'Papelão com os mini manuais impressos saindo de dentro.', desc: 'Cada família pega o seu na saída.', tip: 'Reponham os mini manuais antes de cada culto.' },
+    { n: 6, t: 'Marcas de passos no chão', q: 4, c: 'c-yellow', mat: 'Papel contact ou vinil removível, numeradas de 1 a 4, com setas pontilhadas entre elas.', desc: 'As crianças caminham pelos 4 passos.', tip: 'Testem o vinil num canto do carpete antes de colar tudo.' },
+    { n: 7, t: 'Setas na parede e etiqueta "Fig. 1"', q: 3, c: 'c-blue', mat: 'Duas setas pontilhadas em vinil removível cor creme, apontando para a TV, e a etiqueta em E.V.A. ao lado dela.', desc: 'Faz o palco parecer a figura de um manual.', tip: 'Nada de fita forte na parede preta. Vinil removível ou fio de pesca.' },
+    { n: 8, t: 'Abertura na TV', q: 1, c: 'c-orange', mat: 'Slide com o título da série, exibido antes do culto e entre os momentos.', desc: 'A TV abre a série como a capa de um manual.', tip: 'Peçam o slide para quem opera a TV e testem a tela cheia.' }
+  ];
+  var WEEKS = [
+    ['4 a 10 de outubro', 'Todo brinquedo vem com manual', 'Lâmpada para os meus pés é a tua palavra e luz para o meu caminho.', 'Salmos 119:105'],
+    ['11 a 17 de outubro', 'Quem escreveu o manual?', 'Toda a Escritura divinamente inspirada é proveitosa para ensinar, para repreender, para corrigir, para instruir em justiça.', '2 Timóteo 3:16'],
+    ['18 a 24 de outubro', 'Um passo de cada vez', 'Confia no Senhor de todo o teu coração e não te estribes no teu próprio entendimento. Reconhece-o em todos os teus caminhos, e ele endireitará as tuas veredas.', 'Provérbios 3:5-6'],
+    ['25 a 31 de outubro', 'Montar de verdade', 'E sede cumpridores da palavra e não somente ouvintes, enganando-vos a vós mesmos.', 'Tiago 1:22']
+  ];
+  var STEPS = [
+    { k: 'Ler', c: 'c-blue', min: 3, d: 'Leiam o versículo da semana em voz alta.' },
+    { k: 'Conversar', c: 'c-orange', min: 4, d: 'Respondam às três perguntas em família.' },
+    { k: 'Fazer', c: 'c-green', min: 6, d: 'Façam a atividade da semana juntos.' },
+    { k: 'Orar', c: 'c-purple', min: 2, d: 'Agradeçam a Deus por sua Palavra.' }
+  ];
+  var BOOK = '<svg viewBox="0 0 24 24" fill="none" stroke="#241F31" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5.5C5.5 4.5 9 4.5 12 6.5C15 4.5 18.5 4.5 21 5.5V19C18.5 18 15 18 12 20C9 18 5.5 18 3 19Z"/><path d="M12 6.5V20"/></svg>';
+  var MANU = '<svg class="manu" viewBox="0 0 48 48" aria-hidden="true"><rect x="3" y="3" width="42" height="42" rx="10" fill="#F4BC1C"/><rect x="3" y="3" width="42" height="42" rx="10" fill="none" stroke="#241F31" stroke-width="3"/><circle cx="17" cy="20" r="3.6" fill="#241F31"/><circle cx="31" cy="20" r="3.6" fill="#241F31"/><path d="M14 30 Q24 40 34 30" fill="none" stroke="#241F31" stroke-width="3.2" stroke-linecap="round"/></svg>';
+
+  /* ---------- palco: passo a passo ---------- */
+  var stage = $('#stage'), frame = $('#frame'), panel = $('#panel');
+  var cur = 0, sel = 0, timer = 0, dim = false, nums = false;
+  var pieces = $$('.piece', stage);
+
+  function piece(n) { return pieces.filter(function (p) { return Number(p.dataset.id) === n; })[0]; }
+  function applyStep() {
+    pieces.forEach(function (p) {
+      var id = Number(p.dataset.id);
+      var vis = id <= cur;
+      if (id === 8) { frame.classList.toggle('tv-on', vis); p.classList.remove('hidden'); } /* a TV já existe: só acende */
+      else p.classList.toggle('hidden', !vis);
+      p.classList.toggle('sel', id === sel && vis);
+    });
+    frame.classList.toggle('dim', dim);
+    frame.classList.toggle('numbers', nums);
+    renderPanel();
+    $$('#sbar button').forEach(function (b, i) { b.classList.toggle('cur', i === cur); b.classList.toggle('past', i < cur); b.setAttribute('aria-current', i === cur ? 'step' : 'false'); });
+    $('#prev').disabled = cur === 0; $('#next').disabled = cur === 8;
+  }
+  function renderPanel() {
+    var html;
+    var showId = sel || cur;
+    if (!showId) {
+      html = '<div class="badge"><div class="bigt blk c-yellow" aria-hidden="true">0</div><div><p class="kick">Passo 0 de 8</p><h3>Antes de montar</h3></div></div>' +
+        '<p class="mat"><b>Retirar:</b> banners, cortinas laranja e azul e os cubos atuais. A decoração que aparece na foto atual deve ser ignorada.</p>' +
+        '<p class="mat"><b>Fixação:</b> sem fita forte na parede preta. Usar fio de pesca, pregadores e o varão das luzes.</p>' +
+        '<div class="tip">' + MANU + '<span>Palco limpo, tudo certo. Toquem em <b>Próximo passo</b> para ver a primeira peça chegar.</span></div>';
+    } else {
+      var p = PARTS[showId - 1];
+      html = '<div class="badge"><div class="bigt blk ' + p.c + '" aria-hidden="true">' + p.n + '</div><div><p class="kick">' + (sel ? 'Peça ' + p.n + ' de 8' : 'Passo ' + cur + ' de 8') + '</p><h3>' + esc(p.t) + '</h3></div></div>' +
+        '<span class="qty">Quantidade: ' + p.q + '×</span><p class="mat"><b>Material:</b> ' + esc(p.mat) + '</p><p class="mat">' + esc(p.desc) + '</p>' +
+        '<div class="tip">' + MANU + '<span>' + esc(p.tip) + '</span></div>';
+    }
+    panel.innerHTML = html;
+  }
+  function go(n, fromUser) {
+    cur = Math.max(0, Math.min(8, n)); sel = cur; applyStep();
+    if (fromUser) stopAuto();
+  }
+  function stopAuto() { if (timer) { clearInterval(timer); timer = 0; } var b = $('#auto'); b.textContent = 'Montar sozinho'; b.setAttribute('aria-pressed', 'false'); }
+  function auto() {
+    if (timer) { stopAuto(); return; }
+    cur = 0; sel = 0; applyStep();
+    var b = $('#auto'); b.textContent = 'Parar'; b.setAttribute('aria-pressed', 'true');
+    timer = setInterval(function () { if (cur >= 8) { stopAuto(); return; } go(cur + 1, false); }, reduce ? 900 : 1500);
+  }
+  /* controles montados por JS dentro do painel externo */
+  (function () {
+    var ctr = document.createElement('div');
+    ctr.className = 'ctrls'; ctr.innerHTML =
+      '<button type="button" class="btn" id="prev">Anterior</button><button type="button" class="btn go" id="next">Próximo passo</button><button type="button" class="btn" id="auto" aria-pressed="false">Montar sozinho</button>';
+    var bar = document.createElement('ol'); bar.className = 'steps-bar'; bar.id = 'sbar'; bar.setAttribute('aria-label', 'Ir direto para o passo');
+    for (var i = 0; i <= 8; i++) { var li = document.createElement('li'), b = document.createElement('button'); b.type = 'button'; b.textContent = i; b.setAttribute('aria-label', i ? 'Passo ' + i : 'Antes de montar'); (function (k) { b.addEventListener('click', function () { go(k, true); }); })(i); li.appendChild(b); bar.appendChild(li); }
+    var tg = document.createElement('div'); tg.className = 'toggles';
+    tg.innerHTML = '<button type="button" class="btn" id="tdim" aria-pressed="false">Apagar as luzes</button><button type="button" class="btn" id="tnum" aria-pressed="false">Mostrar números</button>';
+    var holder = document.createElement('div'); holder.appendChild(ctr); holder.appendChild(bar); holder.appendChild(tg);
+    panel.parentNode.appendChild(holder);
+    $('#prev').addEventListener('click', function () { go(cur - 1, true); });
+    $('#next').addEventListener('click', function () { go(cur + 1, true); });
+    $('#auto').addEventListener('click', auto);
+    $('#tdim').addEventListener('click', function (e) { dim = !dim; e.currentTarget.setAttribute('aria-pressed', dim); applyStep(); });
+    $('#tnum').addEventListener('click', function (e) { nums = !nums; e.currentTarget.setAttribute('aria-pressed', nums); applyStep(); });
+  })();
+  pieces.forEach(function (p) {
+    function pick() {
+      var id = Number(p.dataset.id);
+      stopAuto();
+      if (id > cur) cur = id;
+      sel = id; applyStep(); markList();
+    }
+    p.addEventListener('click', pick);
+    p.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (/INPUT|TEXTAREA/.test((e.target.tagName || ''))) return;
+    if (!document.getElementById('palco').matches(':hover, :focus-within')) return;
+    if (e.key === 'ArrowRight') go(cur + 1, true);
+    if (e.key === 'ArrowLeft') go(cur - 1, true);
+  });
+
+  /* ---------- lista de peças ---------- */
+  var list = $('#parts');
+  PARTS.forEach(function (p) {
+    var li = document.createElement('li'); li.className = 'part'; li.dataset.n = p.n;
+    li.innerHTML = '<div class="num blk ' + p.c + '" aria-hidden="true">' + p.n + '</div><h3>' + esc(p.t) + '</h3><p class="m">' + esc(p.mat) + ' ' + esc(p.desc) + '</p>' +
+      '<label><input type="checkbox"> <span>Já separei</span><span class="q">' + p.q + '×</span></label>';
+    var cb = $('input', li);
+    cb.checked = !!st.have[p.n];
+    cb.addEventListener('change', function () { st.have[p.n] = cb.checked ? 1 : 0; save(); renderList(); });
+    $('h3', li).addEventListener('click', function () { stopAuto(); if (p.n > cur) cur = p.n; sel = p.n; applyStep(); markList(); $('#palco').scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' }); });
+    $('h3', li).style.cursor = 'pointer';
+    list.appendChild(li);
+  });
+  function markList() { $$('.part', list).forEach(function (l) { l.classList.toggle('sel', Number(l.dataset.n) === sel); }); }
+  function renderList() {
+    var n = 0;
+    $$('.part', list).forEach(function (l, i) { var on = !!st.have[i + 1]; if (on) n++; l.classList.toggle('have', on); });
+    $('#meter').style.width = (n / 8 * 100) + '%';
+    $('#meterTxt').textContent = n === 8 ? 'Tudo separado! Bom culto.' : n + ' de 8 peças separadas';
+  }
+
+  /* ---------- QR code ---------- */
+  var defaultUrl = '';
+  try { if (/^https?:/.test(location.protocol)) defaultUrl = new URL('../devocional/', location.href).href; } catch (e) {}
+  if (!st.qr) st.qr = defaultUrl;
+  $('#qrUrl').value = st.qr;
+  function qrAll() {
+    var url = (st.qr || '').trim();
+    $$('[data-qr]').forEach(function (box) {
+      box.innerHTML = ''; box.classList.remove('ph');
+      if (url && window.QRCode) {
+        try { new QRCode(box, { text: url, width: 256, height: 256, correctLevel: QRCode.CorrectLevel.M }); return; } catch (e) {}
+      }
+      box.classList.add('ph'); box.style.aspectRatio = '1'; box.textContent = 'QR code';
+    });
+    $('#qrNote').textContent = !url ? 'Sem endereço, as peças saem com um quadro "QR code" para colar depois.' :
+      (window.QRCode ? 'QR code gerado. Testem a leitura com o celular antes de imprimir.' : 'Não deu para carregar o gerador de QR agora. Conectem à internet e recarreguem a página.');
+  }
+  $('#qrUrl').addEventListener('input', function (e) { st.qr = e.target.value; save(); qrAll(); });
+  window.addEventListener('load', function () { qrAll(); });
+
+  /* ---------- varal ---------- */
+  $('#vgrid').innerHTML = STEPS.map(function (s, i) {
+    return '<div class="vcard"><span class="hole" aria-hidden="true"></span><div class="top"><div class="bigt blk ' + s.c + '">' + (i + 1) + '</div>' + BOOK + '</div>' +
+      '<p class="kick">Passo ' + (i + 1) + '</p><div class="word">' + s.k + '</div><p class="desc">' + esc(s.d) + '</p><span class="time">' + s.min + ' min</span></div>';
+  }).join('');
+  $$('#vsize button').forEach(function (b) {
+    if (!b.dataset.w) return;
+    b.addEventListener('click', function () {
+      $$('#vsize button[data-w]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      $('#vgrid').style.setProperty('--cw', b.dataset.w);
+    });
+  });
+  $('#vgrid').style.setProperty('--cw', '148mm');
+
+  /* ---------- parede-manual ---------- */
+  function renderPoster(i) {
+    var w = WEEKS[i];
+    $('#poster').innerHTML = '<div class="ph"><span>Página ' + (i + 1) + ' de 4</span><span>' + esc(w[0]) + '</span></div><h3>' + esc(w[1]) + '</h3>' +
+      '<div class="vs"><q>' + esc(w[2]) + '</q><b>' + esc(w[3]) + '</b></div><div class="rows">' +
+      STEPS.map(function (s, k) { return '<div class="row"><div class="bigt blk ' + s.c + '">' + (k + 1) + '</div><div><h4>' + s.k + '</h4><p>' + esc(s.d) + '</p></div></div>'; }).join('') +
+      '</div><div class="foot"><div class="qr" data-qr></div><p>Escaneie e faça o devocional da semana em casa, com seus filhos.</p></div>';
+    qrAll();
+  }
+  $$('#wsel button[data-w]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      $$('#wsel button[data-w]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+      renderPoster(Number(b.dataset.w));
+    });
+  });
+
+  /* ---------- mini manual ---------- */
+  var titleLetters = ['O', 'M', 'A', 'N', 'U', 'A', 'L'], tcol = ['c-red', 'c-orange', 'c-yellow', 'c-green', 'c-blue', 'c-purple', 'c-red'];
+  function coverHtml() {
+    return '<p class="small" style="font-weight:700;letter-spacing:.1em;text-transform:uppercase">Série de outubro · Videira Kids</p>' +
+      '<div class="tt" aria-label="O Manual">' + titleLetters.map(function (l, i) { return i === 1 ? '<br>' : ''; }).join('') +
+      '<span style="color:var(--red)">O</span><span style="color:var(--orange)">M</span><span style="color:#D9A010">A</span><span style="color:var(--green)">N</span><span style="color:var(--blue)">U</span><span style="color:var(--purple)">A</span><span style="color:var(--red)">L</span></div>' +
+      '<div><h4 style="font-size:1.6em">Devocional da família</h4><p class="small">Quatro semanas para ler, conversar, fazer e orar juntos.</p></div>' +
+      '<div style="width:100%"><p class="small">Este manual pertence à família</p><div class="line" style="width:100%;border-bottom:.12em dotted #241F31;height:1.2em"></div></div>';
+  }
+  function howHtml() {
+    return '<h4>Como usar</h4><p class="small">Um dia da semana, 15 minutos, os quatro passos na ordem.</p><ul class="lst">' +
+      STEPS.map(function (s, k) { return '<li><div class="bigt blk ' + s.c + '">' + (k + 1) + '</div><div><b>' + s.k + '</b>' + esc(s.d) + '</div></li>'; }).join('') +
+      '</ul><p class="small" style="margin-top:auto">Cada passo feito ganha um carimbo na página ao lado.</p>';
+  }
+  function weeksHtml() {
+    return '<h4>Nossas 4 semanas</h4>' + WEEKS.map(function (w, i) {
+      return '<p class="wk"><i class="blk ' + ['c-red', 'c-yellow', 'c-blue', 'c-green'][i] + '">' + (i + 1) + '</i><b>' + esc(w[1]) + '</b><em>' + esc(w[3]) + '</em></p>';
+    }).join('') + '<p class="small">Devocional online com as perguntas e atividades de cada semana.</p><div class="qr" data-qr></div>';
+  }
+  $('#coverF').innerHTML = coverHtml(); $('#howF').innerHTML = howHtml(); $('#bookRight').innerHTML = weeksHtml();
+  $('#flat').innerHTML = '<div class="book"><div class="pg mm cov" style="position:static;width:98mm;height:140mm;font-size:6.5mm">' + coverHtml() + '</div></div>' +
+    '<div class="book"><div class="pg mm" style="position:static;width:98mm;height:140mm;font-size:6.5mm">' + howHtml() + '</div><div class="pg mm" style="position:static;width:98mm;height:140mm;font-size:6.5mm">' + weeksHtml() + '</div></div>';
+  function toggleBook() {
+    var b = $('#book'), open = !b.classList.contains('open');
+    b.classList.toggle('open', open); b.classList.toggle('closed', !open);
+    $('#flip').setAttribute('aria-pressed', open); $('#leaf').setAttribute('aria-label', open ? 'Fechar o mini manual' : 'Abrir o mini manual');
+  }
+  $('#flip').addEventListener('click', toggleBook);
+  $('#leaf').addEventListener('click', toggleBook);
+  $('#leaf').addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleBook(); } });
+
+  /* ---------- abas de impressão ---------- */
+  $$('#ptabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      $$('#ptabs button').forEach(function (x) { x.setAttribute('aria-selected', x === b ? 'true' : 'false'); });
+      $$('.pane').forEach(function (p) { p.hidden = p.id !== 'p-' + b.dataset.p; });
+      qrAll();
+    });
+  });
+  $$('[data-print]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.documentElement.setAttribute('data-print', b.dataset.print);
+      qrAll();
+      setTimeout(function () { window.print(); }, 150);
+    });
+  });
+  window.addEventListener('afterprint', function () { document.documentElement.removeAttribute('data-print'); });
+
+  /* ---------- início ---------- */
+  cur = 8; sel = 0;
+  applyStep(); renderList(); renderPoster(0); qrAll();
+  if (!reduce) { cur = 0; applyStep(); setTimeout(function () { if (!timer && cur === 0) auto(); }, 700); }
+})();
+</script>
+</body>
+</html>
