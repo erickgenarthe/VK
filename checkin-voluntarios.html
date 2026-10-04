@@ -146,11 +146,15 @@
 
   /* ---- Print (only the label card is visible on paper) — 29mm x 90mm, paisagem ---- */
   @media print {
-    /* Esconde as outras telas com display:none (não visibility:hidden): visibility:hidden mantém o
-       espaço ocupado no layout, então a lista de check-ins do dia (que só cresce) ficava "invisível"
-       mas ainda enorme — o Chrome media isso em dezenas de páginas de 29mm, e como #labelCard é
-       position:fixed, ele repete em CADA uma delas. Por isso saíam ~40 cópias da mesma etiqueta.
-       Com display:none essas telas somem de verdade do layout e sobra só a etiqueta, numa página só. */
+    /* visibility:hidden no body inteiro continua necessário: esconde qualquer elemento que a gente não
+       controla diretamente (ex.: o selo "Powered by Netlify" que o próprio Netlify injeta na página),
+       senão ele aparece flutuando por cima da etiqueta na hora de imprimir.
+       display:none nas telas grandes (dashboard, autoatendimento, tela de números) resolve o problema
+       separado de sair ~40 cópias: visibility:hidden sozinho NÃO tira o elemento do layout, só o deixa
+       invisível — a lista de check-ins do dia (que só cresce) continuava enorme e "invisível", e o
+       Chrome media isso em dezenas de páginas de 29mm; como #labelCard é position:fixed, ele repetia em
+       CADA uma delas. display:none tira essas telas do layout de verdade, então sobra 1 página só. */
+    body * { visibility: hidden; }
     #dashboard, #checkoutScreen, .self-screen, .numeros-screen, #selfQrModal { display: none !important; }
     #labelCard, #labelCard * { visibility: visible; }
     .modal-overlay { position: fixed; inset: 0; background: none !important; display: block !important; padding: 0; }
