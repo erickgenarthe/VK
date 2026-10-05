@@ -622,6 +622,17 @@
       }
     });
   });
+
+  // Pede pra função do Netlify sincronizar as vagas reais do MyKids — ela mesma
+  // já escreve direto no Firebase; como este painel já está "ouvindo" esse banco
+  // (ref.on('value') ali em cima), a tela atualiza sozinha quando o número mudar.
+  // Chama uma vez ao carregar a página e depois a cada 20 segundos, só enquanto
+  // esta aba estiver aberta.
+  function syncMyKidsVagas() {
+    fetch('/.netlify/functions/sync-mykids-vagas').catch(function () {});
+  }
+  syncMyKidsVagas();
+  setInterval(syncMyKidsVagas, 20000);
 })();
 </script>
 </body>
