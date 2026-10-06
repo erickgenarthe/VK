@@ -217,6 +217,8 @@ sem build.
   cadastros repetidos serão unificados; depois dá para **desfazer**.
   Importar de novo (relatório atualizado) só acrescenta/atualiza, sem
   apagar alergias, notas ou presenças que você já registrou.
+  Funciona com o relatório de **Membros** e com o de **Visitantes** (as
+  famílias do segundo entram marcadas como “visitante”); importe um depois do outro.
   *Dica:* use o PDF, não o Excel do mesmo relatório — o Excel vem sem
   data de nascimento, telefone e e-mail.
 - **Também aceita CSV/Excel** próprios, com reconhecimento automático das

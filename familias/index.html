@@ -473,7 +473,8 @@ function filaCuidado(){
   state.familias.forEach(f => {
     if (f.status === 'inativa') return;
     const feitos = new Set(f.feitos || []); const tel = contatoPrincipal(f);
-    if (f.status === 'visitante' && !feitos.has('boasvindas')){
+    const recente = (f.origem !== 'mykids' && (Date.now() - new Date(f.criadoEm)) < 14 * 86400000) || (diasDesde(ultimaPresenca(f)) != null && diasDesde(ultimaPresenca(f)) <= 14);
+    if (f.status === 'visitante' && recente && !feitos.has('boasvindas')){
       const c = f.criancas[0];
       fila.push({ f, tema:'boasvindas', chave:'boasvindas', crianca: c ? primeiroNome(c.nome) : '', prioridade: 1, motivo: 'Visitante novo — ainda sem contato' });
     }
@@ -524,7 +525,7 @@ function carregarScript(src){
 function mkParsePaginas(paginas){
   const regs = [], avisos = [], famVistas = new Set();
   let igreja = '';
-  let fam = { id:'', nome:'' };
+  let fam = { id:'', nome:'', sit:'' };
   const limpa = (s) => (s||'').replace(/\s+/g,' ').trim();
   paginas.forEach((pg, pi) => {
     if (!igreja){ const tit = pg.find(i => i.y > 780 && i.y < 800 && i.s.trim() && !/Emiss|P[áa]gina/.test(i.s)); if (tit) igreja = tit.s.trim(); }
@@ -538,7 +539,8 @@ function mkParsePaginas(paginas){
       const idIt = linha.find(i => i.x > 55 && i.x < 110 && /^\d+$/.test(i.s.trim()));
       const nome = linha.filter(i => i.x > 150 && i.x < 440 && i.s.trim() !== 'Famíli' && i.s.trim() !== 'Tipo:')
         .sort((a,b)=>a.x-b.x).map(i=>i.s).join(' ');
-      return { y:c.y, id: idIt ? idIt.s.trim() : '', nome: limpa(nome) === '.' ? '' : limpa(nome) };
+      const sit = linha.filter(i => i.x > 470 && i.s.trim() !== 'Tipo:').map(i => i.s.trim()).join(' ');
+      return { y:c.y, id: idIt ? idIt.s.trim() : '', nome: limpa(nome) === '.' ? '' : limpa(nome), sit: /visit/i.test(sit) ? 'visitante' : 'membro' };
     });
     // 2) âncoras: primeira parte do ID do membro (5 dígitos na margem)
     const rest = itens.filter(i => !ehCab.has(i));
@@ -561,7 +563,7 @@ function mkParsePaginas(paginas){
     // 4) percorre em ordem de leitura trocando a família atual
     let ib = 0;
     eventos.forEach(ev => {
-      if (ev.tipo === 'cab'){ fam = { id:ev.c.id, nome:ev.c.nome }; famVistas.add(fam.id); return; }
+      if (ev.tipo === 'cab'){ fam = { id:ev.c.id, nome:ev.c.nome, sit:ev.c.sit }; famVistas.add(fam.id); return; }
       const b = blocos[ib++];
       const its = b.itens;
       const rodape = its.find(i => i.x < 34 && /^\d{6,}$/.test(i.s.trim()));
@@ -585,9 +587,10 @@ function mkParsePaginas(paginas){
       const emailIts = direita.filter(i => i.x >= 470).sort((p,q)=>(q.y-p.y)||(p.x-q.x));
       const email = emailIts.map(i=>i.s.trim()).join('').toLowerCase();
       const idadeM = linhaTopo.replace(/\d{2}\/\d{2}\/\d{4}/,' ').match(/\b(\d{1,3})\b(?!\d)/);
-      const nome = limpa(nomeIts.map(i=>i.s).join(' '));
+      let nome = limpa(nomeIts.map(i=>i.s).join(' '));
+      nome = nome.replace(/(Responsav(el)?|Crian[çc]a)$/i, '').trim();   // nome longo cola no texto do tipo
       if (!nome) avisos.push(`Página ${pi+1}: registro sem nome (ID ${idMembro})`);
-      regs.push({ famId, famNome: fam.id === famId ? fam.nome : '', mid: idMembro, nome,
+      regs.push({ famId, famNome: fam.id === famId ? fam.nome : '', famTipo: fam.id === famId ? fam.sit : '', mid: idMembro, nome,
         tipo: crianca ? 'crianca' : 'resp', nasc, sexo, tel, email,
         idadeRel: idadeM ? +idadeM[1] : null, pagina: pi+1 });
     });
@@ -595,7 +598,9 @@ function mkParsePaginas(paginas){
   // nome da família: pega do primeiro registro que o tiver
   const nomes = {};
   regs.forEach(r => { if (r.famNome && !nomes[r.famId]) nomes[r.famId] = r.famNome; });
-  regs.forEach(r => { r.famNome = nomes[r.famId] || ''; });
+  const tipos = {};
+  regs.forEach(r => { if (r.famTipo && !tipos[r.famId]) tipos[r.famId] = r.famTipo; });
+  regs.forEach(r => { r.famNome = nomes[r.famId] || ''; r.famTipo = tipos[r.famId] || ''; });
   return { regs, familias: famVistas.size, avisos, igreja };
 }
 /*PARSER-FIM*/
@@ -722,6 +727,8 @@ function aplicarGrupo(fam, rs, modo, existia){
   };
   const f0 = rs[0];
   if (f0.famId && !fam.mids.includes(f0.famId)){ fam.mids.push(f0.famId); r.mudou = true; }
+  const sit = (rs.find(x => x.famTipo) || {}).famTipo;   // Membro / Visitante no MyKids
+  if (sit && fam.status !== 'inativa' && fam.status !== sit && (fonte || !existia)){ if (existia) r.alterados++; fam.status = sit === 'visitante' ? 'visitante' : 'ativa'; r.mudou = true; }
   if (!fam.nome && rs.some(x => x.famNome)){ fam.nome = rs.find(x => x.famNome).famNome; r.mudou = true; }
   ['endereco','bairro'].forEach(k => { const v = (rs.find(x => x[k]) || {})[k]; if (v && !fam[k]){ fam[k] = v; r.mudou = true; } });
   rs.forEach(x => {
@@ -775,7 +782,7 @@ function resumoPlano(itens, regs, modo){
   return {
     pessoas: regs.length, criancas: new Set(regs.filter(r => r.tipo === 'crianca').map(r => (r.famId || r.famKey) + '|' + (r.mid || norm(r.nome) + r.nasc))).size,
     resp: new Set(regs.filter(r => r.tipo !== 'crianca').map(r => (r.famId || r.famKey) + '|' + (r.mid || norm(r.nome)))).size,
-    familias: itens.length, novas: novas.length, mudadas: mudadas.length, iguais: iguais.length,
+    familias: itens.length, visitantes: itens.filter(i => i.fam.status === 'visitante').length, novas: novas.length, mudadas: mudadas.length, iguais: iguais.length,
     criancasNovas: itens.reduce((s, i) => s + i.res.criancasNovas, 0), respNovos: itens.reduce((s, i) => s + i.res.respNovos, 0),
     alterados: itens.reduce((s, i) => s + i.res.alterados, 0), ausentes,
     semResp: itens.filter(i => !i.fam.responsaveis.length).length,
@@ -1132,7 +1139,8 @@ function telaImportar(){
   if (imp.estagio === 'previa'){
     const s = imp.resumo;
     return `<div class="cartao"><div class="cartao-titulo">📄 ${esc(imp.arquivo)} <span class="badge b-servir">${esc(imp.origem)}</span></div>
-      <div class="grade-4"><div class="kpi"><div class="n">${s.familias}</div><div class="l">famílias no arquivo</div></div><div class="kpi"><div class="n">${s.criancas}</div><div class="l">crianças</div></div><div class="kpi"><div class="n">${s.resp}</div><div class="l">responsáveis</div></div><div class="kpi ${s.semResp ? 'ouro' : ''}"><div class="n">${s.semResp}</div><div class="l">sem responsável</div></div></div></div>
+      <div class="grade-4"><div class="kpi"><div class="n">${s.familias}</div><div class="l">famílias no arquivo</div></div><div class="kpi"><div class="n">${s.criancas}</div><div class="l">crianças</div></div><div class="kpi"><div class="n">${s.resp}</div><div class="l">responsáveis</div></div><div class="kpi ${s.semResp ? 'ouro' : ''}"><div class="n">${s.semResp}</div><div class="l">sem responsável</div></div></div>
+      ${s.visitantes ? `<p class="hint" style="margin-top:10px;">👋 ${s.visitantes} ${s.visitantes === 1 ? 'família é de visitantes' : 'famílias são de visitantes'} (relatório de Visitantes do MyKids) e ${s.visitantes === 1 ? 'entra' : 'entram'} como “visitante”.</p>` : ''}</div>
       <div class="cartao"><div class="cartao-titulo">O que vai acontecer</div>
         <div class="item"><div class="t">➕ Famílias novas</div><span class="badge b-servir">${s.novas}</span></div>
         <div class="item"><div class="t">✏️ Famílias com dados novos</div><span class="badge b-azul">${s.mudadas}</span></div>
