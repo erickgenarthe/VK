@@ -1,0 +1,20 @@
+{
+  "name": "Central de Famílias · Ministério Infantil",
+  "short_name": "Famílias",
+  "description": "Banco de dados das famílias do ministério infantil, com importação do MyKids.",
+  "start_url": "/familias/index.html",
+  "scope": "/familias/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FBF7F1",
+  "theme_color": "#1F6F5C",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMjAwIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgcng9IjQwIiBmaWxsPSIjRkJGN0YxIi8+PHBhdGggZD0iTTM0IDEwNCAxMDAgNDhsNjYgNTZ2NThhNiA2IDAgMCAxLTYgNkg0MGE2IDYgMCAwIDEtNi02eiIgZmlsbD0iIzFGNkY1QyIvPjxwYXRoIGQ9Ik0xMDAgMTUwYy0yNi0xOC0zOC0zMC0zOC00NGEyMiAyMiAwIDAgMSAzOC04IDIyIDIyIDAgMCAxIDM4IDhjMCAxNC0xMiAyNi0zOCA0NHoiIGZpbGw9IiNGNEI3NDAiLz48L3N2Zz4=",
+      "sizes": "200x200",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

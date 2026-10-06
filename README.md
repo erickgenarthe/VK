@@ -137,6 +137,7 @@ netlify/functions/agradecimento-servico.mjs  → agradecimento pós-culto
 netlify/functions/status-lideres.mjs         → resumo pros líderes (ter/sáb)
 netlify/functions/vagas-abertas.mjs          → aviso automático de vaga aberta (qua)
 treino/                           → app pessoal "FORJA" (personal trainer), veja abaixo
+familias/                         → "Central de Famílias" do ministério infantil, veja abaixo
 ```
 
 ## FORJA — personal trainer digital (`treino/`)
@@ -199,6 +200,54 @@ FORJA separado não mexe nele.
 
 Pra só testar rapidinho sem publicar nada: abra `treino/index.html` direto
 no navegador.
+
+## Central de Famílias — banco de dados do ministério infantil (`familias/`)
+
+Um terceiro app, independente do SERVE, para o ministério infantil ter **um só
+lugar** com todas as famílias cadastradas no MyKids: quem são os
+responsáveis, quais crianças, idade, turma, alergias, telefone, quem
+precisa de um contato. Mesmo visual do SERVE, mesma ideia: um `index.html`
+sem build.
+
+- **Importa o PDF do MyKids direto.** Em "Mais" → "Importar do MyKids",
+  solte o *Relatório de Famílias Com Seus Integrantes* (PDF). O app lê as
+  famílias, crianças e responsáveis (nome, nascimento, sexo, telefone,
+  e-mail e ID do MyKids) no próprio aparelho — o arquivo não é enviado a
+  ninguém. Antes de gravar, mostra o que é novo, o que muda e quantos
+  cadastros repetidos serão unificados; depois dá para **desfazer**.
+  Importar de novo (relatório atualizado) só acrescenta/atualiza, sem
+  apagar alergias, notas ou presenças que você já registrou.
+  *Dica:* use o PDF, não o Excel do mesmo relatório — o Excel vem sem
+  data de nascimento, telefone e e-mail.
+- **Também aceita CSV/Excel** próprios, com reconhecimento automático das
+  colunas (e você ajusta o que estiver errado).
+- **Busca de balcão**: digite nome da criança, do responsável, final do
+  telefone ou ID do MyKids; a ficha mostra alergias e cuidados em vermelho.
+- **Ficha da família**: contatos com WhatsApp/ligar em um toque, crianças com
+  turma automática pela idade, alergias/medicação/necessidades especiais,
+  autorização de foto, autorizados a buscar, histórico de anotações.
+- **Cuidar**: fila de quem merece uma mensagem hoje (visitante novo,
+  aniversariante, família ausente) com texto pronto para o WhatsApp; o
+  contato fica registrado na ficha.
+- **Presença de hoje** (alimenta o aviso de ausência), **turmas** com
+  **ficha de sala em PDF** (alergias em destaque), **aniversariantes**.
+- **Limpeza de dados**: % de cadastros prontos para contato, famílias sem
+  responsável/telefone e **possíveis duplicadas** (com mesclagem).
+- **Exportar**: Excel, CSV, PDF e backup `.json`. **PIN** opcional de bloqueio.
+- **Dados**: ficam no `localStorage` do aparelho. Para compartilhar entre
+  vários líderes, preencha o `firebaseConfig` no topo de `familias/index.html`
+  (mesmo passo a passo do SERVE; aqui o acesso é só por login, as contas
+  são criadas por você no console do Firebase — não há cadastro aberto, e as
+  regras do Firestore devem exigir `request.auth != null`). **A sincronização
+  com o Firebase ainda não foi testada contra um projeto real.**
+
+> **Privacidade (LGPD):** isto guarda dados de crianças. Nunca coloque o PDF/Excel
+> do MyKids no repositório (o `.gitignore` já bloqueia `*.pdf`, `*.xlsx`,
+> `*.csv`, `*.zip`), use o PIN, e dê acesso só a quem serve no ministério infantil.
+
+Para publicar como site próprio no Netlify, siga os mesmos passos do FORJA com
+**Base directory** = `familias`. Para só testar: abra `familias/index.html`
+no navegador e use "Ver com famílias de exemplo".
 
 ## Limitações conhecidas (é um MVP, não um produto de 5 anos de estrada)
 

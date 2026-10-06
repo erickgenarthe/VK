@@ -1,0 +1,7 @@
+# Dados reais de famílias/crianças nunca vão para o repositório
+*.pdf
+*.xlsx
+*.xls
+*.csv
+*.zip
+node_modules/
