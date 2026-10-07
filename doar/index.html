@@ -182,10 +182,10 @@ $('grade').addEventListener('click', e => {
 
 /* ---- brinquedoteca ao vivo ---- */
 const salaPrincipal = new Sala($('sala'));
-let vivas = [], porVivo = {};
-Dados.aoVivoMural(({ total, porItem, ultimas }) => {
-  totalAtual = total; vivas = ultimas; porVivo = porItem;
-  salaPrincipal.atualiza(porItem, ultimas);
+let porVivo = {};
+Dados.aoVivoMural(({ total, porItem }) => {
+  totalAtual = total; porVivo = porItem;
+  salaPrincipal.atualiza(porItem);
   const brinquedos = Object.values(porItem).reduce((a, b) => a + b, 0);
   $('sala-num').textContent = brinquedos;
   $('sala-txt').textContent = brinquedos === 0
@@ -266,9 +266,9 @@ function celebra(nome, numero, porAntes, meus){
   $('festa').classList.add('aberta');
   if (salaFesta) salaFesta.destroy();
   salaFesta = new Sala($('sala-festa'));
-  salaFesta.atualiza(porAntes, []);
+  salaFesta.atualiza(porAntes);
   const depois = { ...porAntes }; meus.forEach(id => { depois[id] = (depois[id] || 0) + 1; });
-  setTimeout(() => { salaFesta.atualiza(depois, [{ nome: primeiroNome(nome) }]); confete($('confete')); }, 600);
+  setTimeout(() => { salaFesta.atualiza(depois, primeiroNome(nome)); confete($('confete')); }, 600);
   escolhidos = [];
 }
 $('mais').addEventListener('click', () => { $('festa').classList.remove('aberta'); window.scrollTo({ top: $('grade').offsetTop - 12, behavior: 'smooth' }); });

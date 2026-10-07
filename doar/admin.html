@@ -19,6 +19,19 @@
   .login{max-width:380px;margin:40px auto;display:grid;gap:12px}
   .login input{min-height:52px;padding:0 14px;border-radius:12px;border:2px solid #E3D3B6;background:#fff;font-size:1.05rem;width:100%}
   .login .erro{color:var(--vermelho);font-size:.9rem}
+  .totais{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0 12px}
+  .total{background:#fff;border:2px solid var(--creme-2);border-radius:16px;padding:12px 14px;min-width:0}
+  .total b{display:block;font-family:var(--f-titulo);font-weight:900;font-size:3.2rem;line-height:.95;color:var(--azul);font-variant-numeric:tabular-nums}
+  .total span{font-size:.85rem;color:var(--tinta-2)}
+  .total.alerta b{color:var(--vermelho)}
+  .barras{background:#fff;border:2px solid var(--creme-2);border-radius:16px;padding:12px 14px;margin-bottom:12px;display:grid;gap:8px}
+  .barras h2{margin:0 0 2px;font-family:var(--f-titulo);font-weight:900;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
+  .barra-item{display:grid;grid-template-columns:28px minmax(0,11rem) 1fr 2.5rem;gap:10px;align-items:center;font-size:.9rem}
+  .barra-item .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .barra-item .trilho{height:14px;border-radius:7px;background:var(--creme)}
+  .barra-item .trilho i{display:block;height:100%;border-radius:7px;min-width:4px}
+  .barra-item .qt{font-family:var(--f-titulo);font-weight:900;font-size:1.3rem;text-align:right;font-variant-numeric:tabular-nums}
+  @media (max-width:520px){.barra-item{grid-template-columns:28px 1fr 2.5rem}.barra-item .trilho{grid-column:1 / -1;order:5}}
   .resumo{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
   .fil{border:2px solid var(--creme-2);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.9rem;display:inline-flex;gap:8px;align-items:center}
   .fil b{font-family:var(--f-titulo);font-weight:900;font-size:1.25rem;line-height:1}
@@ -62,6 +75,9 @@
       </span>
     </div>
     <div class="demo-aviso" id="demo" hidden>Modo demonstração: estes dados ficam só neste navegador. Para guardar de verdade, ligue o Firebase (veja o README). <button class="mini" id="limpar" type="button">Apagar dados de teste</button></div>
+
+    <div class="totais" id="totais" aria-label="Totais"></div>
+    <section class="barras" id="barras" aria-labelledby="t-barras"></section>
 
     <div class="resumo" id="resumo"></div>
     <input class="busca" id="busca" type="search" placeholder="Buscar por nome ou telefone" aria-label="Buscar">
@@ -113,6 +129,22 @@ function desenha(){
   // filtros (contagem por item e por status)
   const porItem = {}, porStatus = {};
   todas.forEach(d => { d.itens.forEach(i => porItem[i.id] = (porItem[i.id] || 0) + 1); porStatus[d.status] = (porStatus[d.status] || 0) + 1; });
+  // totais gerais e quanto chegou de cada item
+  const hoje = new Date().toDateString();
+  const itensTotal = Object.values(porItem).reduce((a, b) => a + b, 0);
+  const deHoje = todas.filter(d => new Date(d.criadoEm).toDateString() === hoje).length;
+  const aguardando = porStatus.novo || 0;
+  $('totais').innerHTML =
+    `<div class="total"><b>${todas.length}</b><span>${todas.length === 1 ? 'pessoa quer doar' : 'pessoas querem doar'}</span></div>` +
+    `<div class="total"><b>${itensTotal}</b><span>${itensTotal === 1 ? 'item prometido' : 'itens prometidos'} no total</span></div>` +
+    `<div class="total"><b>${deHoje}</b><span>${deHoje === 1 ? 'doação' : 'doações'} hoje</span></div>` +
+    `<div class="total ${aguardando ? 'alerta' : ''}"><b>${aguardando}</b><span>ainda sem contato no WhatsApp</span></div>`;
+  const maior = Math.max(1, ...Object.values(porItem));
+  $('barras').innerHTML = '<h2 id="t-barras">O que mais está chegando</h2>' + ITENS.map(i => {
+    const n = porItem[i.id] || 0;
+    return `<div class="barra-item"><span style="display:inline-flex">${iconeSvg(i.id, 26)}</span><span class="nm" title="${escapaHtml(i.nome)}">${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</span><span class="trilho"><i style="width:${n / maior * 100}%;background:${COR_HEX[i.cor]}"></i></span><span class="qt">${n}</span></div>`;
+  }).join('');
+
   $('resumo').innerHTML =
     `<button class="fil" data-k="todos" aria-pressed="${!filtroItem && !filtroStatus}"><b>${todas.length}</b> pessoas</button>` +
     Object.keys(STATUS).map(s => `<button class="fil" data-s="${s}" aria-pressed="${filtroStatus === s}"><b>${porStatus[s] || 0}</b> ${STATUS[s].toLowerCase()}</button>`).join('') +

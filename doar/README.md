@@ -25,4 +25,4 @@ Tatames e abafadores/cubos infinitos ficaram de fora (estavam riscados na lista)
 4. Cole `firestore.rules` nas regras do Firestore e troque `SEU_EMAIL@exemplo.com` pelo seu e-mail.
 5. Abra `/telao` no culto e `/admin` quando quiser ver e chamar as pessoas.
 
-Privacidade: o telão mostra só o primeiro nome e o item. Nome completo e telefone só ficam na coleção `doacoes`, legível apenas pelo e-mail administrador.
+Privacidade: o telão e a página pública mostram só números (total de doações e quantos de cada item), nunca nomes. Nome e telefone ficam só na coleção `doacoes`, legível apenas pelo e-mail administrador. A única tela com nome é a de agradecimento no celular da própria pessoa.

@@ -32,8 +32,8 @@ class Sala {
     this.piso = H * .36;
   }
 
-  /** `porItem` = quantos de cada item já foram doados. `ultimas` (mais nova primeiro) dá o nome de quem chegou agora. */
-  atualiza(porItem, ultimas = []){
+  /** `porItem` = quantos de cada item já foram doados. `nome` (opcional) aparece sobre o brinquedo que acabou de chegar. */
+  atualiza(porItem, nome = null){
     const animar = !this.primeira, novos = [];
     ITENS.forEach((it, ix) => {
       const n = Math.max(0, Math.floor(porItem[it.id] || 0));
@@ -43,7 +43,7 @@ class Sala {
     });
     this.primeira = false;
     if (animar && novos.length){
-      novos.forEach((t, i) => { t.espera = i * .3 + .001; if (ultimas[0] && i < 3) t.nome = ultimas[0].nome; });
+      novos.forEach((t, i) => { t.espera = i * .3 + .001; if (nome && i < 3) t.nome = nome; });
     }
   }
 

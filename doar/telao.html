@@ -72,7 +72,7 @@
     <div class="contador"><span class="n" id="n">0</span><span class="l" id="l">doações</span></div>
     <div class="sala" id="sala"></div>
     <div class="contagem" id="contagem" aria-label="Quantos de cada item já foram doados"></div>
-    <div class="aviso" id="aviso"><div class="espera">Quando alguém doar, o nome aparece aqui.</div></div>
+    <div class="aviso" id="aviso"><div class="espera">Cada doação que chegar aparece aqui.</div></div>
   </section>
 </main>
 
@@ -99,7 +99,7 @@ function desenhaQR(){
 if (window.qrcode) desenhaQR(); else $('qr').textContent = alvo;
 
 /* Brinquedoteca + aviso a cada doação nova */
-let vistos = null, fila = [], mostrando = false, totalMostrado = 0;
+let pendentes = 0, mostrando = false, totalMostrado = 0, iniciou = false;
 function contaAte(alvoN){
   const el = $('n'), ini = totalMostrado, t0 = performance.now();
   (function passo(t){
@@ -109,16 +109,15 @@ function contaAte(alvoN){
   })(t0);
 }
 function mostraProximo(){
-  if (mostrando || !fila.length) return;
-  mostrando = true;
-  const d = fila.shift(), it = itemPorId(d.itemId) || {};
-  const el = document.createElement('div');
-  el.className = 'brinde peca c-' + (it.cor || 'azul');
-  el.innerHTML = `<span class="ico">${iconeSvg(d.itemId, 60)}</span><span><b>${escapaHtml(d.nome)}</b> vai doar:<br>${escapaHtml(d.item)}</span>`;
+  if (mostrando || pendentes <= 0) return;
+  mostrando = true; pendentes--;
+  const el = document.createElement('div');   // aviso sem nome de ninguém: só a notícia de que chegou mais uma doação
+  el.className = 'brinde peca c-' + CORES[Math.floor(Math.random() * CORES.length)];
+  el.innerHTML = '<span><b>Mais uma doação chegou!</b><br>Obrigado por participar.</span>';
   $('aviso').replaceChildren(el);
   somEncaixe(); confete($('confete'), 2200);
-  setTimeout(() => el.classList.add('sai'), 5200);
-  setTimeout(() => { mostrando = false; if (fila.length) mostraProximo(); else $('aviso').innerHTML = '<div class="espera">Seu brinquedo também chega na brinquedoteca. Escaneie e participe!</div>'; }, 5700);
+  setTimeout(() => el.classList.add('sai'), 3200);
+  setTimeout(() => { mostrando = false; if (pendentes > 0) mostraProximo(); else $('aviso').innerHTML = '<div class="espera">Seu brinquedo também chega na brinquedoteca. Escaneie e participe!</div>'; }, 3700);
 }
 /* A cada 50 doações o telão para para comemorar. A brinquedoteca não tem limite. */
 const MARCO = 50;
@@ -133,22 +132,20 @@ const sala = new Sala($('sala'));
 $('contagem').innerHTML = ITENS.map(i =>
   `<span class="conta" id="ct-${i.id}" title="${escapaHtml(i.nome)}"><span class="ico">${iconeSvg(i.id, 40)}</span><span class="v">0</span></span>`).join('');
 let totalAntes = null;
-Dados.aoVivoMural(({ total, porItem, ultimas }) => {
-  sala.atualiza(porItem, ultimas);
+Dados.aoVivoMural(({ total, porItem }) => {
+  sala.atualiza(porItem);
   ITENS.forEach(i => {
     const el = $('ct-' + i.id).querySelector('.v'), n = porItem[i.id] || 0;
     if (+el.textContent !== n){
       el.textContent = n;
-      if (vistos !== null){ const c = $('ct-' + i.id); c.classList.remove('pulsa'); void c.offsetWidth; c.classList.add('pulsa'); }
+      if (iniciou){ const c = $('ct-' + i.id); c.classList.remove('pulsa'); void c.offsetWidth; c.classList.add('pulsa'); }
     }
   });
   contaAte(total);
   $('l').textContent = total === 1 ? 'doação' : 'doações';
   if (totalAntes !== null && Math.floor(total / MARCO) > Math.floor(totalAntes / MARCO)) comemoraMarco(Math.floor(total / MARCO) * MARCO);
-  totalAntes = total;
-  if (vistos === null){ vistos = new Set(ultimas.map(u => u.id)); return; }  // não repete o que já existia
-  ultimas.slice().reverse().forEach(u => { if (!vistos.has(u.id)){ vistos.add(u.id); fila.push(u); } });
-  mostraProximo();
+  if (iniciou && total > totalAntes){ pendentes += total - totalAntes; mostraProximo(); }   // não repete o que já existia ao abrir
+  totalAntes = total; iniciou = true;
 });
 
 if (Dados.demo){

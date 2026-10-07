@@ -162,13 +162,11 @@ const Dados = {
   async enviar({ nome, whatsapp, itens, obs }){
     const lista = itens.map(id => ({ id, nome: itemPorId(id).nome }));
     const base = { nome: nome.trim(), whatsapp: normalizaWhats(whatsapp), itens: lista, obs: (obs || '').trim(), status: 'novo' };
-    const publico = { nome: primeiroNome(nome), item: lista.length === 1 ? lista[0].nome : `${lista[0].nome} + ${lista.length - 1}`, itemId: lista[0].id };
     if (fdb){
       const ts = firebase.firestore.FieldValue.serverTimestamp();
       const resumoRef = fdb.doc('publico/resumo');
       const batch = fdb.batch();
       batch.set(fdb.collection('doacoes').doc(), { ...base, criadoEm: ts });
-      batch.set(fdb.collection('mural').doc(), { ...publico, criadoEm: ts });
       const porItem = {}; lista.forEach(i => { porItem[i.id] = firebase.firestore.FieldValue.increment(1); });
       batch.set(resumoRef, { total: firebase.firestore.FieldValue.increment(1), porItem }, { merge: true });
       await batch.commit();
@@ -177,31 +175,22 @@ const Dados = {
       return { numero: total || undefined };
     }
     const doacoes = _lsGet('doar_doacoes', []);
-    const mural = _lsGet('doar_mural', []);
     const agora = Date.now();
-    doacoes.unshift({ id: 'd' + agora, ...base, criadoEm: agora });
-    mural.unshift({ id: 'm' + agora, ...publico, criadoEm: agora });
-    _lsSet('doar_doacoes', doacoes); _lsSet('doar_mural', mural);
+    doacoes.unshift({ id: 'd' + agora + Math.random().toString(36).slice(2, 5), ...base, criadoEm: agora });
+    _lsSet('doar_doacoes', doacoes);
     _canal && _canal.postMessage('mudou'); _avisa();
     return { numero: doacoes.length };
   },
 
-  /** Total de doações, quantos de cada item e as últimas doações (só primeiro nome), ao vivo. */
+  /** Só números, ao vivo: total de doações e quantos de cada item. Nenhum nome é público. */
   aoVivoMural(cb){
     if (fdb){
-      let total = 0, porItem = {}, ultimas = [], r1 = false, r2 = false;
-      const emite = () => { if (r1 && r2) cb({ total, porItem, ultimas }); };
-      const u1 = fdb.doc('publico/resumo').onSnapshot(s => { const x = s.data() || {}; total = x.total || 0; porItem = x.porItem || {}; r1 = true; emite(); }, console.error);
-      const u2 = fdb.collection('mural').orderBy('criadoEm', 'desc').limit(30).onSnapshot(q => {
-        ultimas = q.docs.map(d => ({ id: d.id, ...d.data(), criadoEm: d.data().criadoEm ? d.data().criadoEm.toMillis() : Date.now() }));
-        r2 = true; emite();
-      }, console.error);
-      return () => { u1(); u2(); };
+      return fdb.doc('publico/resumo').onSnapshot(s => { const x = s.data() || {}; cb({ total: x.total || 0, porItem: x.porItem || {} }); }, console.error);
     }
     const f = () => {
-      const l = _lsGet('doar_doacoes', []), m = _lsGet('doar_mural', []), porItem = {};
+      const l = _lsGet('doar_doacoes', []), porItem = {};
       l.forEach(d => d.itens.forEach(i => { porItem[i.id] = (porItem[i.id] || 0) + 1; }));
-      cb({ total: l.length, porItem, ultimas: m.slice(0, 30) });
+      cb({ total: l.length, porItem });
     };
     _ouvintes.add(f); f();
     return () => _ouvintes.delete(f);
@@ -233,6 +222,6 @@ const Dados = {
   },
   async limparDemo(){
     if (fdb) return;
-    _lsSet('doar_doacoes', []); _lsSet('doar_mural', []); _canal && _canal.postMessage('mudou'); _avisa();
+    _lsSet('doar_doacoes', []); _canal && _canal.postMessage('mudou'); _avisa();
   }
 };
