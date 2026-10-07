@@ -4,12 +4,12 @@
 
 const DOAR_CONFIG = {
   firebaseConfig: {
-    apiKey: 'COLE_AQUI_SUA_API_KEY',
-    authDomain: 'COLE_AQUI.firebaseapp.com',
-    projectId: 'COLE_AQUI',
-    storageBucket: 'COLE_AQUI.firebasestorage.app',
-    messagingSenderId: '',
-    appId: ''
+    apiKey: 'AIzaSyDnEg0lGtYy_KAWToI4vIDQVcGMdHVdRDI',
+    authDomain: 'qrcodevk.firebaseapp.com',
+    projectId: 'qrcodevk',
+    storageBucket: 'qrcodevk.firebasestorage.app',
+    messagingSenderId: '863694911106',
+    appId: '1:863694911106:web:084898cb62b9c9a3d4a69b'
   },
   // Endereço que o QR Code do telão abre. Vazio = usa o endereço da própria página inicial do site.
   urlPublica: '',
