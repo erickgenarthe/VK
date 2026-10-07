@@ -1,4 +1,4 @@
-# Outubro da Criança — o que doar
+# Clube Videira Kids — o que doar (Dia das Crianças, 11 de outubro)
 
 Site para a campanha de doações: o QR Code aparece no telão do culto, a pessoa
 escolhe o que quer doar, deixa nome e WhatsApp, e você vê tudo no painel.
