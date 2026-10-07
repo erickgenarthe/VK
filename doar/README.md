@@ -6,10 +6,10 @@ escolhe o que quer doar, deixa nome e WhatsApp, e você vê tudo no painel.
 | Página | Para quê |
 |---|---|
 | `index.html` | O que o celular da pessoa abre (escolhe o item, deixa nome e WhatsApp, comemora). |
-| `telao.html` | Projetar no telão: QR Code grande, a brinquedoteca ao vivo, o contador por item e o aviso "Maria vai doar: Pufes" a cada doação. |
+| `telao.html` | Projetar no telão: QR Code grande, a sala ao vivo, o contador por item e o aviso "Mais uma doação chegou!" (sem nome) a cada doação. |
 | `admin.html` | Painel só seu: lista, filtros por item/situação, botão "Chamar no WhatsApp" com mensagem pronta, CSV. |
 
-O centro do site é a **Brinquedoteca**: uma sala da Videira Kids que vai sendo montada. Cada item doado cai na sala e ganha vida (carrinhos andam, dinossauros passeiam, bolas quicam, bonecos pulam) e aparece com o primeiro nome de quem doou. Não há limite: quanto mais doações, mais cheia a sala, e os brinquedos encolhem para caber. No telão há ainda um contador por item (mostra o que mais está chegando) e uma comemoração a cada 50 doações (`MARCO` em `telao.html`).
+O centro do site é a sala "Brinquedos para o VK" (frase: *Cada doação vira um brinquedo para o nosso VK*). Cada item doado cai na sala e ganha vida (carrinhos andam, dinossauros passeiam, bolas quicam, bonecos pulam). Não há limite: quanto mais doações, mais cheia a sala, e os brinquedos encolhem para caber. No telão há ainda um contador por item (mostra o que mais está chegando) e uma comemoração a cada 50 doações (`MARCO` em `telao.html`).
 
 **Fotos reais:** as ilustrações são desenhos próprios. Para usar fotos, ponha PNGs com fundo transparente em `img/itens/` e liste em `FOTOS` no topo de `doar.js` (ex.: `{ dinos: 'img/itens/dinos.png' }`). Use só imagens que você tenha direito de usar (suas ou de licença livre).
 

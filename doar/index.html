@@ -97,11 +97,11 @@
   </section>
 
   <h1 class="titulo">O que doar:</h1>
-  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada escolha vira um brinquedo de verdade na nossa brinquedoteca.</p>
+  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada doação vira um brinquedo para o nosso VK.</p>
 
   <section class="cubo-card" aria-labelledby="t-cubo">
     <header>
-      <h2 id="t-cubo">A brinquedoteca</h2>
+      <h2 id="t-cubo">Brinquedos para o VK</h2>
       <span class="num" id="sala-num">0</span>
     </header>
     <div class="sala" id="sala"></div>
@@ -189,8 +189,8 @@ Dados.aoVivoMural(({ total, porItem }) => {
   const brinquedos = Object.values(porItem).reduce((a, b) => a + b, 0);
   $('sala-num').textContent = brinquedos;
   $('sala-txt').textContent = brinquedos === 0
-    ? 'A sala está vazia. Seu brinquedo pode ser o primeiro! Toque na sala para brincar.'
-    : `${brinquedos} ${brinquedos === 1 ? 'brinquedo já chegou' : 'brinquedos já chegaram'}. Toque na sala para brincar!`;
+    ? 'Ainda não chegou nenhum brinquedo. O seu pode ser o primeiro! Toque na imagem para brincar.'
+    : `${brinquedos} ${brinquedos === 1 ? 'brinquedo já está a caminho' : 'brinquedos já estão a caminho'} do nosso VK. Toque na imagem para brincar!`;
 });
 
 /* ---- folha de doação ---- */
@@ -260,8 +260,8 @@ let salaFesta = null;
 function celebra(nome, numero, porAntes, meus){
   $('festa-titulo').textContent = `Valeu, ${primeiroNome(nome)}!`;
   $('festa-txt').textContent = meus.length > 1
-    ? `Seus ${meus.length} brinquedos já chegaram na brinquedoteca. Vamos te chamar no WhatsApp para combinar a entrega.`
-    : 'Seu brinquedo já chegou na brinquedoteca. Vamos te chamar no WhatsApp para combinar a entrega.';
+    ? `Seus ${meus.length} brinquedos já estão a caminho do nosso VK. Vamos te chamar no WhatsApp para combinar a entrega.`
+    : 'Seu brinquedo já está a caminho do nosso VK. Vamos te chamar no WhatsApp para combinar a entrega.';
   $('festa-num').textContent = numero ? `Você é o doador nº ${numero}` : '';
   $('festa').classList.add('aberta');
   if (salaFesta) salaFesta.destroy();

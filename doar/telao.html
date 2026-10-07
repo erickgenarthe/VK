@@ -117,13 +117,13 @@ function mostraProximo(){
   $('aviso').replaceChildren(el);
   somEncaixe(); confete($('confete'), 2200);
   setTimeout(() => el.classList.add('sai'), 3200);
-  setTimeout(() => { mostrando = false; if (pendentes > 0) mostraProximo(); else $('aviso').innerHTML = '<div class="espera">Seu brinquedo também chega na brinquedoteca. Escaneie e participe!</div>'; }, 3700);
+  setTimeout(() => { mostrando = false; if (pendentes > 0) mostraProximo(); else $('aviso').innerHTML = '<div class="espera">Cada doação vira um brinquedo para o nosso VK. Escaneie e participe!</div>'; }, 3700);
 }
 /* A cada 50 doações o telão para para comemorar. A brinquedoteca não tem limite. */
 const MARCO = 50;
 function comemoraMarco(n){
   $('cheio-tit').textContent = `${n} doações!`;
-  $('cheio-txt').textContent = 'Obrigado, igreja! A brinquedoteca não para de crescer.';
+  $('cheio-txt').textContent = 'Obrigado, igreja! Cada doação vira um brinquedo para o nosso VK.';
   $('cheio').classList.add('aberto'); somEncaixe(); confete($('confete'), 4500);
   const c = setInterval(() => confete($('confete'), 3000), 3200);
   setTimeout(() => { clearInterval(c); $('cheio').classList.remove('aberto'); }, 9000);
