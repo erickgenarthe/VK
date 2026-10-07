@@ -78,3 +78,15 @@ button,input,textarea{font:inherit;color:inherit}
 .sala{position:relative;width:100%;aspect-ratio:5/4;border-radius:22px;overflow:hidden;background:var(--creme)}
 .sala canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;touch-action:pan-y}
 .sala-legenda{margin:10px 0 0;text-align:center;font-size:.95rem;color:var(--tinta-2)}
+
+/* atalhos discretos entre as três telas (doação, telão, painel) */
+.nav-telas{display:flex;gap:6px;font-family:var(--f-texto);font-size:12px;line-height:1}
+.nav-telas a{color:var(--tinta-2);text-decoration:none;padding:7px 10px;border-radius:99px;background:rgba(255,255,255,.65)}
+.nav-telas a:hover,.nav-telas a:focus-visible{color:var(--azul);background:#fff}
+.nav-telas.fixa{position:fixed;left:8px;bottom:8px;z-index:50;opacity:.55}
+.nav-telas.fixa:hover,.nav-telas.fixa:focus-within{opacity:1}
+/* no telão: invisível para quem assiste, aparece só ao passar o mouse ou apertar Tab */
+.nav-telas.discreta{opacity:0;transition:opacity .2s}
+.nav-telas.discreta:hover,.nav-telas.discreta:focus-within{opacity:1}
+.nav-telas.estatica{justify-content:center;margin-top:14px;opacity:.5}
+.nav-telas.estatica:hover,.nav-telas.estatica:focus-within{opacity:1}
