@@ -6,7 +6,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     function admin() {
-      return request.auth != null && request.auth.token.email in ['SEU_EMAIL@exemplo.com'];
+      return request.auth != null && request.auth.token.email in ['ccvideiracm.voluntarios@gmail.com'];
     }
 
     // Quem escaneia o QR Code só consegue CRIAR uma doação (nunca ler as dos outros).
