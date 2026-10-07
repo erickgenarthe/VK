@@ -15,9 +15,6 @@ O centro do site é a sala "Brinquedos para o VK" (frase: *Cada doação vira um
 
 Tatames e abafadores/cubos infinitos ficaram de fora (estavam riscados na lista). Para mudar os itens, edite `ITENS` no topo de `doar.js`.
 
-## Testar agora
-`cd doar && python3 -m http.server`, abra `/telao.html` numa aba e `/index.html` em outra. Sem Firebase o site roda em modo demonstração (dados só no navegador). No telão, a tecla **T** simula uma doação.
-
 ## Publicar (Netlify) e ligar o banco (Firebase)
 1. Netlify → novo site a partir deste repositório, **Base directory = `doar`**. O QR do telão aponta sozinho para o endereço do site.
 2. Crie um projeto Firebase **só para este site** (as regras abertas do SERVE deixariam qualquer voluntário ler os telefones). Ative o Firestore e o Authentication (e-mail/senha), crie o seu usuário e **desative novos cadastros**.

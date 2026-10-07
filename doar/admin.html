@@ -84,7 +84,7 @@
         <button class="mini" id="sair" type="button">Sair</button>
       </span>
     </div>
-    <div class="demo-aviso" id="demo" hidden>Modo demonstração: estes dados ficam só neste navegador. Para guardar de verdade, ligue o Firebase (veja o README). <button class="mini" id="limpar" type="button">Apagar dados de teste</button></div>
+    <div class="demo-aviso" id="demo" hidden>Atenção: o Firebase ainda não está ligado, então estas doações ficam só neste navegador e não são guardadas. Veja o README.</div>
 
     <div class="totais" id="totais" aria-label="Totais"></div>
     <section class="barras" id="barras" aria-labelledby="t-barras"></section>
@@ -123,7 +123,6 @@ $('entrar').addEventListener('click', async () => {
 });
 $('senha').addEventListener('keydown', e => { if (e.key === 'Enter') $('entrar').click(); });
 $('sair').addEventListener('click', () => Dados.sair());
-$('limpar').addEventListener('click', () => Dados.limparDemo());
 $('busca').addEventListener('input', e => { busca = e.target.value.toLowerCase().trim(); desenha(); });
 
 function msgWhats(d){

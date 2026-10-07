@@ -52,7 +52,6 @@
   @keyframes sai{to{transform:translateY(-3vh);opacity:0}}
   .espera{font-size:3vh;color:var(--tinta-2);text-align:center}
   #confete{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:7}
-  .teste{position:fixed;right:1.4vh;bottom:1vh;z-index:2;font-size:1.8vh;color:var(--tinta-2);opacity:.7}
 </style>
 </head>
 <body>
@@ -80,7 +79,6 @@
 <div class="cheio" id="cheio" role="status"><img src="img/selo-missao.png" alt=""><h2 class="titulo" id="cheio-tit">100 doações!</h2><p id="cheio-txt"></p></div>
 <canvas id="confete" aria-hidden="true"></canvas>
 <nav class="nav-telas fixa discreta" aria-label="Outras telas"><a href="index.html">doar</a><a href="admin.html" rel="nofollow">painel de doações</a></nav>
-<div class="teste" id="teste" hidden>Modo demonstração · aperte T para simular uma doação</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
@@ -148,16 +146,6 @@ Dados.aoVivoMural(({ total, porItem }) => {
   if (iniciou && total > totalAntes){ pendentes += total - totalAntes; mostraProximo(); }   // não repete o que já existia ao abrir
   totalAntes = total; iniciou = true;
 });
-
-if (Dados.demo){
-  $('teste').hidden = false;
-  document.addEventListener('keydown', e => {
-    if (e.key.toLowerCase() !== 't') return;
-    const i = ITENS[Math.floor(Math.random() * ITENS.length)];
-    const nomes = ['Ana', 'Lucas', 'Marta', 'João', 'Beatriz', 'Pedro'];
-    Dados.enviar({ nome: nomes[Math.floor(Math.random() * nomes.length)] + ' Teste', whatsapp: '11912345678', itens: [i.id], obs: '' });
-  });
-}
 </script>
 </body>
 </html>
