@@ -116,7 +116,7 @@ function desenha(){
   $('resumo').innerHTML =
     `<button class="fil" data-k="todos" aria-pressed="${!filtroItem && !filtroStatus}"><b>${todas.length}</b> pessoas</button>` +
     Object.keys(STATUS).map(s => `<button class="fil" data-s="${s}" aria-pressed="${filtroStatus === s}"><b>${porStatus[s] || 0}</b> ${STATUS[s].toLowerCase()}</button>`).join('') +
-    ITENS.filter(i => porItem[i.id]).map(i => `<button class="fil" data-i="${i.id}" aria-pressed="${filtroItem === i.id}"><span aria-hidden="true">${i.emoji}</span> <b>${porItem[i.id]}</b> ${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</button>`).join('');
+    ITENS.filter(i => porItem[i.id]).map(i => `<button class="fil" data-i="${i.id}" aria-pressed="${filtroItem === i.id}"><span aria-hidden="true" style="display:inline-flex">${iconeSvg(i.id, 22)}</span> <b>${porItem[i.id]}</b> ${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</button>`).join('');
 
   const vis = todas.filter(d =>
     (!filtroItem || d.itens.some(i => i.id === filtroItem)) &&

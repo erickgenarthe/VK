@@ -13,7 +13,7 @@ const DOAR_CONFIG = {
   },
   // Endereço que o QR Code do telão abre. Vazio = usa o endereço da própria página inicial do site.
   urlPublica: '',
-  // Quantas peças tem a primeira torre. Passou disso, a torre cresce de 50 em 50.
+  // Quantos brinquedos enchem um cubo. Encheu, o cubo comemora, esvazia e começa o próximo.
   metaInicial: 50,
   // Mensagem enviada pelo painel ao chamar a pessoa no WhatsApp. {nome} e {itens} são trocados.
   mensagemWhats:
@@ -23,15 +23,37 @@ const DOAR_CONFIG = {
 
 /* Itens da lista "O que doar" (Tatames e abafadores/cubos infinitos foram riscados na lista, então ficam de fora). */
 const ITENS = [
-  { id:'pufes',      emoji:'🛋️', nome:'Pufes',                         detalhe:'',                                                              cor:'azul' },
-  { id:'faz-de-conta',emoji:'🍳', nome:'Brinquedos de cozinha, salão, engenheiro e médico', detalhe:'Faz de conta',                           cor:'vermelho' },
-  { id:'carros',     emoji:'🚚', nome:'Carros de brinquedo',           detalhe:'Grandes',                                                       cor:'amarelo' },
-  { id:'dinos',      emoji:'🦖', nome:'Dinossauros',                   detalhe:'Grandes',                                                       cor:'verde' },
-  { id:'bonecos',    emoji:'🦸', nome:'Bonecas Barbies e Bonecos de Super Heróis', detalhe:'',                                                  cor:'rosa' },
-  { id:'esportivos', emoji:'🏀', nome:'Brinquedos esportivos',         detalhe:'Corda de pular, basquete, tiro ao alvo, boliche, pega bolinha', cor:'laranja' },
-  { id:'papelaria',  emoji:'✏️', nome:'Itens de papelaria',            detalhe:'Lápis jumbo, canetões, cola bastão, tesoura, cartolina, EVA, TNT', cor:'roxo' },
-  { id:'regulacao',  emoji:'🫧', nome:'Itens de regulação',            detalhe:'Pop its e massinhas',                                           cor:'azul' }
+  { id:'pufes',      nome:'Pufes',                         detalhe:'',                                                              cor:'azul' },
+  { id:'faz-de-conta',nome:'Brinquedos de cozinha, salão, engenheiro e médico', detalhe:'Faz de conta',                           cor:'vermelho' },
+  { id:'carros',     nome:'Carros de brinquedo',           detalhe:'Grandes',                                                       cor:'amarelo' },
+  { id:'dinos',      nome:'Dinossauros',                   detalhe:'Grandes',                                                       cor:'verde' },
+  { id:'bonecos',    nome:'Bonecas Barbies e Bonecos de Super Heróis', detalhe:'',                                                  cor:'rosa' },
+  { id:'esportivos', nome:'Brinquedos esportivos',         detalhe:'Corda de pular, basquete, tiro ao alvo, boliche, pega bolinha', cor:'laranja' },
+  { id:'papelaria',  nome:'Itens de papelaria',            detalhe:'Lápis jumbo, canetões, cola bastão, tesoura, cartolina, EVA, TNT', cor:'roxo' },
+  { id:'regulacao',  nome:'Itens de regulação',            detalhe:'Pop its e massinhas',                                           cor:'azul' }
 ];
+const ICONES = {
+  'pufes': `<ellipse cx="32" cy="55" rx="21" ry="4" fill="rgba(29,26,43,.15)"/><path d="M10 42c-1-14 8-24 22-24s23 10 22 24c-1 9-9 12-22 12S11 51 10 42z" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M22 25c6 3 14 3 20 0" fill="none" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M17 38c1-5 4-8 8-10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".7"/>`,
+  'faz-de-conta': `<path d="M11 29h42v17c0 6-5 10-11 10H22c-6 0-11-4-11-10z" fill="#E8272F" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M12 29c1-9 9-13 20-13s19 4 20 13z" fill="#FF7B80" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="32" cy="13" r="3.5" fill="#1D1A2B"/><path d="M11 36H5M53 36h6" fill="none" stroke="#1D1A2B" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M20 38v10" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".6"/>`,
+  'carros': `<rect x="5" y="24" width="33" height="24" rx="3" fill="#F6B800" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M38 31h11l9 9v8H38z" fill="#E8272F" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M43 34h5l5 6h-10z" fill="#BFE8FF"/><rect x="10" y="30" width="22" height="3" rx="1.5" fill="#fff" opacity=".6"/><circle cx="19" cy="50" r="7" fill="#1D1A2B"/><circle cx="19" cy="50" r="2.6" fill="#ddd"/><circle cx="46" cy="50" r="7" fill="#1D1A2B"/><circle cx="46" cy="50" r="2.6" fill="#ddd"/>`,
+  'dinos': `<path d="M13 36L3 47" fill="none" stroke="#1D1A2B" stroke-width="12" stroke-linecap="round"/><path d="M13 36L3 47" fill="none" stroke="#3DAA3C" stroke-width="7" stroke-linecap="round"/><path d="M42 31l8-16" fill="none" stroke="#1D1A2B" stroke-width="13" stroke-linecap="round"/><path d="M42 31l8-16" fill="none" stroke="#3DAA3C" stroke-width="8" stroke-linecap="round"/><rect x="17" y="40" width="9" height="17" rx="3.5" fill="#2E8B2D" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round"/><rect x="36" y="40" width="9" height="17" rx="3.5" fill="#2E8B2D" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round"/><ellipse cx="29" cy="37" rx="20" ry="11" fill="#3DAA3C" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round"/><path d="M16 28l4-8 5 7M26 26l5-9 5 8M36 28l5-7 3 8" fill="#F28A12" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="53" cy="12" rx="9" ry="6.5" fill="#3DAA3C" stroke="#1D1A2B" stroke-width="3"/><circle cx="54" cy="10" r="1.8" fill="#1D1A2B"/><path d="M26 44c3 2 8 2 11 0" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".6"/>`,
+  'bonecos': `<path d="M22 27L10 56h44L42 27z" fill="#E8272F" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><rect x="23" y="27" width="18" height="18" rx="5" fill="#DE3A98" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><rect x="24" y="44" width="7" height="12" rx="2.5" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><rect x="33" y="44" width="7" height="12" rx="2.5" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="32" cy="17" r="9" fill="#F3C7A1" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M23 17c0-8 5-11 10-10 5 0 8 4 8 10-3-4-8-6-12-5-3 1-5 3-6 5z" fill="#6B3A1E" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M32 30l2 4 4 .5-3 3 .8 4.2-3.8-2-3.8 2 .8-4.2-3-3 4-.5z" fill="#F6B800"/>`,
+  'esportivos': `<circle cx="32" cy="32" r="25" fill="#F28A12" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M7 32h50M32 7v50" fill="none" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M14 13c11 8 11 30 0 38M50 13c-11 8-11 30 0 38" fill="none" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M16 20c3-4 7-7 11-8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".55"/>`,
+  'papelaria': `<g transform="rotate(40 32 32)"><rect x="25" y="14" width="14" height="32" fill="#F6B800" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M32 18v24" stroke="#F28A12" stroke-width="3" stroke-linecap="round"/><path d="M25 46h14L32 60z" fill="#F3C7A1" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M29.5 55l2.5 5 2.5-5z" fill="#1D1A2B"/><rect x="25" y="9" width="14" height="5" fill="#C9CCD6" stroke="#1D1A2B" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M25 9V6c0-3 3-4 7-4s7 1 7 4v3z" fill="#DE3A98" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></g>`,
+  'regulacao': `<rect x="7" y="7" width="50" height="50" rx="11" fill="#8E44B8" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="20" cy="20" r="5.2" fill="#E8272F" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="18.4" cy="18.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="32" cy="20" r="5.2" fill="#F6B800" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="30.4" cy="18.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="44" cy="20" r="5.2" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="42.4" cy="18.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="20" cy="32" r="5.2" fill="#F6B800" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="18.4" cy="30.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="32" cy="32" r="5.2" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="30.4" cy="30.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="44" cy="32" r="5.2" fill="#E8272F" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="42.4" cy="30.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="20" cy="44" r="5.2" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="18.4" cy="42.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="32" cy="44" r="5.2" fill="#E8272F" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="30.4" cy="42.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="44" cy="44" r="5.2" fill="#F6B800" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="42.4" cy="42.2" r="1.5" fill="#fff" opacity=".7"/>`
+};
+/** Ilustração do item como <svg> (tamanho em px). */
+function iconeSvg(id, tam = 48){ return `<svg viewBox="0 0 64 64" width="${tam}" height="${tam}" aria-hidden="true" focusable="false">${ICONES[id] || ''}</svg>`; }
+const _imgIcone = {};
+/** Mesma ilustração como imagem pronta para o canvas do cubo. */
+function iconeImg(id){
+  if (!_imgIcone[id]){
+    const im = new Image();
+    im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">${ICONES[id] || ''}</svg>`);
+    _imgIcone[id] = im;
+  }
+  return _imgIcone[id];
+}
 const itemPorId = id => ITENS.find(i => i.id === id);
 const COR_HEX = { azul:'#0A9BE3', vermelho:'#E8272F', amarelo:'#F6B800', verde:'#3DAA3C', roxo:'#8E44B8', laranja:'#F28A12', rosa:'#DE3A98' };
 const CORES = Object.keys(COR_HEX);
@@ -64,43 +86,6 @@ function formataWhats(n){
 }
 function primeiroNome(n){ const p = String(n||'').trim().split(/\s+/)[0] || ''; return p.charAt(0).toUpperCase() + p.slice(1); }
 function escapaHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function metaDaTorre(total){ return Math.max(DOAR_CONFIG.metaInicial, Math.ceil((total + 1) / 50) * 50); }
-function corDaPeca(n){ return CORES[n % CORES.length]; }
-
-/* Desenha a torre. Reaproveita as células já existentes para a peça nova "cair" sozinha. */
-function desenhaTorre(el, total, opts = {}){
-  const meta = metaDaTorre(total);
-  const cols = opts.cols || (meta <= 50 ? 10 : 10);
-  el.style.setProperty('--cols', cols);
-  const antes = Number(el.dataset.total || 0);
-  const mesmoTamanho = el.children.length === meta;
-  if (!mesmoTamanho){
-    el.innerHTML = '';
-    for (let i = 0; i < meta; i++){
-      const c = document.createElement('div');
-      c.className = 'cel';
-      el.appendChild(c);
-    }
-  }
-  // a torre sobe de baixo para cima: o índice 0 fica na linha de baixo
-  const linhas = Math.ceil(meta / cols);
-  for (let i = 0; i < meta; i++){
-    const linha = Math.floor(i / cols), col = i % cols;
-    const pos = (linhas - 1 - linha) * cols + col;
-    const c = el.children[pos];
-    const cheia = i < total;
-    const jaCheia = c.classList.contains('cheia');
-    if (cheia && !jaCheia){
-      c.className = 'cel cheia peca c-' + corDaPeca(i) + (opts.animaNovas && i >= antes && mesmoTamanho ? ' nova' : '');
-    } else if (!cheia && jaCheia){
-      c.className = 'cel';
-    }
-  }
-  el.dataset.total = total;
-  el.setAttribute('role', 'img');
-  el.setAttribute('aria-label', `${total} de ${meta} peças da torre`);
-  return meta;
-}
 
 /* Confete de peças (canvas). */
 function confete(canvas, ms = 2600){
@@ -194,7 +179,7 @@ const Dados = {
     return { numero: doacoes.length };
   },
 
-  /** Total de peças + últimas doações (só primeiro nome), ao vivo. */
+  /** Total de doações + últimas doações (só primeiro nome), ao vivo. */
   aoVivoMural(cb){
     if (fdb){
       let total = 0, ultimas = [];

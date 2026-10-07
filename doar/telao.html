@@ -28,13 +28,18 @@
   .contador{display:flex;align-items:baseline;gap:1.6vh}
   .contador .n{font-family:var(--f-titulo);font-weight:900;font-size:15vh;line-height:.85;color:var(--azul);font-variant-numeric:tabular-nums}
   .contador .l{font-family:var(--f-titulo);font-weight:800;font-size:5vh;text-transform:uppercase;line-height:1}
-  .dir .parede{width:min(58vh,100%)}
+  .cubo-area{width:100%;height:53vh;display:grid;place-items:end center}
+  .sub-cubo{margin:0;font-size:2.6vh;font-weight:500;color:var(--tinta-2)}
+  .cheio{position:fixed;inset:0;z-index:6;display:grid;place-content:center;justify-items:center;gap:2vh;background:rgba(253,244,229,.94);text-align:center;opacity:0;pointer-events:none;transition:opacity .4s}
+  .cheio.aberto{opacity:1}
+  .cheio .titulo{font-size:22vh}
+  .cheio p{margin:0;font-size:4vh;font-weight:600}
   .aviso{min-height:11vh;display:grid;align-items:center;width:100%}
   .brinde{
     display:flex;align-items:center;gap:2vh;padding:1.6vh 2.4vh;border-radius:2.4vh;color:#fff;font-size:3.4vh;font-weight:600;line-height:1.15;
     animation:entra .6s cubic-bezier(.2,1.4,.4,1) both;
   }
-  .brinde .emo{font-size:6vh;position:relative;z-index:1}
+  .brinde .ico{width:8vh;height:8vh;flex:none;display:grid;place-items:center;background:#fff;border-radius:50%;position:relative;z-index:1}
   .brinde span{position:relative;z-index:1}
   .brinde b{font-weight:700}
   .brinde.sai{animation:sai .5s ease-in both}
@@ -58,19 +63,22 @@
   </section>
 
   <section class="dir">
-    <div class="contador"><span class="n" id="n">0</span><span class="l" id="l">peças encaixadas</span></div>
-    <div class="parede" id="torre"></div>
+    <div class="contador"><span class="n" id="n">0</span><span class="l" id="l">doações</span></div>
+    <div class="cubo-area"><div id="cubo"></div></div>
+    <p class="sub-cubo" id="sub"></p>
     <div class="aviso" id="aviso"><div class="espera">Quando alguém doar, o nome aparece aqui.</div></div>
   </section>
 </main>
 
 <div class="faixa base" aria-hidden="true"></div>
+<div class="cheio" id="cheio" role="status"><h2 class="titulo">Cubo cheio!</h2><p id="cheio-txt"></p></div>
 <canvas id="confete" aria-hidden="true"></canvas>
 <div class="teste" id="teste" hidden>Modo demonstração · aperte T para simular uma doação</div>
 
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <script src="doar.js"></script>
+<script src="cubo.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 
@@ -84,7 +92,7 @@ function desenhaQR(){
 }
 if (window.qrcode) desenhaQR(); else $('qr').textContent = alvo;
 
-/* Torre + comemoração a cada doação nova */
+/* Cubo + comemoração a cada doação nova */
 let vistos = null, fila = [], mostrando = false, totalMostrado = 0;
 function contaAte(alvoN){
   const el = $('n'), ini = totalMostrado, t0 = performance.now();
@@ -100,16 +108,24 @@ function mostraProximo(){
   const d = fila.shift(), it = itemPorId(d.itemId) || {};
   const el = document.createElement('div');
   el.className = 'brinde peca c-' + (it.cor || 'azul');
-  el.innerHTML = `<span class="emo">${it.emoji || '🎁'}</span><span><b>${escapaHtml(d.nome)}</b> encaixou uma peça:<br>${escapaHtml(d.item)}</span>`;
+  el.innerHTML = `<span class="ico">${iconeSvg(d.itemId, 60)}</span><span><b>${escapaHtml(d.nome)}</b> colocou no cubo:<br>${escapaHtml(d.item)}</span>`;
   $('aviso').replaceChildren(el);
   somEncaixe(); confete($('confete'), 2200);
   setTimeout(() => el.classList.add('sai'), 5200);
-  setTimeout(() => { mostrando = false; if (fila.length) mostraProximo(); else $('aviso').innerHTML = '<div class="espera">Sua doação também entra na torre. Escaneie e participe!</div>'; }, 5700);
+  setTimeout(() => { mostrando = false; if (fila.length) mostraProximo(); else $('aviso').innerHTML = '<div class="espera">Seu brinquedo também entra no cubo. Escaneie e participe!</div>'; }, 5700);
 }
+const cubo = new Cubo($('cubo'), { alturaMax: true, max: 900, onCheio: n => {
+  $('cheio-txt').textContent = `O cubo nº ${n} está cheio. Obrigado, igreja! Vamos começar o próximo.`;
+  $('cheio').classList.add('aberto'); somEncaixe(); confete($('confete'), 4500);
+  const c = setInterval(() => confete($('confete'), 3000), 3200);
+  setTimeout(() => { clearInterval(c); $('cheio').classList.remove('aberto'); }, 9000);
+} });
 Dados.aoVivoMural(({ total, ultimas }) => {
-  desenhaTorre($('torre'), total, { animaNovas: vistos !== null });
+  cubo.atualiza(total, ultimas);
+  if (vistos !== null) setTimeout(() => cubo.sacode(), 1200);
   contaAte(total);
-  $('l').textContent = total === 1 ? 'peça encaixada' : 'peças encaixadas';
+  $('l').textContent = total === 1 ? 'doação' : 'doações';
+  $('sub').textContent = total ? `Cubo nº ${cubo.cubo + 1}: ${cubo.n} de ${DOAR_CONFIG.metaInicial} brinquedos` : 'O cubo está vazio. Seja o primeiro!';
   if (vistos === null){ vistos = new Set(ultimas.map(u => u.id)); return; }  // não repete o que já existia
   ultimas.slice().reverse().forEach(u => { if (!vistos.has(u.id)){ vistos.add(u.id); fila.push(u); } });
   mostraProximo();

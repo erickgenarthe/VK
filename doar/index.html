@@ -19,11 +19,12 @@
   .lead{margin:10px 0 0;font-size:1.12rem;color:var(--tinta-2);max-width:34ch}
   .lead b{color:var(--tinta);font-weight:600}
 
-  .torre-card{margin-top:22px;padding:16px;border-radius:20px;background:#fff;border:2px solid var(--creme-2)}
-  .torre-card header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
-  .torre-card h2{margin:0;font-family:var(--f-titulo);font-weight:900;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em}
-  .torre-card .num{font-family:var(--f-titulo);font-weight:900;font-size:2.2rem;line-height:1;color:var(--azul);font-variant-numeric:tabular-nums}
-  .torre-card p{margin:12px 0 0;font-size:.95rem;color:var(--tinta-2)}
+  .cubo-card{margin-top:22px;padding:16px;border-radius:20px;background:#fff;border:2px solid var(--creme-2)}
+  .cubo-card header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .cubo-card h2{margin:0;font-family:var(--f-titulo);font-weight:900;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em}
+  .cubo-card .num{font-family:var(--f-titulo);font-weight:900;font-size:2.2rem;line-height:1;color:var(--azul);font-variant-numeric:tabular-nums}
+  .cubo-card .cubo-area{margin-top:6px}
+  .cubo-card p{margin:12px 0 0;font-size:.95rem;color:var(--tinta-2)}
 
   .grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px;padding:0;list-style:none}
   .item{
@@ -31,7 +32,8 @@
     display:grid;align-content:start;gap:6px;
     transition:transform .15s cubic-bezier(.3,1.6,.5,1);
   }
-  .item .emo{position:relative;z-index:1;font-size:2.5rem;line-height:1;filter:drop-shadow(0 2px 0 rgba(0,0,0,.18))}
+  .item .ico,.escolha .ico,.chip .ico{position:relative;z-index:1;display:grid;place-items:center;background:#fff;border-radius:50%;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+  .item .ico{width:62px;height:62px}
   .item .nome{position:relative;z-index:1;font-weight:700;font-size:1.02rem;line-height:1.2;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.25);overflow-wrap:anywhere}
   .item .det{position:relative;z-index:1;font-size:.78rem;line-height:1.25;color:rgba(255,255,255,.92);overflow-wrap:anywhere}
   .item:hover{transform:translateY(-3px) rotate(-1deg)}
@@ -52,12 +54,13 @@
   .folha.aberta{transform:none}
   .folha .alca{width:48px;height:5px;border-radius:3px;background:#D7C7A9;margin:6px auto 30px}
   .escolha{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;color:#fff}
-  .escolha .emo{font-size:2.2rem;position:relative;z-index:1}
+  .escolha .ico{width:56px;height:56px;flex:none}
+  .chip .ico{width:24px;height:24px;box-shadow:none;background:var(--creme)}
   .escolha small{display:block;position:relative;z-index:1;opacity:.9;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
   .escolha strong{position:relative;z-index:1;font-size:1.05rem;line-height:1.2;overflow-wrap:anywhere}
   .mais{margin:14px 0 4px;font-size:.88rem;color:var(--tinta-2)}
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px;padding:0;list-style:none}
-  .chip{border:2px solid var(--creme-2);background:#fff;border-radius:999px;padding:7px 12px;font-size:.88rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+  .chip{border:2px solid var(--creme-2);background:#fff;border-radius:999px;padding:4px 12px 4px 5px;font-size:.84rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
   .chip[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:#fff}
   label.campo{display:grid;gap:6px;margin-top:14px;font-weight:600;font-size:.95rem}
   label.campo input,label.campo textarea{
@@ -76,10 +79,10 @@
   .festa{position:fixed;inset:0;z-index:30;background:var(--creme);display:grid;align-content:center;justify-items:center;gap:14px;padding:24px 20px;text-align:center;overflow:auto;
     opacity:0;pointer-events:none;transition:opacity .3s}
   .festa.aberta{opacity:1;pointer-events:auto}
-  .festa canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .festa #confete{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   .festa .titulo{font-size:clamp(3rem,15vw,4.6rem)}
   .festa p{margin:0;max-width:30ch;font-size:1.1rem}
-  .festa .torre-mini{width:min(78vw,320px);position:relative}
+  .festa .cubo-area{width:min(78vw,300px);position:relative}
   .festa .numero{font-weight:600;color:var(--azul-esc)}
   .festa .botoes{display:grid;gap:10px;width:min(100%,320px);position:relative;z-index:1}
   .rodape{margin-top:30px;text-align:center;font-size:.8rem;color:var(--tinta-2)}
@@ -95,15 +98,15 @@
   </section>
 
   <h1 class="titulo">O que doar:</h1>
-  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada escolha encaixa uma peça na torre.</p>
+  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada escolha vira um brinquedo dentro do nosso cubo.</p>
 
-  <section class="torre-card" aria-labelledby="t-torre">
+  <section class="cubo-card" aria-labelledby="t-cubo">
     <header>
-      <h2 id="t-torre">A torre da comunidade</h2>
-      <span class="num" id="torre-num">0</span>
+      <h2 id="t-cubo">O cubo de doações</h2>
+      <span class="num" id="cubo-num">0</span>
     </header>
-    <div class="parede" id="torre"></div>
-    <p id="torre-txt">Carregando…</p>
+    <div class="cubo-area"><div id="cubo"></div></div>
+    <p class="cubo-legenda" id="cubo-txt">Carregando…</p>
   </section>
 
   <ul class="grade" id="grade"></ul>
@@ -138,14 +141,14 @@
   </label>
   <span class="erro" id="e-geral" style="color:var(--vermelho);font-size:.9rem" hidden></span>
   <div class="acoes">
-    <button class="botao" id="enviar" type="submit">Encaixar minha peça</button>
+    <button class="botao" id="enviar" type="submit">Colocar no cubo</button>
   </div>
 </form>
 
 <div class="festa" id="festa" role="status" aria-live="polite">
   <canvas id="confete" aria-hidden="true"></canvas>
   <h2 class="titulo" id="festa-titulo">Obrigado!</h2>
-  <div class="torre-mini"><div class="parede" id="torre-mini"></div></div>
+  <div class="cubo-area"><div id="cubo-festa"></div></div>
   <p id="festa-txt"></p>
   <p class="numero" id="festa-num"></p>
   <div class="botoes">
@@ -156,6 +159,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <script src="doar.js"></script>
+<script src="cubo.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 let escolhidos = [];       // ids selecionados, o primeiro é o que a pessoa tocou
@@ -165,7 +169,7 @@ let enviando = false;
 /* ---- grade de itens ---- */
 $('grade').innerHTML = ITENS.map(i => `
   <li><button type="button" class="item peca c-${i.cor}" data-id="${i.id}" aria-label="Doar: ${escapaHtml(i.nome)}">
-    <span class="emo" aria-hidden="true">${i.emoji}</span>
+    <span class="ico">${iconeSvg(i.id, 46)}</span>
     <span class="nome">${escapaHtml(i.nome)}</span>
     ${i.detalhe ? `<span class="det">${escapaHtml(i.detalhe)}</span>` : ''}
   </button></li>`).join('');
@@ -177,15 +181,17 @@ $('grade').addEventListener('click', e => {
   abreFolha();
 });
 
-/* ---- torre ao vivo ---- */
-Dados.aoVivoMural(({ total }) => {
-  const primeira = $('torre').children.length === 0;
-  totalAtual = total;
-  const meta = desenhaTorre($('torre'), total, { animaNovas: !primeira });
-  $('torre-num').textContent = total;
-  $('torre-txt').textContent = total === 0
-    ? 'Ainda está vazia. A sua pode ser a primeira peça!'
-    : `${total} ${total === 1 ? 'peça encaixada' : 'peças encaixadas'} de ${meta}. A próxima pode ser a sua.`;
+/* ---- cubo ao vivo ---- */
+const cuboPrincipal = new Cubo($('cubo'), { max: 300 });
+let vivas = [];
+Dados.aoVivoMural(({ total, ultimas }) => {
+  totalAtual = total; vivas = ultimas;
+  cuboPrincipal.atualiza(total, ultimas);
+  const cap = DOAR_CONFIG.metaInicial;
+  $('cubo-num').textContent = total;
+  $('cubo-txt').textContent = total === 0
+    ? 'O cubo está vazio. Seu brinquedo pode ser o primeiro! Toque nele para sacudir.'
+    : `Cubo nº ${cuboPrincipal.cubo + 1}: ${cuboPrincipal.n} de ${cap} brinquedos. Toque nele para sacudir!`;
 });
 
 /* ---- folha de doação ---- */
@@ -193,9 +199,9 @@ function pintaFolha(){
   const principal = itemPorId(escolhidos[0]);
   const e = $('escolha');
   e.className = 'escolha peca c-' + principal.cor;
-  e.innerHTML = `<span class="emo" aria-hidden="true">${principal.emoji}</span><span><small>Você escolheu</small><strong>${escapaHtml(principal.nome)}</strong></span>`;
+  e.innerHTML = `<span class="ico">${iconeSvg(principal.id, 44)}</span><span><small>Você escolheu</small><strong>${escapaHtml(principal.nome)}</strong></span>`;
   $('chips').innerHTML = ITENS.filter(i => i.id !== escolhidos[0]).map(i =>
-    `<li><button type="button" class="chip" data-id="${i.id}" aria-pressed="${escolhidos.includes(i.id)}"><span aria-hidden="true">${i.emoji}</span> ${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</button></li>`).join('');
+    `<li><button type="button" class="chip" data-id="${i.id}" aria-pressed="${escolhidos.includes(i.id)}"><span class="ico">${iconeSvg(i.id, 20)}</span> ${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</button></li>`).join('');
   document.querySelectorAll('.item').forEach(b => b.classList.toggle('escolhido', escolhidos.includes(b.dataset.id)));
 }
 function abreFolha(){
@@ -245,25 +251,25 @@ $('folha').addEventListener('submit', async e => {
     console.error(err);
     erro('e-geral', 'Não conseguimos salvar agora. Confira a internet e toque de novo.');
   }finally{
-    enviando = false; $('enviar').disabled = false; $('enviar').textContent = 'Encaixar minha peça';
+    enviando = false; $('enviar').disabled = false; $('enviar').textContent = 'Colocar no cubo';
   }
 });
 
 /* ---- tela de comemoração ---- */
+let cuboFesta = null;
 function celebra(nome, numero){
   const principal = itemPorId(escolhidos[0]);
-  const f = $('festa');
   $('festa-titulo').textContent = `Valeu, ${primeiroNome(nome)}!`;
   $('festa-txt').textContent = escolhidos.length > 1
-    ? `Sua doação de ${escolhidos.length} itens já entrou na torre. Vamos te chamar no WhatsApp para combinar a entrega.`
-    : `Sua doação de ${principal.nome.toLowerCase()} já entrou na torre. Vamos te chamar no WhatsApp para combinar a entrega.`;
-  $('festa-num').textContent = numero ? `Você encaixou a peça nº ${numero}` : '';
-  f.classList.add('aberta');
-  const mini = $('torre-mini');
-  const total = numero || totalAtual;
-  mini.dataset.total = Math.max(0, total - 1); mini.innerHTML = '';
-  desenhaTorre(mini, Math.max(0, total - 1));
-  setTimeout(() => { somEncaixe(); desenhaTorre(mini, total, { animaNovas: true }); confete($('confete')); }, 450);
+    ? `Seus ${escolhidos.length} brinquedos já estão no cubo. Vamos te chamar no WhatsApp para combinar a entrega.`
+    : `Seu brinquedo já está no cubo. Vamos te chamar no WhatsApp para combinar a entrega.`;
+  $('festa-num').textContent = numero ? `Você é o doador nº ${numero}` : '';
+  $('festa').classList.add('aberta');
+  const total = numero || totalAtual, meu = principal.id;
+  const host = $('cubo-festa'); if (cuboFesta){ cuboFesta.destroy(); }
+  cuboFesta = new Cubo(host, { max: 260, onCheio: n => { $('festa-num').textContent = `Vocês encheram o cubo nº ${n}!`; confete($('confete'), 3500); } });
+  cuboFesta.atualiza(Math.max(0, total - 1), vivas);
+  setTimeout(() => { somEncaixe(); cuboFesta.atualiza(total, [{ itemId: meu }].concat(vivas)); confete($('confete')); }, 500);
   escolhidos = [];
 }
 $('mais').addEventListener('click', () => { $('festa').classList.remove('aberta'); window.scrollTo({ top: $('grade').offsetTop - 12, behavior: 'smooth' }); });

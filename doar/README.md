@@ -6,8 +6,10 @@ escolhe o que quer doar, deixa nome e WhatsApp, e você vê tudo no painel.
 | Página | Para quê |
 |---|---|
 | `index.html` | O que o celular da pessoa abre (escolhe o item, deixa nome e WhatsApp, comemora). |
-| `telao.html` | Projetar no telão: QR Code grande, torre de peças que cresce e aviso "Maria encaixou: Pufes" a cada doação. |
+| `telao.html` | Projetar no telão: QR Code grande, o cubo de blocos que se enche de brinquedos e o aviso "Maria colocou no cubo: Pufes" a cada doação. |
 | `admin.html` | Painel só seu: lista, filtros por item/situação, botão "Chamar no WhatsApp" com mensagem pronta, CSV. |
+
+O centro do site é o **Cubo de Doações**: cada doação solta no cubo o brinquedo escolhido (ilustrações próprias, sem emojis). Quando junta 50 (`metaInicial` em `doar.js`), o cubo comemora, esvazia e começa o próximo. Tocando no cubo, os brinquedos pulam.
 
 Tatames e abafadores/cubos infinitos ficaram de fora (estavam riscados na lista). Para mudar os itens, edite `ITENS` no topo de `doar.js`.
 
