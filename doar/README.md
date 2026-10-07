@@ -6,10 +6,12 @@ escolhe o que quer doar, deixa nome e WhatsApp, e você vê tudo no painel.
 | Página | Para quê |
 |---|---|
 | `index.html` | O que o celular da pessoa abre (escolhe o item, deixa nome e WhatsApp, comemora). |
-| `telao.html` | Projetar no telão: QR Code grande, o cubo de blocos que se enche de brinquedos e o aviso "Maria colocou no cubo: Pufes" a cada doação. |
+| `telao.html` | Projetar no telão: QR Code grande, a brinquedoteca ao vivo, o contador por item e o aviso "Maria vai doar: Pufes" a cada doação. |
 | `admin.html` | Painel só seu: lista, filtros por item/situação, botão "Chamar no WhatsApp" com mensagem pronta, CSV. |
 
-O centro do site é o **Cubo de Doações**: cada doação solta no cubo o brinquedo escolhido (ilustrações próprias, sem emojis). Quando junta 50 (`metaInicial` em `doar.js`), o cubo comemora, esvazia e começa o próximo. Tocando no cubo, os brinquedos pulam.
+O centro do site é a **Brinquedoteca**: uma sala da Videira Kids que vai sendo montada. Cada item doado cai na sala e ganha vida (carrinhos andam, dinossauros passeiam, bolas quicam, bonecos pulam) e aparece com o primeiro nome de quem doou. Não há limite: quanto mais doações, mais cheia a sala, e os brinquedos encolhem para caber. No telão há ainda um contador por item (mostra o que mais está chegando) e uma comemoração a cada 50 doações (`MARCO` em `telao.html`).
+
+**Fotos reais:** as ilustrações são desenhos próprios. Para usar fotos, ponha PNGs com fundo transparente em `img/itens/` e liste em `FOTOS` no topo de `doar.js` (ex.: `{ dinos: 'img/itens/dinos.png' }`). Use só imagens que você tenha direito de usar (suas ou de licença livre).
 
 Tatames e abafadores/cubos infinitos ficaram de fora (estavam riscados na lista). Para mudar os itens, edite `ITENS` no topo de `doar.js`.
 

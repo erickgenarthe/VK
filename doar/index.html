@@ -23,7 +23,6 @@
   .cubo-card header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
   .cubo-card h2{margin:0;font-family:var(--f-titulo);font-weight:900;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em}
   .cubo-card .num{font-family:var(--f-titulo);font-weight:900;font-size:2.2rem;line-height:1;color:var(--azul);font-variant-numeric:tabular-nums}
-  .cubo-card .cubo-area{margin-top:6px}
   .cubo-card p{margin:12px 0 0;font-size:.95rem;color:var(--tinta-2)}
 
   .grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px;padding:0;list-style:none}
@@ -82,7 +81,7 @@
   .festa #confete{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
   .festa .titulo{font-size:clamp(3rem,15vw,4.6rem)}
   .festa p{margin:0;max-width:30ch;font-size:1.1rem}
-  .festa .cubo-area{width:min(78vw,300px);position:relative}
+  .festa .sala-festa{width:min(100%,380px)}
   .festa .numero{font-weight:600;color:var(--azul-esc)}
   .festa .botoes{display:grid;gap:10px;width:min(100%,320px);position:relative;z-index:1}
   .rodape{margin-top:30px;text-align:center;font-size:.8rem;color:var(--tinta-2)}
@@ -98,15 +97,15 @@
   </section>
 
   <h1 class="titulo">O que doar:</h1>
-  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada escolha vira um brinquedo dentro do nosso cubo.</p>
+  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada escolha vira um brinquedo de verdade na nossa brinquedoteca.</p>
 
   <section class="cubo-card" aria-labelledby="t-cubo">
     <header>
-      <h2 id="t-cubo">O cubo de doações</h2>
-      <span class="num" id="cubo-num">0</span>
+      <h2 id="t-cubo">A brinquedoteca</h2>
+      <span class="num" id="sala-num">0</span>
     </header>
-    <div class="cubo-area"><div id="cubo"></div></div>
-    <p class="cubo-legenda" id="cubo-txt">Carregando…</p>
+    <div class="sala" id="sala"></div>
+    <p class="sala-legenda" id="sala-txt">Carregando…</p>
   </section>
 
   <ul class="grade" id="grade"></ul>
@@ -141,14 +140,14 @@
   </label>
   <span class="erro" id="e-geral" style="color:var(--vermelho);font-size:.9rem" hidden></span>
   <div class="acoes">
-    <button class="botao" id="enviar" type="submit">Colocar no cubo</button>
+    <button class="botao" id="enviar" type="submit">Quero doar</button>
   </div>
 </form>
 
 <div class="festa" id="festa" role="status" aria-live="polite">
   <canvas id="confete" aria-hidden="true"></canvas>
   <h2 class="titulo" id="festa-titulo">Obrigado!</h2>
-  <div class="cubo-area"><div id="cubo-festa"></div></div>
+  <div class="sala sala-festa" id="sala-festa"></div>
   <p id="festa-txt"></p>
   <p class="numero" id="festa-num"></p>
   <div class="botoes">
@@ -159,7 +158,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <script src="doar.js"></script>
-<script src="cubo.js"></script>
+<script src="sala.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 let escolhidos = [];       // ids selecionados, o primeiro é o que a pessoa tocou
@@ -181,17 +180,17 @@ $('grade').addEventListener('click', e => {
   abreFolha();
 });
 
-/* ---- cubo ao vivo ---- */
-const cuboPrincipal = new Cubo($('cubo'), { max: 300 });
-let vivas = [];
-Dados.aoVivoMural(({ total, ultimas }) => {
-  totalAtual = total; vivas = ultimas;
-  cuboPrincipal.atualiza(total, ultimas);
-  const cap = DOAR_CONFIG.metaInicial;
-  $('cubo-num').textContent = total;
-  $('cubo-txt').textContent = total === 0
-    ? 'O cubo está vazio. Seu brinquedo pode ser o primeiro! Toque nele para sacudir.'
-    : `Cubo nº ${cuboPrincipal.cubo + 1}: ${cuboPrincipal.n} de ${cap} brinquedos. Toque nele para sacudir!`;
+/* ---- brinquedoteca ao vivo ---- */
+const salaPrincipal = new Sala($('sala'));
+let vivas = [], porVivo = {};
+Dados.aoVivoMural(({ total, porItem, ultimas }) => {
+  totalAtual = total; vivas = ultimas; porVivo = porItem;
+  salaPrincipal.atualiza(porItem, ultimas);
+  const brinquedos = Object.values(porItem).reduce((a, b) => a + b, 0);
+  $('sala-num').textContent = brinquedos;
+  $('sala-txt').textContent = brinquedos === 0
+    ? 'A sala está vazia. Seu brinquedo pode ser o primeiro! Toque na sala para brincar.'
+    : `${brinquedos} ${brinquedos === 1 ? 'brinquedo já chegou' : 'brinquedos já chegaram'}. Toque na sala para brincar!`;
 });
 
 /* ---- folha de doação ---- */
@@ -241,35 +240,35 @@ $('folha').addEventListener('submit', async e => {
   if (!whatsValido(whats)) return $('whats').focus();
   if (!$('aceite').checked){ erro('e-geral', 'Marque a caixinha para podermos te chamar no WhatsApp.'); return; }
   erro('e-geral', '');
-  enviando = true; $('enviar').disabled = true; $('enviar').textContent = 'Encaixando…';
+  enviando = true; $('enviar').disabled = true; $('enviar').textContent = 'Enviando…';
+  const porAntes = { ...porVivo }, meus = escolhidos.slice();
   try{
     const r = await Dados.enviar({ nome, whatsapp: whats, itens: escolhidos, obs: $('obs').value });
     try{ localStorage.setItem('doar_pessoa', JSON.stringify({ nome, whats })); }catch(_){}
     $('obs').value = '';
-    fechaFolha(); celebra(nome, r.numero);
+    fechaFolha(); celebra(nome, r.numero, porAntes, meus);
   }catch(err){
     console.error(err);
     erro('e-geral', 'Não conseguimos salvar agora. Confira a internet e toque de novo.');
   }finally{
-    enviando = false; $('enviar').disabled = false; $('enviar').textContent = 'Colocar no cubo';
+    enviando = false; $('enviar').disabled = false; $('enviar').textContent = 'Quero doar';
   }
 });
 
-/* ---- tela de comemoração ---- */
-let cuboFesta = null;
-function celebra(nome, numero){
-  const principal = itemPorId(escolhidos[0]);
+/* ---- tela de comemoração: a sala com o brinquedo da pessoa caindo lá dentro ---- */
+let salaFesta = null;
+function celebra(nome, numero, porAntes, meus){
   $('festa-titulo').textContent = `Valeu, ${primeiroNome(nome)}!`;
-  $('festa-txt').textContent = escolhidos.length > 1
-    ? `Seus ${escolhidos.length} brinquedos já estão no cubo. Vamos te chamar no WhatsApp para combinar a entrega.`
-    : `Seu brinquedo já está no cubo. Vamos te chamar no WhatsApp para combinar a entrega.`;
+  $('festa-txt').textContent = meus.length > 1
+    ? `Seus ${meus.length} brinquedos já chegaram na brinquedoteca. Vamos te chamar no WhatsApp para combinar a entrega.`
+    : 'Seu brinquedo já chegou na brinquedoteca. Vamos te chamar no WhatsApp para combinar a entrega.';
   $('festa-num').textContent = numero ? `Você é o doador nº ${numero}` : '';
   $('festa').classList.add('aberta');
-  const total = numero || totalAtual, meu = principal.id;
-  const host = $('cubo-festa'); if (cuboFesta){ cuboFesta.destroy(); }
-  cuboFesta = new Cubo(host, { max: 260, onCheio: n => { $('festa-num').textContent = `Vocês encheram o cubo nº ${n}!`; confete($('confete'), 3500); } });
-  cuboFesta.atualiza(Math.max(0, total - 1), vivas);
-  setTimeout(() => { somEncaixe(); cuboFesta.atualiza(total, [{ itemId: meu }].concat(vivas)); confete($('confete')); }, 500);
+  if (salaFesta) salaFesta.destroy();
+  salaFesta = new Sala($('sala-festa'));
+  salaFesta.atualiza(porAntes, []);
+  const depois = { ...porAntes }; meus.forEach(id => { depois[id] = (depois[id] || 0) + 1; });
+  setTimeout(() => { salaFesta.atualiza(depois, [{ nome: primeiroNome(nome) }]); confete($('confete')); }, 600);
   escolhidos = [];
 }
 $('mais').addEventListener('click', () => { $('festa').classList.remove('aberta'); window.scrollTo({ top: $('grade').offsetTop - 12, behavior: 'smooth' }); });

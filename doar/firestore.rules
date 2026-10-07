@@ -31,11 +31,11 @@ service cloud.firestore {
       allow update, delete: if admin();
     }
 
-    // Contador da torre: o público só consegue somar 1 por vez.
+    // Contadores da brinquedoteca (total e quantos de cada item): o público só consegue somar 1 doação por vez.
     match /publico/resumo {
       allow read: if true;
-      allow create: if request.resource.data.keys().hasOnly(['total']) && request.resource.data.total == 1;
-      allow update: if request.resource.data.keys().hasOnly(['total']) && request.resource.data.total == resource.data.total + 1;
+      allow create: if request.resource.data.keys().hasOnly(['total','porItem']) && request.resource.data.total == 1;
+      allow update: if request.resource.data.keys().hasOnly(['total','porItem']) && request.resource.data.total == resource.data.total + 1;
       allow update, delete: if admin();
     }
   }

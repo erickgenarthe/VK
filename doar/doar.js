@@ -13,8 +13,6 @@ const DOAR_CONFIG = {
   },
   // Endereço que o QR Code do telão abre. Vazio = usa o endereço da própria página inicial do site.
   urlPublica: '',
-  // Quantos brinquedos enchem um cubo. Encheu, o cubo comemora, esvazia e começa o próximo.
-  metaInicial: 50,
   // Mensagem enviada pelo painel ao chamar a pessoa no WhatsApp. {nome} e {itens} são trocados.
   mensagemWhats:
     'Oi, {nome}! Aqui é da Videira Kids 💛 Vimos que você quer doar para o Outubro da Criança: {itens}. ' +
@@ -43,10 +41,18 @@ const ICONES = {
   'regulacao': `<rect x="7" y="7" width="50" height="50" rx="11" fill="#8E44B8" stroke="#1D1A2B" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><circle cx="20" cy="20" r="5.2" fill="#E8272F" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="18.4" cy="18.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="32" cy="20" r="5.2" fill="#F6B800" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="30.4" cy="18.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="44" cy="20" r="5.2" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="42.4" cy="18.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="20" cy="32" r="5.2" fill="#F6B800" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="18.4" cy="30.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="32" cy="32" r="5.2" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="30.4" cy="30.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="44" cy="32" r="5.2" fill="#E8272F" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="42.4" cy="30.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="20" cy="44" r="5.2" fill="#0A9BE3" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="18.4" cy="42.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="32" cy="44" r="5.2" fill="#E8272F" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="30.4" cy="42.2" r="1.5" fill="#fff" opacity=".7"/><circle cx="44" cy="44" r="5.2" fill="#F6B800" stroke="#1D1A2B" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="42.4" cy="42.2" r="1.5" fill="#fff" opacity=".7"/>`
 };
 /** Ilustração do item como <svg> (tamanho em px). */
-function iconeSvg(id, tam = 48){ return `<svg viewBox="0 0 64 64" width="${tam}" height="${tam}" aria-hidden="true" focusable="false">${ICONES[id] || ''}</svg>`; }
+/* Fotos reais dos itens (PNG com fundo transparente). Para usar uma foto no lugar da ilustração,
+   coloque o arquivo em img/itens/ e liste aqui, por exemplo: { dinos: 'img/itens/dinos.png' }.
+   Tudo no site (cartões, brinquedoteca, telão) passa a usar a foto automaticamente. */
+const FOTOS = {};
+function iconeSvg(id, tam = 48){
+  if (FOTOS[id]) return `<img src="${FOTOS[id]}" width="${tam}" height="${tam}" alt="" style="object-fit:contain">`;
+  return `<svg viewBox="0 0 64 64" width="${tam}" height="${tam}" aria-hidden="true" focusable="false">${ICONES[id] || ''}</svg>`;
+}
 const _imgIcone = {};
-/** Mesma ilustração como imagem pronta para o canvas do cubo. */
+/** Mesma imagem pronta para o canvas da brinquedoteca. */
 function iconeImg(id){
+  if (!_imgIcone[id] && FOTOS[id]){ const im = new Image(); im.src = FOTOS[id]; _imgIcone[id] = im; }
   if (!_imgIcone[id]){
     const im = new Image();
     im.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="128" height="128">${ICONES[id] || ''}</svg>`);
@@ -152,7 +158,7 @@ window.addEventListener('storage', e => { if (e.key && e.key.startsWith('doar_')
 const Dados = {
   demo: MODO_DEMO,
 
-  /** Registra a doação. Devolve { numero } (a ordem da pessoa na torre). */
+  /** Registra a doação. Devolve { numero } (a ordem da pessoa entre os doadores). */
   async enviar({ nome, whatsapp, itens, obs }){
     const lista = itens.map(id => ({ id, nome: itemPorId(id).nome }));
     const base = { nome: nome.trim(), whatsapp: normalizaWhats(whatsapp), itens: lista, obs: (obs || '').trim(), status: 'novo' };
@@ -163,7 +169,8 @@ const Dados = {
       const batch = fdb.batch();
       batch.set(fdb.collection('doacoes').doc(), { ...base, criadoEm: ts });
       batch.set(fdb.collection('mural').doc(), { ...publico, criadoEm: ts });
-      batch.set(resumoRef, { total: firebase.firestore.FieldValue.increment(1) }, { merge: true });
+      const porItem = {}; lista.forEach(i => { porItem[i.id] = firebase.firestore.FieldValue.increment(1); });
+      batch.set(resumoRef, { total: firebase.firestore.FieldValue.increment(1), porItem }, { merge: true });
       await batch.commit();
       let total = 0;
       try{ total = (await resumoRef.get()).data().total; }catch(e){}
@@ -179,19 +186,23 @@ const Dados = {
     return { numero: doacoes.length };
   },
 
-  /** Total de doações + últimas doações (só primeiro nome), ao vivo. */
+  /** Total de doações, quantos de cada item e as últimas doações (só primeiro nome), ao vivo. */
   aoVivoMural(cb){
     if (fdb){
-      let total = 0, ultimas = [];
-      const emite = () => cb({ total, ultimas });
-      const u1 = fdb.doc('publico/resumo').onSnapshot(s => { total = (s.data() || {}).total || 0; emite(); }, console.error);
+      let total = 0, porItem = {}, ultimas = [], r1 = false, r2 = false;
+      const emite = () => { if (r1 && r2) cb({ total, porItem, ultimas }); };
+      const u1 = fdb.doc('publico/resumo').onSnapshot(s => { const x = s.data() || {}; total = x.total || 0; porItem = x.porItem || {}; r1 = true; emite(); }, console.error);
       const u2 = fdb.collection('mural').orderBy('criadoEm', 'desc').limit(30).onSnapshot(q => {
         ultimas = q.docs.map(d => ({ id: d.id, ...d.data(), criadoEm: d.data().criadoEm ? d.data().criadoEm.toMillis() : Date.now() }));
-        emite();
+        r2 = true; emite();
       }, console.error);
       return () => { u1(); u2(); };
     }
-    const f = () => { const m = _lsGet('doar_mural', []); cb({ total: m.length, ultimas: m.slice(0, 30) }); };
+    const f = () => {
+      const l = _lsGet('doar_doacoes', []), m = _lsGet('doar_mural', []), porItem = {};
+      l.forEach(d => d.itens.forEach(i => { porItem[i.id] = (porItem[i.id] || 0) + 1; }));
+      cb({ total: l.length, porItem, ultimas: m.slice(0, 30) });
+    };
     _ouvintes.add(f); f();
     return () => _ouvintes.delete(f);
   },
