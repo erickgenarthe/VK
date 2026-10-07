@@ -1,0 +1,21 @@
+SELOS DO CLUBE VIDEIRA KIDS — ARQUIVOS PARA IMPRIMIR
+
+PDFs prontos (A4, com marcas de corte nas margens)
+  1-selos-A4-tamanho-grande-9cm.pdf   -> 1 folha com os 6 selos, 9 x 9 cm cada
+  2-selos-12-por-folha-5,5cm.pdf      -> 6 páginas (uma por selo), 12 iguais por página, 5,5 x 5,5 cm
+  3-selos-20-por-folha-4cm.pdf        -> 6 páginas (uma por selo), 20 iguais por página, 4 x 4 cm
+
+Pasta png/
+  *-transparente.png  -> selo recortado, fundo transparente (para plotter de recorte, Canva, etc.)
+  *-quadrado.jpg      -> selo com fundo creme, para cortar em quadrado na guilhotina
+
+Como imprimir
+  - Escala 100% / "tamanho real" (NÃO usar "ajustar à página"), para as medidas saírem certas.
+  - Papel adesivo (vinil ou couchê) ou papel comum + cola/fita dupla-face.
+  - Imprima mais folhas dos selos que as crianças mais vão receber (todos recebem o 1 e o 6).
+  - Cortar pelas marcas nas margens (guilhotina). Os selos já têm contorno branco.
+
+Observação sobre a qualidade
+  As imagens originais da apresentação são pequenas (cerca de 330 x 330 px). Foram ampliadas
+  com suavização, e ficam boas até ~5,5 cm. No tamanho de 9 cm já aparece um pouco de
+  serrilhado. Se tiverem os arquivos originais do designer (PNG/PDF grande), vale usar esses.

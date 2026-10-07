@@ -663,12 +663,12 @@ $$('#promise li').forEach(function(li){li.querySelector('button').addEventListen
 
 /* ---------- selos / passaporte ---------- */
 var SELOS=[
- {id:1,t:'Selo de Entrada',nome:'Membro do Clube',frase:'Eu faço parte!',zone:'parking',club:null,pin:[94,-108]},
- {id:2,t:'Selo do A13',nome:'Clube da Aventura',frase:'Topou o desafio!',zone:'praca',club:'a13',pin:[449,77]},
- {id:3,t:'Selo do VERT E A13 UNI',nome:'Clube das Ideias',frase:'Criei algo incrível!',zone:'foyer',club:'vert',pin:[456.5,-82]},
- {id:4,t:'Selo do INSPIRE',nome:'Clube da Palavra',frase:'Guardei uma verdade!',zone:'conv',club:'inspire',pin:[479,-112,479,-100]},
- {id:5,t:'Selo do SOMOS UM',nome:'Clube da Mesa',frase:'Compartilhei com alegria!',zone:'kids',club:'somos',pin:[200,-54]},
- {id:6,t:'SELO VIDEIRA KIDS',nome:'Ninguém fica de fora',frase:'Ninguém fica de fora!',zone:'kids',club:null,pin:[285,-54]}
+ {id:1,t:'Selo de Entrada',nome:'Membro do Clube',frase:'Eu faço parte!',zone:'parking',club:null,pin:[90,-95]},
+ {id:2,t:'Selo do A13',nome:'Clube da Aventura',frase:'Topou o desafio!',zone:'parking',club:'a13',pin:[125,-95]},
+ {id:3,t:'Selo do VERT E A13 UNI',nome:'Clube das Ideias',frase:'Criei algo incrível!',zone:'parking',club:'vert',pin:[160,-95]},
+ {id:4,t:'Selo do INSPIRE',nome:'Clube da Palavra',frase:'Guardei uma verdade!',zone:'parking',club:'inspire',pin:[80,-45]},
+ {id:5,t:'Selo do SOMOS UM',nome:'Clube da Mesa',frase:'Compartilhei com alegria!',zone:'parking',club:'somos',pin:[112,-45]},
+ {id:6,t:'SELO VIDEIRA KIDS',nome:'Ninguém fica de fora',frase:'Ninguém fica de fora!',zone:'parking',club:null,pin:[146,-45]}
 ];
 var got=store.get('selos',[]).filter(function(n){return n>=1&&n<=6});
 var extras=store.get('extras',[]);
@@ -701,13 +701,13 @@ $('#resetBtn').addEventListener('click',function(){got=[];extras=[];store.set('s
 
 /* ---------- mapa ---------- */
 var ZONES={
- parking:{t:'Estacionamentos (1 e 2)',i:'Chegada das famílias. Boa hora para entregar o primeiro selo: Membro do Clube — “Eu faço parte!”.'},
- kids:{t:'Kids (térreo)',i:'A casa das crianças do Videira Kids: um bom lugar para a mesa do SOMOS UM e para o fechamento da aventura com o Selo Missão Completa.'},
+ parking:{t:'Estacionamentos (1 e 2)',i:'Ponto dos selos: todas as estações ficam no Estacionamento 1, pertinho do Kids — da chegada (Selo de Entrada) até o fechamento (Selo Missão Completa).'},
+ kids:{t:'Kids (térreo)',i:'A casa das crianças do Videira Kids, ao lado das estações do Estacionamento 1.'},
  adm:{t:'Administrativo (ADM), 2º andar sobre o Kids',i:'Bastidores, longe do caminho das crianças: base de apoio dos voluntários e guarda dos materiais (selos, tintas, doces).'},
  aud:{t:'Auditório',i:'Onde acontecem os cultos. É um bom lugar para entregar o Selo Culto, um dos selos extras.'},
- foyer:{t:'Foyer',i:'Pré-culto artístico do VERT e A13 UNI: pintura de rosto, pintura nas mãos e penteados antes dos cultos.'},
- conv:{t:'Área de convivência (frente)',i:'Mural interativo do INSPIRE: cartões e mensagens para crianças e familiares na chegada e na saída.'},
- praca:{t:'Praça de convivência',i:'Espaço aberto para o circuito de desafios e as brincadeiras do A13 JR e School.'},
+ foyer:{t:'Foyer',i:null,ref:'Nenhuma estação neste espaço — os selos ficam no Estacionamento 1.'},
+ conv:{t:'Área de convivência (frente)',i:null,ref:'Nenhuma estação neste espaço — os selos ficam no Estacionamento 1.'},
+ praca:{t:'Praça de convivência',i:null,ref:'Nenhuma estação neste espaço — os selos ficam no Estacionamento 1.'},
  neigh:{t:'Edificações vizinhas',i:null,ref:'Referências no mapa: Condomínio Água Viva, CORREIOS CDD NATAL e Connecta Startup.'},
  roads:{t:'Vias',i:null,ref:'No mapa: Rua Montenegro, Rua Firmino dos Santos e Av. Ayrton Senna.'}
 };
@@ -737,7 +737,7 @@ function selectZone(z){
 }
 map.addEventListener('click',function(e){
   var pin=e.target.closest('.pin');
-  if(pin){var s=SELOS[+pin.dataset.selo-1];selPanel=null;selectZone(s.zone);return}
+  if(pin){var s=SELOS[+pin.dataset.selo-1];selPanel=null;selectZone(s.zone);$$('.pin').forEach(function(p){p.classList.toggle('sel',p===pin)});return}
   var z=e.target.closest('[data-zone]');if(z)selectZone(z.dataset.zone);
 });
 map.addEventListener('mouseover',function(e){if(selPanel)return;var z=e.target.closest&&e.target.closest('[data-zone]');if(z)setFocus(z.dataset.zone)});
@@ -880,14 +880,14 @@ $('#fixlist').innerHTML=FIX.map(function(f){return '<div class="fixrow"><span cl
 
 var LV={a:['Alta','var(--red)'],m:['Média','var(--orange)'],b:['Bônus','var(--purple)']};
 var DECIDE=[
- ['d1','a','Quem monta onde?','O mapa mostra os espaços, mas o material não diz onde cada clube vai ficar. Deixei pins sugeridos no mapa (A13 na Praça, VERT e A13 UNI no Foyer, INSPIRE na convivência, SOMOS UM no Kids). Validem e fixem um lugar por clube.'],
+ ['d1','a','Como organizar as 6 estações no Estacionamento 1?','Com tudo junto, vale definir a ordem e o espaçamento das mesas, o sentido do fluxo (para a fila de uma estação não cruzar a outra) e quem ocupa cada ponto. Deixei no mapa uma posição sugerida, perto do Kids — ajustem como preferirem. Também combinar o isolamento da área para carros durante o evento.'],
  ['d2','a','Horários e janelas de cada atividade','“Antes ou depois dos cultos”: definir os horários dos cultos e a janela de cada clube numa linha do tempo única (quem abre, quem fecha, quando troca de turno).'],
  ['d3','a','Quantos voluntários, exatamente?','“Dois por clube” dá 12 se contarmos 6 ministérios (A13 JR, School, VERT, A13 UNI, INSPIRE, SOMOS UM) ou 8 se forem os 4 slides. Vale somar um guia do passaporte e um coringa por turno.'],
  ['d4','a','Segurança e cuidado com as crianças','Proporção de adultos por criança, quem fica no circuito, onde os pais esperam, saída identificada e como o Kids conecta criança e responsável (etiqueta/pulseira).'],
  ['d5','a','Alimentos: alergias e higiene','Avisar ingredientes (amendoim, leite, glúten), luvas e tampas nos potes, opção sem açúcar (frutas) e autorização dos pais. Sucos e pipoca ajudam muito.'],
  ['d6','m','Como o selo é entregue?','Cartela impressa + adesivos reais dos 6 selos? Carimbo? Estimar quantidade (crianças × 6 selos) e quem guarda o estoque em cada estação.'],
  ['d7','m','Fila da pintura de rosto','Pintura de rosto é lenta. Usar ficha numerada, um “cardápio” de desenhos simples (estrela, coração, borboleta) e 2+ cadeiras para não travar o fluxo.'],
- ['d8','m','Plano B para chuva','Praça e estacionamento são abertos. Combinar para onde o circuito do A13 migra (foyer/convivência/Kids) e onde ficam tendas.'],
+ ['d8','m','Sol, chuva e som','O estacionamento é aberto: tendas ou cobertura sobre as estações (sol forte também cansa), plano B de chuva (para onde migram as estações: Kids, foyer ou convivência) e cuidado com o volume do som entre as mesas.'],
  ['d9','m','Critério dos selos extras','Quem entrega o Selo da Amizade, o da Gentileza e o Selo Culto, e com que critério? Sugestão: voluntários entregam “selos surpresa” quando flagrarem o gesto.'],
  ['d10','m','Fotos e imagem','Autorização de uso de imagem das crianças e um responsável por registrar o dia (sem atrapalhar as brincadeiras).']
 ];
@@ -896,7 +896,7 @@ var MAGIC=[
  ['g2','b','Ponto de foto “Ninguém fica de fora”','Moldura/painel com a logo do Clube Videira Kids e QR para ver o mural de fotos depois.'],
  ['g3','b','Cantinho calmo','Um espaço sem barulho e com poucos estímulos para crianças que se cansam fácil ou têm sensibilidade sensorial — inclusão de verdade.'],
  ['g4','b','Cartão do INSPIRE para a família','Cada mensagem com uma pergunta para conversar em casa (“Quando você sentiu que Deus estava com você?”) — leva a Palavra para a semana.'],
- ['g5','b','Cartaz-mapa e QR nas entradas','Imprimir este mapa com o caminho dos selos e um QR para o voluntário e para os pais abrirem no celular.'],
+ ['g5','b','Cartaz-mapa e QR nas entradas','Imprimir este mapa com a posição das estações no Estacionamento 1 e um QR para o voluntário e para os pais abrirem no celular.'],
  ['g6','b','Medir para melhorar','Contar selos entregues por estação e perguntar “o que mais gostou?” com carinhas (😀🙂😐) — dado ouro para o próximo ano.'],
  ['g7','b','Missão Completa com momento de festa','Ao carimbar o 6º selo: toque de sino, medalha ou adesivo especial e o grito “Ninguém fica de fora!”.']
 ];
