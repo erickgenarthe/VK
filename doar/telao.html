@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Telão — Outubro da Criança</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="doar.css">
+<script src="qrcode.js"></script>
+<style>
+  /* Feito para projetar em 16:9. Tudo escala com a altura da tela. */
+  html,body{height:100%;overflow:hidden}
+  body{display:grid;grid-template-rows:auto 1fr auto;font-size:calc(1.15vh + .6vw)}
+  .faixa{height:5.2vh}
+  .palco{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:4vw;align-items:center;padding:2vh 5vw}
+  .esq{display:grid;justify-items:center;gap:2.2vh;text-align:center}
+  .esq .titulo{font-size:12.5vh}
+  .esq .sub{margin:0;font-size:3.4vh;font-weight:500}
+  .qr-peca{padding:2.2vh;width:min(46vh,100%);aspect-ratio:1;--c:var(--azul);border-radius:3vh}
+  .qr-peca::after{display:none}
+  .qr-peca{box-shadow:inset 0 0 0 .5vh rgba(255,255,255,.3),inset 0 0 0 1.3vh color-mix(in srgb,var(--c) 78%,#000)}
+  .qr-miolo{position:relative;z-index:1;width:100%;height:100%;background:#fff;border-radius:1.6vh;padding:1.4vh;display:grid;place-items:center}
+  .qr-miolo svg{width:100%;height:100%;display:block}
+  .url{font-family:var(--f-texto);font-weight:600;font-size:2.6vh;color:var(--azul-esc);overflow-wrap:anywhere}
+  .dir{display:grid;gap:2vh;justify-items:center;min-width:0}
+  .contador{display:flex;align-items:baseline;gap:1.6vh}
+  .contador .n{font-family:var(--f-titulo);font-weight:900;font-size:15vh;line-height:.85;color:var(--azul);font-variant-numeric:tabular-nums}
+  .contador .l{font-family:var(--f-titulo);font-weight:800;font-size:5vh;text-transform:uppercase;line-height:1}
+  .dir .parede{width:min(58vh,100%)}
+  .aviso{min-height:11vh;display:grid;align-items:center;width:100%}
+  .brinde{
+    display:flex;align-items:center;gap:2vh;padding:1.6vh 2.4vh;border-radius:2.4vh;color:#fff;font-size:3.4vh;font-weight:600;line-height:1.15;
+    animation:entra .6s cubic-bezier(.2,1.4,.4,1) both;
+  }
+  .brinde .emo{font-size:6vh;position:relative;z-index:1}
+  .brinde span{position:relative;z-index:1}
+  .brinde b{font-weight:700}
+  .brinde.sai{animation:sai .5s ease-in both}
+  @keyframes entra{from{transform:translateY(6vh) scale(.8);opacity:0}to{transform:none;opacity:1}}
+  @keyframes sai{to{transform:translateY(-3vh);opacity:0}}
+  .espera{font-size:3vh;color:var(--tinta-2);text-align:center}
+  .faixa.base{align-self:end}
+  #confete{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
+  .teste{position:fixed;right:1.4vh;bottom:6.5vh;font-size:1.8vh;color:var(--tinta-2);opacity:.7}
+</style>
+</head>
+<body>
+<div class="faixa" aria-hidden="true"></div>
+
+<main class="palco">
+  <section class="esq">
+    <h1 class="titulo">Escaneie e doe</h1>
+    <p class="sub">Aponte a câmera do celular para o QR Code</p>
+    <div class="qr-peca peca"><div class="qr-miolo" id="qr" role="img" aria-label="QR Code para doar"></div></div>
+    <div class="url" id="url"></div>
+  </section>
+
+  <section class="dir">
+    <div class="contador"><span class="n" id="n">0</span><span class="l" id="l">peças encaixadas</span></div>
+    <div class="parede" id="torre"></div>
+    <div class="aviso" id="aviso"><div class="espera">Quando alguém doar, o nome aparece aqui.</div></div>
+  </section>
+</main>
+
+<div class="faixa base" aria-hidden="true"></div>
+<canvas id="confete" aria-hidden="true"></canvas>
+<div class="teste" id="teste" hidden>Modo demonstração · aperte T para simular uma doação</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="doar.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+
+/* QR Code: aponta para a página de doação (index.html desta mesma pasta). */
+const alvo = DOAR_CONFIG.urlPublica || new URL('./', location.href).href.replace(/index\.html$/, '');
+function desenhaQR(){
+  const qr = qrcode(0, 'M'); qr.addData(alvo); qr.make();
+  $('qr').innerHTML = qr.createSvgTag({ cellSize: 8, margin: 0, scalable: true });
+  const svg = $('qr').querySelector('svg'); svg.setAttribute('shape-rendering', 'crispEdges');
+  $('url').textContent = alvo.replace(/^https?:\/\//, '').replace(/\/$/, '');
+}
+if (window.qrcode) desenhaQR(); else $('qr').textContent = alvo;
+
+/* Torre + comemoração a cada doação nova */
+let vistos = null, fila = [], mostrando = false, totalMostrado = 0;
+function contaAte(alvoN){
+  const el = $('n'), ini = totalMostrado, t0 = performance.now();
+  (function passo(t){
+    const p = Math.min(1, (t - t0) / 700);
+    el.textContent = Math.round(ini + (alvoN - ini) * p);
+    if (p < 1) requestAnimationFrame(passo); else totalMostrado = alvoN;
+  })(t0);
+}
+function mostraProximo(){
+  if (mostrando || !fila.length) return;
+  mostrando = true;
+  const d = fila.shift(), it = itemPorId(d.itemId) || {};
+  const el = document.createElement('div');
+  el.className = 'brinde peca c-' + (it.cor || 'azul');
+  el.innerHTML = `<span class="emo">${it.emoji || '🎁'}</span><span><b>${escapaHtml(d.nome)}</b> encaixou uma peça:<br>${escapaHtml(d.item)}</span>`;
+  $('aviso').replaceChildren(el);
+  somEncaixe(); confete($('confete'), 2200);
+  setTimeout(() => el.classList.add('sai'), 5200);
+  setTimeout(() => { mostrando = false; if (fila.length) mostraProximo(); else $('aviso').innerHTML = '<div class="espera">Sua doação também entra na torre. Escaneie e participe!</div>'; }, 5700);
+}
+Dados.aoVivoMural(({ total, ultimas }) => {
+  desenhaTorre($('torre'), total, { animaNovas: vistos !== null });
+  contaAte(total);
+  $('l').textContent = total === 1 ? 'peça encaixada' : 'peças encaixadas';
+  if (vistos === null){ vistos = new Set(ultimas.map(u => u.id)); return; }  // não repete o que já existia
+  ultimas.slice().reverse().forEach(u => { if (!vistos.has(u.id)){ vistos.add(u.id); fila.push(u); } });
+  mostraProximo();
+});
+
+if (Dados.demo){
+  $('teste').hidden = false;
+  document.addEventListener('keydown', e => {
+    if (e.key.toLowerCase() !== 't') return;
+    const i = ITENS[Math.floor(Math.random() * ITENS.length)];
+    const nomes = ['Ana', 'Lucas', 'Marta', 'João', 'Beatriz', 'Pedro'];
+    Dados.enviar({ nome: nomes[Math.floor(Math.random() * nomes.length)] + ' Teste', whatsapp: '11912345678', itens: [i.id], obs: '' });
+  });
+}
+</script>
+</body>
+</html>

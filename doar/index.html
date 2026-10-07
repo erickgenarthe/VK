@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FDF4E5">
+<title>Outubro da Criança — O que doar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="doar.css">
+<style>
+  body{padding-bottom:calc(40px + env(safe-area-inset-bottom,0px))}
+  .miolo{max-width:560px;margin-inline:auto;padding:0 16px}
+  .topo{display:grid;justify-items:center;gap:6px;padding-block:18px 6px}
+  .topo .logo{width:76px;height:auto}
+  .topo .arte{width:min(100%,420px);height:auto}
+  h1.titulo{font-size:clamp(3.4rem,17vw,5.4rem);margin-top:6px}
+  .lead{margin:10px 0 0;font-size:1.12rem;color:var(--tinta-2);max-width:34ch}
+  .lead b{color:var(--tinta);font-weight:600}
+
+  .torre-card{margin-top:22px;padding:16px;border-radius:20px;background:#fff;border:2px solid var(--creme-2)}
+  .torre-card header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .torre-card h2{margin:0;font-family:var(--f-titulo);font-weight:900;font-size:1.5rem;text-transform:uppercase;letter-spacing:.02em}
+  .torre-card .num{font-family:var(--f-titulo);font-weight:900;font-size:2.2rem;line-height:1;color:var(--azul);font-variant-numeric:tabular-nums}
+  .torre-card p{margin:12px 0 0;font-size:.95rem;color:var(--tinta-2)}
+
+  .grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:22px;padding:0;list-style:none}
+  .item{
+    width:100%;min-height:158px;padding:14px 12px 16px;text-align:left;border:0;cursor:pointer;
+    display:grid;align-content:start;gap:6px;
+    transition:transform .15s cubic-bezier(.3,1.6,.5,1);
+  }
+  .item .emo{position:relative;z-index:1;font-size:2.5rem;line-height:1;filter:drop-shadow(0 2px 0 rgba(0,0,0,.18))}
+  .item .nome{position:relative;z-index:1;font-weight:700;font-size:1.02rem;line-height:1.2;color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.25);overflow-wrap:anywhere}
+  .item .det{position:relative;z-index:1;font-size:.78rem;line-height:1.25;color:rgba(255,255,255,.92);overflow-wrap:anywhere}
+  .item:hover{transform:translateY(-3px) rotate(-1deg)}
+  .item:active{transform:scale(.95)}
+  .item.escolhido{outline:4px solid var(--tinta);outline-offset:2px}
+  @media (min-width:420px){ .item .nome{font-size:1.1rem} }
+
+  /* painel que sobe de baixo */
+  .veu{position:fixed;inset:0;background:rgba(29,26,43,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+  .veu.aberto{opacity:1;pointer-events:auto}
+  .folha{
+    position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:92%;overflow:auto;
+    max-width:560px;margin-inline:auto;background:var(--creme);border-radius:26px 26px 0 0;
+    padding:8px 18px calc(22px + env(safe-area-inset-bottom,0px));
+    transform:translateY(105%);transition:transform .38s cubic-bezier(.2,1,.3,1);
+    box-shadow:0 -10px 40px rgba(0,0,0,.25);
+  }
+  .folha.aberta{transform:none}
+  .folha .alca{width:48px;height:5px;border-radius:3px;background:#D7C7A9;margin:6px auto 30px}
+  .escolha{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:16px;color:#fff}
+  .escolha .emo{font-size:2.2rem;position:relative;z-index:1}
+  .escolha small{display:block;position:relative;z-index:1;opacity:.9;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+  .escolha strong{position:relative;z-index:1;font-size:1.05rem;line-height:1.2;overflow-wrap:anywhere}
+  .mais{margin:14px 0 4px;font-size:.88rem;color:var(--tinta-2)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px;padding:0;list-style:none}
+  .chip{border:2px solid var(--creme-2);background:#fff;border-radius:999px;padding:7px 12px;font-size:.88rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+  .chip[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:#fff}
+  label.campo{display:grid;gap:6px;margin-top:14px;font-weight:600;font-size:.95rem}
+  label.campo input,label.campo textarea{
+    width:100%;min-height:54px;padding:12px 14px;border-radius:14px;border:2px solid #E3D3B6;background:#fff;font-size:1.1rem;font-weight:400;
+  }
+  label.campo textarea{min-height:76px;resize:vertical;font-size:1rem}
+  label.campo input:focus,label.campo textarea:focus{outline:0;border-color:var(--azul);box-shadow:0 0 0 4px rgba(10,155,227,.2)}
+  label.campo .dica{font-weight:400;font-size:.8rem;color:var(--tinta-2)}
+  label.campo .erro{font-weight:500;font-size:.85rem;color:var(--vermelho)}
+  .aceite{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:.85rem;color:var(--tinta-2)}
+  .aceite input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--azul);flex:none}
+  .acoes{display:grid;gap:10px;margin-top:18px}
+  .fechar{position:absolute;top:4px;right:8px;width:44px;height:44px;border:0;background:transparent;font-size:1.7rem;cursor:pointer;color:var(--tinta-2)}
+
+  /* comemoração */
+  .festa{position:fixed;inset:0;z-index:30;background:var(--creme);display:grid;align-content:center;justify-items:center;gap:14px;padding:24px 20px;text-align:center;overflow:auto;
+    opacity:0;pointer-events:none;transition:opacity .3s}
+  .festa.aberta{opacity:1;pointer-events:auto}
+  .festa canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+  .festa .titulo{font-size:clamp(3rem,15vw,4.6rem)}
+  .festa p{margin:0;max-width:30ch;font-size:1.1rem}
+  .festa .torre-mini{width:min(78vw,320px);position:relative}
+  .festa .numero{font-weight:600;color:var(--azul-esc)}
+  .festa .botoes{display:grid;gap:10px;width:min(100%,320px);position:relative;z-index:1}
+  .rodape{margin-top:30px;text-align:center;font-size:.8rem;color:var(--tinta-2)}
+</style>
+</head>
+<body>
+<div class="faixa" aria-hidden="true"></div>
+
+<main class="miolo">
+  <section class="topo">
+    <img class="logo" src="img/logo-vk.png" alt="Videira Kids" width="76" height="61">
+    <img class="arte" src="img/outubro-da-crianca.png" alt="Outubro da Criança" width="420" height="255">
+  </section>
+
+  <h1 class="titulo">O que doar:</h1>
+  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada escolha encaixa uma peça na torre.</p>
+
+  <section class="torre-card" aria-labelledby="t-torre">
+    <header>
+      <h2 id="t-torre">A torre da comunidade</h2>
+      <span class="num" id="torre-num">0</span>
+    </header>
+    <div class="parede" id="torre"></div>
+    <p id="torre-txt">Carregando…</p>
+  </section>
+
+  <ul class="grade" id="grade"></ul>
+
+  <p class="rodape">Seu nome e WhatsApp ficam só com a equipe da Videira Kids, que vai combinar com você a entrega.</p>
+</main>
+
+<div class="veu" id="veu"></div>
+<form class="folha" id="folha" role="dialog" aria-modal="true" aria-labelledby="f-titulo" novalidate>
+  <div class="alca" aria-hidden="true"></div>
+  <button type="button" class="fechar" id="fechar" aria-label="Fechar">×</button>
+  <div class="escolha peca" id="escolha"></div>
+
+  <p class="mais" id="f-titulo">Quer levar mais alguma coisa? Toque para juntar:</p>
+  <ul class="chips" id="chips"></ul>
+
+  <label class="campo" for="nome">Seu nome
+    <input id="nome" name="nome" type="text" autocomplete="name" autocapitalize="words" maxlength="80" placeholder="Como podemos te chamar?" required>
+    <span class="erro" id="e-nome" hidden></span>
+  </label>
+  <label class="campo" for="whats">Seu WhatsApp
+    <input id="whats" name="whats" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(11) 91234-5678" maxlength="16" required>
+    <span class="dica">É por ele que a gente combina a entrega.</span>
+    <span class="erro" id="e-whats" hidden></span>
+  </label>
+  <label class="campo" for="obs">Quer contar mais? <span class="dica">(opcional)</span>
+    <textarea id="obs" name="obs" maxlength="300" placeholder="Ex.: 2 dinossauros e 1 pufe verde"></textarea>
+  </label>
+  <label class="aceite" for="aceite">
+    <input type="checkbox" id="aceite" checked>
+    <span>Pode me chamar no WhatsApp sobre a minha doação.</span>
+  </label>
+  <span class="erro" id="e-geral" style="color:var(--vermelho);font-size:.9rem" hidden></span>
+  <div class="acoes">
+    <button class="botao" id="enviar" type="submit">Encaixar minha peça</button>
+  </div>
+</form>
+
+<div class="festa" id="festa" role="status" aria-live="polite">
+  <canvas id="confete" aria-hidden="true"></canvas>
+  <h2 class="titulo" id="festa-titulo">Obrigado!</h2>
+  <div class="torre-mini"><div class="parede" id="torre-mini"></div></div>
+  <p id="festa-txt"></p>
+  <p class="numero" id="festa-num"></p>
+  <div class="botoes">
+    <button class="botao" id="mais" type="button">Quero doar mais</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="doar.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let escolhidos = [];       // ids selecionados, o primeiro é o que a pessoa tocou
+let totalAtual = 0;
+let enviando = false;
+
+/* ---- grade de itens ---- */
+$('grade').innerHTML = ITENS.map(i => `
+  <li><button type="button" class="item peca c-${i.cor}" data-id="${i.id}" aria-label="Doar: ${escapaHtml(i.nome)}">
+    <span class="emo" aria-hidden="true">${i.emoji}</span>
+    <span class="nome">${escapaHtml(i.nome)}</span>
+    ${i.detalhe ? `<span class="det">${escapaHtml(i.detalhe)}</span>` : ''}
+  </button></li>`).join('');
+
+$('grade').addEventListener('click', e => {
+  const b = e.target.closest('.item'); if (!b) return;
+  somEncaixe();
+  escolhidos = [b.dataset.id];
+  abreFolha();
+});
+
+/* ---- torre ao vivo ---- */
+Dados.aoVivoMural(({ total }) => {
+  const primeira = $('torre').children.length === 0;
+  totalAtual = total;
+  const meta = desenhaTorre($('torre'), total, { animaNovas: !primeira });
+  $('torre-num').textContent = total;
+  $('torre-txt').textContent = total === 0
+    ? 'Ainda está vazia. A sua pode ser a primeira peça!'
+    : `${total} ${total === 1 ? 'peça encaixada' : 'peças encaixadas'} de ${meta}. A próxima pode ser a sua.`;
+});
+
+/* ---- folha de doação ---- */
+function pintaFolha(){
+  const principal = itemPorId(escolhidos[0]);
+  const e = $('escolha');
+  e.className = 'escolha peca c-' + principal.cor;
+  e.innerHTML = `<span class="emo" aria-hidden="true">${principal.emoji}</span><span><small>Você escolheu</small><strong>${escapaHtml(principal.nome)}</strong></span>`;
+  $('chips').innerHTML = ITENS.filter(i => i.id !== escolhidos[0]).map(i =>
+    `<li><button type="button" class="chip" data-id="${i.id}" aria-pressed="${escolhidos.includes(i.id)}"><span aria-hidden="true">${i.emoji}</span> ${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</button></li>`).join('');
+  document.querySelectorAll('.item').forEach(b => b.classList.toggle('escolhido', escolhidos.includes(b.dataset.id)));
+}
+function abreFolha(){
+  pintaFolha();
+  ['e-nome','e-whats','e-geral'].forEach(id => $(id).hidden = true);
+  $('veu').classList.add('aberto'); $('folha').classList.add('aberta');
+  setTimeout(() => $('nome').focus({ preventScroll: true }), 380);
+}
+function fechaFolha(){
+  $('veu').classList.remove('aberto'); $('folha').classList.remove('aberta');
+  document.querySelectorAll('.item').forEach(b => b.classList.remove('escolhido'));
+}
+$('veu').addEventListener('click', fechaFolha);
+$('fechar').addEventListener('click', fechaFolha);
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ fechaFolha(); $('festa').classList.remove('aberta'); } });
+$('chips').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  const id = c.dataset.id;
+  escolhidos = escolhidos.includes(id) ? escolhidos.filter(x => x !== id) : [...escolhidos, id];
+  somEncaixe(); pintaFolha();
+});
+$('whats').addEventListener('input', e => { e.target.value = mascaraWhats(e.target.value); });
+
+try{ // lembra quem já doou neste aparelho para não digitar de novo
+  const s = JSON.parse(localStorage.getItem('doar_pessoa') || 'null');
+  if (s){ $('nome').value = s.nome || ''; $('whats').value = s.whats || ''; }
+}catch(e){}
+
+function erro(id, msg){ const el = $(id); el.textContent = msg; el.hidden = !msg; }
+
+$('folha').addEventListener('submit', async e => {
+  e.preventDefault(); if (enviando) return;
+  const nome = $('nome').value.trim(), whats = $('whats').value;
+  erro('e-nome', nome.length < 2 ? 'Escreva seu nome para a gente saber com quem falar.' : '');
+  erro('e-whats', whatsValido(whats) ? '' : 'Confira o número com DDD. Exemplo: (11) 91234-5678');
+  if (nome.length < 2) return $('nome').focus();
+  if (!whatsValido(whats)) return $('whats').focus();
+  if (!$('aceite').checked){ erro('e-geral', 'Marque a caixinha para podermos te chamar no WhatsApp.'); return; }
+  erro('e-geral', '');
+  enviando = true; $('enviar').disabled = true; $('enviar').textContent = 'Encaixando…';
+  try{
+    const r = await Dados.enviar({ nome, whatsapp: whats, itens: escolhidos, obs: $('obs').value });
+    try{ localStorage.setItem('doar_pessoa', JSON.stringify({ nome, whats })); }catch(_){}
+    $('obs').value = '';
+    fechaFolha(); celebra(nome, r.numero);
+  }catch(err){
+    console.error(err);
+    erro('e-geral', 'Não conseguimos salvar agora. Confira a internet e toque de novo.');
+  }finally{
+    enviando = false; $('enviar').disabled = false; $('enviar').textContent = 'Encaixar minha peça';
+  }
+});
+
+/* ---- tela de comemoração ---- */
+function celebra(nome, numero){
+  const principal = itemPorId(escolhidos[0]);
+  const f = $('festa');
+  $('festa-titulo').textContent = `Valeu, ${primeiroNome(nome)}!`;
+  $('festa-txt').textContent = escolhidos.length > 1
+    ? `Sua doação de ${escolhidos.length} itens já entrou na torre. Vamos te chamar no WhatsApp para combinar a entrega.`
+    : `Sua doação de ${principal.nome.toLowerCase()} já entrou na torre. Vamos te chamar no WhatsApp para combinar a entrega.`;
+  $('festa-num').textContent = numero ? `Você encaixou a peça nº ${numero}` : '';
+  f.classList.add('aberta');
+  const mini = $('torre-mini');
+  const total = numero || totalAtual;
+  mini.dataset.total = Math.max(0, total - 1); mini.innerHTML = '';
+  desenhaTorre(mini, Math.max(0, total - 1));
+  setTimeout(() => { somEncaixe(); desenhaTorre(mini, total, { animaNovas: true }); confete($('confete')); }, 450);
+  escolhidos = [];
+}
+$('mais').addEventListener('click', () => { $('festa').classList.remove('aberta'); window.scrollTo({ top: $('grade').offsetTop - 12, behavior: 'smooth' }); });
+</script>
+</body>
+</html>
