@@ -7,38 +7,44 @@
 <title>Painel de Doações — Outubro da Criança</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:wght@400;500;700&family=Lilita+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="doar.css">
 <style>
   .miolo{max-width:900px;margin-inline:auto;padding:16px 16px 60px}
-  h1.titulo{font-size:3.2rem}
+  .topo-admin{position:relative;display:flex;align-items:center;gap:16px;padding:6px 0 4px;overflow:hidden}
+  .topo-admin .m-rosa{width:150px;height:143px;left:-80px;top:-50px}
+  .topo-admin .m-laranja{width:140px;height:114px;right:-60px;top:-40px}
+  .topo-admin > *:not(.mancha){position:relative;z-index:1}
+  .topo-admin img{width:96px;height:auto}
+  .topo-admin .etiqueta{font-size:1.3rem}
+  h1.titulo{font-size:2.8rem;margin-top:6px}
   .barra{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:6px}
   .barra .quem{font-size:.85rem;color:var(--tinta-2)}
-  .mini{min-height:42px;padding:0 14px;border-radius:10px;border:2px solid var(--creme-2);background:#fff;cursor:pointer;font-weight:600;font-size:.9rem}
+  .mini{min-height:42px;padding:0 14px;border-radius:10px;border:2px solid var(--papel-2);background:#fff;cursor:pointer;font-weight:600;font-size:.9rem}
   .demo-aviso{margin:12px 0;padding:12px 14px;border-radius:12px;background:#FFF3C4;border:2px solid #F0D676;font-size:.9rem}
   .login{max-width:380px;margin:40px auto;display:grid;gap:12px}
   .login input{min-height:52px;padding:0 14px;border-radius:12px;border:2px solid #E3D3B6;background:#fff;font-size:1.05rem;width:100%}
   .login .erro{color:var(--vermelho);font-size:.9rem}
   .totais{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0 12px}
-  .total{background:#fff;border:2px solid var(--creme-2);border-radius:16px;padding:12px 14px;min-width:0}
-  .total b{display:block;font-family:var(--f-titulo);font-weight:900;font-size:3.2rem;line-height:.95;color:var(--azul);font-variant-numeric:tabular-nums}
+  .total{background:#fff;border:2px solid var(--papel-2);border-radius:16px;padding:12px 14px;min-width:0}
+  .total b{display:block;font-family:var(--f-titulo);font-weight:400;font-size:3.2rem;line-height:.95;color:var(--azul);font-variant-numeric:tabular-nums}
   .total span{font-size:.85rem;color:var(--tinta-2)}
   .total.alerta b{color:var(--vermelho)}
-  .barras{background:#fff;border:2px solid var(--creme-2);border-radius:16px;padding:12px 14px;margin-bottom:12px;display:grid;gap:8px}
-  .barras h2{margin:0 0 2px;font-family:var(--f-titulo);font-weight:900;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
+  .barras{background:#fff;border:2px solid var(--papel-2);border-radius:16px;padding:12px 14px;margin-bottom:12px;display:grid;gap:8px}
+  .barras h2{margin:0 0 2px;font-family:var(--f-titulo);font-weight:400;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
   .barra-item{display:grid;grid-template-columns:28px minmax(0,11rem) 1fr 2.5rem;gap:10px;align-items:center;font-size:.9rem}
   .barra-item .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .barra-item .trilho{height:14px;border-radius:7px;background:var(--creme)}
+  .barra-item .trilho{height:14px;border-radius:7px;background:var(--papel)}
   .barra-item .trilho i{display:block;height:100%;border-radius:7px;min-width:4px}
-  .barra-item .qt{font-family:var(--f-titulo);font-weight:900;font-size:1.3rem;text-align:right;font-variant-numeric:tabular-nums}
+  .barra-item .qt{font-family:var(--f-titulo);font-weight:400;font-size:1.3rem;text-align:right;font-variant-numeric:tabular-nums}
   @media (max-width:520px){.barra-item{grid-template-columns:28px 1fr 2.5rem}.barra-item .trilho{grid-column:1 / -1;order:5}}
   .resumo{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
-  .fil{border:2px solid var(--creme-2);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.9rem;display:inline-flex;gap:8px;align-items:center}
-  .fil b{font-family:var(--f-titulo);font-weight:900;font-size:1.25rem;line-height:1}
+  .fil{border:2px solid var(--papel-2);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.9rem;display:inline-flex;gap:8px;align-items:center}
+  .fil b{font-family:var(--f-titulo);font-weight:400;font-size:1.25rem;line-height:1}
   .fil[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:#fff}
   .busca{width:100%;min-height:48px;border-radius:12px;border:2px solid #E3D3B6;background:#fff;padding:0 14px;font-size:1rem;margin:6px 0 14px}
   .lista{display:grid;gap:12px;padding:0;margin:0;list-style:none}
-  .card{background:#fff;border:2px solid var(--creme-2);border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0}
+  .card{background:#fff;border:2px solid var(--papel-2);border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0}
   .card.entregue{opacity:.62}
   .card .linha1{display:flex;gap:10px;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
   .card h3{margin:0;font-size:1.15rem;overflow-wrap:anywhere}
@@ -49,14 +55,17 @@
   .acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .zap{background:#1FAF5A;color:#fff;border:0;border-radius:10px;min-height:44px;padding:0 16px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
   .fone{font-variant-numeric:tabular-nums;font-size:.92rem}
-  select.st{min-height:44px;border-radius:10px;border:2px solid var(--creme-2);background:#fff;padding:0 10px;font-size:.92rem}
+  select.st{min-height:44px;border-radius:10px;border:2px solid var(--papel-2);background:#fff;padding:0 10px;font-size:.92rem}
   .vazio{padding:40px 10px;text-align:center;color:var(--tinta-2)}
 </style>
 </head>
 <body>
-<div class="faixa" aria-hidden="true"></div>
 <main class="miolo">
-  <h1 class="titulo">Painel de doações</h1>
+  <header class="topo-admin">
+    <span class="mancha m-laranja" aria-hidden="true"></span>
+    <img src="img/logo-clube.png" alt="Clube Videira Kids" width="96" height="101">
+    <div><span class="etiqueta">painel de doações</span><h1 class="titulo">Quem vai doar</h1></div>
+  </header>
 
   <section id="entrada" class="login" hidden>
     <p>Entre com o e-mail da liderança para ver quem quer doar.</p>

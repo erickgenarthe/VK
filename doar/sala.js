@@ -12,8 +12,9 @@ class Sala {
     this.cv = document.createElement('canvas'); host.appendChild(this.cv); this.g = this.cv.getContext('2d');
     this.por = {}; this.toys = []; this.parts = []; this.primeira = true;
     this.W = 0; this.H = 0; this.T = 0; this.vivo = true;
-    this.faixa = new Image(); this.faixa.src = 'img/borda-topo.png';
-    this.logo = new Image(); this.logo.src = 'img/logo-vk.png';
+    const img = src => { const i = new Image(); i.src = src; return i; };
+    this.logo = img('img/logo-clube.png'); this.chao = img('img/fundo-grade.jpg');
+    this.rosa = img('img/mancha-rosa.png'); this.laranja = img('img/mancha-laranja.png'); this.azul = img('img/arco-azul.png');
     this.ro = new ResizeObserver(() => this.ajusta()); this.ro.observe(host);
     this.ajusta();
     this.cv.addEventListener('pointerdown', e => this.toque(e));
@@ -161,41 +162,31 @@ class Sala {
     const w = g.measureText(txt).width + 18, h = fs + 10;
     const x = Math.max(w / 2 + 4, Math.min(this.W - w / 2 - 4, t.ex)), y = t.ey - sz * 1.15 - 6;
     g.globalAlpha = Math.min(1, (t.labelAte - this.T) * 2);
-    g.fillStyle = '#1D1A2B'; g.beginPath(); g.roundRect(x - w / 2, y - h / 2, w, h, h / 2); g.fill();
+    g.fillStyle = '#E43FB9'; g.beginPath(); g.roundRect(x - w / 2, y - h / 2, w, h, h / 2); g.fill();
     g.fillStyle = '#fff'; g.fillText(txt, x, y + 1); g.globalAlpha = 1;
   }
 
   fundo(g, W, H, piso){
-    const parede = g.createLinearGradient(0, 0, 0, piso);
-    parede.addColorStop(0, '#FFF6E8'); parede.addColorStop(1, '#F8E3C4');
-    g.fillStyle = parede; g.fillRect(0, 0, W, piso);
-    // faixa de peças no alto da parede
-    const fh = Math.max(12, H * .07);
-    if (this.faixa.complete && this.faixa.naturalWidth){
-      const fw = this.faixa.naturalWidth * (fh / this.faixa.naturalHeight);
-      for (let x = 0; x < W; x += fw) g.drawImage(this.faixa, x, 0, fw, fh);
+    // parede de papel com manchas de tinta e o logo do clube
+    g.fillStyle = '#F4F0EA'; g.fillRect(0, 0, W, piso);
+    const ok = i => i.complete && i.naturalWidth;
+    if (ok(this.rosa)){ const w = W * .5, h = w * this.rosa.naturalHeight / this.rosa.naturalWidth; g.drawImage(this.rosa, -w * .38, -h * .3, w, h); }
+    if (ok(this.laranja)){ const w = W * .42, h = w * this.laranja.naturalHeight / this.laranja.naturalWidth; g.drawImage(this.laranja, W - w * .72, -h * .28, w, h); }
+    if (ok(this.azul)){ const h = piso * .78, w = h * this.azul.naturalWidth / this.azul.naturalHeight; g.drawImage(this.azul, W - w * .55, piso * .32, w, h); }
+    if (ok(this.logo)){
+      const lh = piso * .88, lw = this.logo.naturalWidth * (lh / this.logo.naturalHeight);
+      g.drawImage(this.logo, W / 2 - lw / 2, (piso - lh) / 2 - H * .01, lw, lh);
     }
-    // logo na parede
-    if (this.logo.complete && this.logo.naturalWidth){
-      const lh = (piso - fh) * .62, lw = this.logo.naturalWidth * (lh / this.logo.naturalHeight);
-      g.drawImage(this.logo, W / 2 - lw / 2, fh + (piso - fh - lh) / 2 - H * .01, lw, lh);
-    }
-    // rodapé de peças coloridas
-    const n = 9, rw = W / n, rh = H * .035;
-    for (let i = 0; i < n; i++){
-      g.fillStyle = COR_HEX[CORES[i % CORES.length]]; g.beginPath(); g.roundRect(i * rw + 1, piso - rh, rw - 2, rh, 4); g.fill();
-      g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(i * rw + 4, piso - rh + 3, rw - 8, rh * .3);
-    }
-    // piso de tatame colorido
-    g.fillStyle = '#FBEFD9'; g.fillRect(0, piso, W, H - piso);
-    const s = W / 7, linhas = Math.ceil((H - piso) / s) + 1;
-    for (let r = 0; r < linhas; r++) for (let c = 0; c < 7; c++){
-      g.fillStyle = COR_HEX[CORES[(r * 2 + c) % CORES.length]]; g.globalAlpha = .17;
-      g.fillRect(c * s + 2, piso + r * s + 2, s - 4, s - 4);
-    }
-    g.globalAlpha = 1;
-    const sombra = g.createLinearGradient(0, piso, 0, piso + H * .08);
-    sombra.addColorStop(0, 'rgba(29,26,43,.16)'); sombra.addColorStop(1, 'rgba(29,26,43,0)');
-    g.fillStyle = sombra; g.fillRect(0, piso, W, H * .08);
+    // chão: o xadrez verde sobre amarelo do clube
+    if (ok(this.chao)){
+      const r = Math.max(W / this.chao.naturalWidth, (H - piso) / this.chao.naturalHeight);
+      const dw = this.chao.naturalWidth * r, dh = this.chao.naturalHeight * r;
+      g.save(); g.beginPath(); g.rect(0, piso, W, H - piso); g.clip();
+      g.drawImage(this.chao, (W - dw) / 2, piso, dw, dh); g.restore();
+    } else { g.fillStyle = '#F1E2B7'; g.fillRect(0, piso, W, H - piso); }
+    const sombra = g.createLinearGradient(0, piso, 0, piso + H * .09);
+    sombra.addColorStop(0, 'rgba(29,26,43,.2)'); sombra.addColorStop(1, 'rgba(29,26,43,0)');
+    g.fillStyle = sombra; g.fillRect(0, piso, W, H * .09);
+    g.fillStyle = '#fff'; g.fillRect(0, piso - 2, W, 4);
   }
 }

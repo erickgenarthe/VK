@@ -6,65 +6,66 @@
 <title>Telão — Outubro da Criança</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@800;900&family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:wght@400;500;700&family=Lilita+One&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="doar.css">
 <script src="qrcode.js"></script>
 <style>
   /* Feito para projetar em 16:9. Tudo escala com a altura da tela. */
   html,body{height:100%;overflow:hidden}
-  body{display:grid;grid-template-rows:auto 1fr auto;font-size:calc(1.15vh + .6vw)}
-  .faixa{height:5.2vh}
-  .palco{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:4vw;align-items:center;padding:2vh 5vw}
-  .esq{display:grid;justify-items:center;gap:2.2vh;text-align:center}
-  .esq .titulo{font-size:12.5vh}
-  .esq .sub{margin:0;font-size:3.4vh;font-weight:500}
-  .qr-peca{padding:2.2vh;width:min(46vh,100%);aspect-ratio:1;--c:var(--azul);border-radius:3vh}
-  .qr-peca::after{display:none}
-  .qr-peca{box-shadow:inset 0 0 0 .5vh rgba(255,255,255,.3),inset 0 0 0 1.3vh color-mix(in srgb,var(--c) 78%,#000)}
-  .qr-miolo{position:relative;z-index:1;width:100%;height:100%;background:#fff;border-radius:1.6vh;padding:1.4vh;display:grid;place-items:center}
-  .qr-miolo svg{width:100%;height:100%;display:block}
-  .url{font-family:var(--f-texto);font-weight:600;font-size:2.6vh;color:var(--azul-esc);overflow-wrap:anywhere}
-  .dir{display:grid;gap:2vh;justify-items:center;min-width:0}
+  body{position:relative;font-size:calc(1.15vh + .6vw)}
+  .palco{position:relative;z-index:1;height:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:4vw;align-items:center;padding:3vh 5vw}
+  .mancha{z-index:0}
+  .mancha.a{width:48vh;height:46vh;left:-14vh;top:-12vh}
+  .mancha.b{width:44vh;height:36vh;right:-10vh;bottom:-12vh}
+  .mancha.c{width:20vh;height:21vh;left:38vw;bottom:-3vh}
+  .esq{display:grid;justify-items:center;gap:2vh;text-align:center}
+  .esq .logo{height:30vh;width:auto}
+  .esq .etiqueta{font-size:8vh;padding:.1em .5em .16em}
+  .esq .sub{margin:0;font-size:3vh;font-weight:500}
+  .qr{padding:1.6vh;width:min(40vh,100%);aspect-ratio:1;background:#fff;border:1.1vh solid var(--rosa);border-radius:3.2vh;box-shadow:0 1.2vh 0 var(--rosa-esc);display:grid}
+  .qr svg{width:100%;height:100%;display:block}
+  .url{font-weight:700;font-size:2.8vh;color:var(--azul);overflow-wrap:anywhere}
+  .dir{display:grid;gap:1.8vh;justify-items:center;min-width:0}
   .contador{display:flex;align-items:baseline;gap:1.6vh}
-  .contador .n{font-family:var(--f-titulo);font-weight:900;font-size:15vh;line-height:.85;color:var(--azul);font-variant-numeric:tabular-nums}
-  .contador .l{font-family:var(--f-titulo);font-weight:800;font-size:5vh;text-transform:uppercase;line-height:1}
-  .sala{position:relative;width:100%;height:41vh;border-radius:2vh;overflow:hidden;border:.5vh solid #fff;box-shadow:0 1vh 3vh rgba(29,26,43,.18)}
+  .contador .n{font-family:var(--f-titulo);font-size:15vh;line-height:.85;color:var(--azul);font-variant-numeric:tabular-nums}
+  .contador .l{font-family:var(--f-mao);font-weight:700;font-size:6.4vh;color:var(--rosa);line-height:1}
+  .sala{position:relative;width:100%;height:40vh;aspect-ratio:auto;border-radius:3vh;overflow:hidden;border:.6vh solid #fff;box-shadow:0 1vh 0 var(--papel-2)}
   .sala canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
   .contagem{display:flex;flex-wrap:wrap;justify-content:center;gap:1vh 1.6vh;width:100%}
-  .conta{display:inline-flex;align-items:center;gap:.8vh;padding:.5vh 1.4vh .5vh .5vh;border-radius:99vh;background:#fff;border:.3vh solid var(--creme-2);font-weight:700;font-size:3vh;font-variant-numeric:tabular-nums}
-  .conta .ico{width:5vh;height:5vh;display:grid;place-items:center;border-radius:50%;background:var(--creme)}
+  .conta{display:inline-flex;align-items:center;gap:.8vh;padding:.5vh 1.6vh .5vh .5vh;border-radius:99vh;background:#fff;box-shadow:0 .4vh 0 var(--papel-2);font-weight:700;font-size:3vh;font-variant-numeric:tabular-nums}
+  .conta .ico{width:5.2vh;height:5.2vh;display:grid;place-items:center;border-radius:50%;background:var(--c)}
   .conta .ico svg,.conta .ico img{width:4.2vh;height:4.2vh;object-fit:contain}
   .conta.pulsa{animation:pulsa .6s ease-out}
-  @keyframes pulsa{40%{transform:scale(1.22);background:var(--amarelo)}}
-  .cheio{position:fixed;inset:0;z-index:6;display:grid;place-content:center;justify-items:center;gap:2vh;background:rgba(253,244,229,.94);text-align:center;opacity:0;pointer-events:none;transition:opacity .4s}
+  @keyframes pulsa{40%{transform:scale(1.22)}}
+  .cheio{position:fixed;inset:0;z-index:6;display:grid;place-content:center;justify-items:center;gap:2vh;background:rgba(244,240,234,.95);text-align:center;opacity:0;pointer-events:none;transition:opacity .4s}
   .cheio.aberto{opacity:1}
   .cheio .titulo{font-size:22vh}
-  .cheio p{margin:0;font-size:4vh;font-weight:600}
-  .aviso{min-height:11vh;display:grid;align-items:center;width:100%}
+  .cheio p{margin:0;font-size:4.2vh;font-weight:700}
+  .cheio img{height:34vh;width:auto}
+  .aviso{min-height:10vh;display:grid;align-items:center;width:100%}
   .brinde{
-    display:flex;align-items:center;gap:2vh;padding:1.6vh 2.4vh;border-radius:2.4vh;color:#fff;font-size:3.4vh;font-weight:600;line-height:1.15;
-    animation:entra .6s cubic-bezier(.2,1.4,.4,1) both;
+    display:flex;align-items:center;justify-content:center;gap:2vh;padding:1.6vh 2.4vh;border-radius:99vh;background:var(--c);color:#fff;font-size:3.4vh;font-weight:700;line-height:1.15;text-align:center;
+    box-shadow:0 .6vh 0 rgba(29,26,43,.18);animation:entra .6s cubic-bezier(.2,1.4,.4,1) both;
   }
-  .brinde .ico{width:8vh;height:8vh;flex:none;display:grid;place-items:center;background:#fff;border-radius:50%;position:relative;z-index:1}
-  .brinde span{position:relative;z-index:1}
-  .brinde b{font-weight:700}
   .brinde.sai{animation:sai .5s ease-in both}
   @keyframes entra{from{transform:translateY(6vh) scale(.8);opacity:0}to{transform:none;opacity:1}}
   @keyframes sai{to{transform:translateY(-3vh);opacity:0}}
   .espera{font-size:3vh;color:var(--tinta-2);text-align:center}
-  .faixa.base{align-self:end}
-  #confete{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5}
-  .teste{position:fixed;right:1.4vh;bottom:6.5vh;font-size:1.8vh;color:var(--tinta-2);opacity:.7}
+  #confete{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:7}
+  .teste{position:fixed;right:1.4vh;bottom:1vh;z-index:2;font-size:1.8vh;color:var(--tinta-2);opacity:.7}
 </style>
 </head>
 <body>
-<div class="faixa" aria-hidden="true"></div>
+<span class="mancha m-rosa a" aria-hidden="true"></span>
+<span class="mancha m-laranja b" aria-hidden="true"></span>
+<span class="mancha m-azul c" aria-hidden="true"></span>
 
 <main class="palco">
   <section class="esq">
-    <h1 class="titulo">Escaneie e doe</h1>
+    <img class="logo" src="img/logo-clube.png" alt="Clube Videira Kids — ninguém fica de fora">
+    <span class="etiqueta">escaneie e doe</span>
     <p class="sub">Aponte a câmera do celular para o QR Code</p>
-    <div class="qr-peca peca"><div class="qr-miolo" id="qr" role="img" aria-label="QR Code para doar"></div></div>
+    <div class="qr" id="qr" role="img" aria-label="QR Code para doar"></div>
     <div class="url" id="url"></div>
   </section>
 
@@ -76,8 +77,7 @@
   </section>
 </main>
 
-<div class="faixa base" aria-hidden="true"></div>
-<div class="cheio" id="cheio" role="status"><h2 class="titulo" id="cheio-tit">100 doações!</h2><p id="cheio-txt"></p></div>
+<div class="cheio" id="cheio" role="status"><img src="img/selo-missao.png" alt=""><h2 class="titulo" id="cheio-tit">100 doações!</h2><p id="cheio-txt"></p></div>
 <canvas id="confete" aria-hidden="true"></canvas>
 <div class="teste" id="teste" hidden>Modo demonstração · aperte T para simular uma doação</div>
 
@@ -112,7 +112,7 @@ function mostraProximo(){
   if (mostrando || pendentes <= 0) return;
   mostrando = true; pendentes--;
   const el = document.createElement('div');   // aviso sem nome de ninguém: só a notícia de que chegou mais uma doação
-  el.className = 'brinde peca c-' + CORES[Math.floor(Math.random() * CORES.length)];
+  el.className = 'brinde c-' + CORES[Math.floor(Math.random() * CORES.length)];
   el.innerHTML = '<span><b>Mais uma doação chegou!</b><br>Obrigado por participar.</span>';
   $('aviso').replaceChildren(el);
   somEncaixe(); confete($('confete'), 2200);
@@ -130,7 +130,7 @@ function comemoraMarco(n){
 }
 const sala = new Sala($('sala'));
 $('contagem').innerHTML = ITENS.map(i =>
-  `<span class="conta" id="ct-${i.id}" title="${escapaHtml(i.nome)}"><span class="ico">${iconeSvg(i.id, 40)}</span><span class="v">0</span></span>`).join('');
+  `<span class="conta" id="ct-${i.id}" title="${escapaHtml(i.nome)}"><span class="ico c-${i.cor}">${iconeSvg(i.id, 40)}</span><span class="v">0</span></span>`).join('');
 let totalAntes = null;
 Dados.aoVivoMural(({ total, porItem }) => {
   sala.atualiza(porItem);

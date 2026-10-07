@@ -5,7 +5,7 @@ escolhe o que quer doar, deixa nome e WhatsApp, e você vê tudo no painel.
 
 | Página | Para quê |
 |---|---|
-| `index.html` | O que o celular da pessoa abre (escolhe o item, deixa nome e WhatsApp, comemora). |
+| `index.html` | O que o celular da pessoa abre (escolhe o item, deixa nome e WhatsApp, ganha os selos do clube). |
 | `telao.html` | Projetar no telão: QR Code grande, a sala ao vivo, o contador por item e o aviso "Mais uma doação chegou!" (sem nome) a cada doação. |
 | `admin.html` | Painel só seu: lista, filtros por item/situação, botão "Chamar no WhatsApp" com mensagem pronta, CSV. |
 

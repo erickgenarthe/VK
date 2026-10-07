@@ -1,26 +1,32 @@
-/* Outubro da Criança — identidade visual: peças de blocos magnéticos sobre fundo creme */
+/* Clube Videira Kids — identidade: papel claro, manchas de tinta (rosa, laranja, azul),
+   rótulos magenta com letra de mão, letras coloridas e selos de adesivo. */
 :root{
-  --creme:#FDF4E5;
-  --creme-2:#F8E9D0;
+  --papel:#F4F0EA;
+  --papel-2:#EAE3D8;
+  --creme:#F1E2B7;
+  --grade:#9CC9B4;
   --tinta:#1D1A2B;
-  --tinta-2:#5B5668;
-  --azul:#0A9BE3;
-  --azul-esc:#0877B3;
-  --vermelho:#E8272F;
-  --amarelo:#F6B800;
-  --verde:#3DAA3C;
-  --roxo:#8E44B8;
-  --laranja:#F28A12;
-  --rosa:#DE3A98;
+  --tinta-2:#5D5870;
+  --rosa:#E43FB9;
+  --rosa-esc:#B92A94;
+  --laranja:#F07A1A;
+  --ouro:#F5AE2C;
+  --azul:#234FB8;
+  --azul-esc:#183B8E;
+  --ciano:#5AB4F2;
+  --vermelho:#E8452A;
+  --verde:#3DA55A;
+  --roxo:#8E5BD9;
   --branco:#FFFFFF;
-  --f-titulo:'Big Shoulders Display','Arial Narrow',Impact,sans-serif;
-  --f-texto:'Rubik',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-titulo:'Lilita One','Arial Rounded MT Bold',Impact,sans-serif;
+  --f-mao:'Caveat','Segoe Print','Bradley Hand',cursive;
+  --f-texto:'DM Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
   color-scheme:light;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0;background:var(--creme);color:var(--tinta);
+  margin:0;background:var(--papel);color:var(--tinta);
   font-family:var(--f-texto);font-size:17px;line-height:1.45;
   -webkit-tap-highlight-color:transparent;
 }
@@ -29,45 +35,46 @@ button,input,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--azul);outline-offset:3px;border-radius:6px}
 [hidden]{display:none!important}
 
-/* faixa de peças no topo, igual à arte do convite */
-.faixa{height:clamp(22px,5vw,40px);background:url(img/borda-topo.png) left center/auto 100% repeat-x}
+/* manchas de tinta que enfeitam os cantos (como nos slides do clube) */
+.mancha{position:absolute;pointer-events:none;user-select:none;z-index:0}
+.m-rosa{background:url(img/mancha-rosa.png) center/contain no-repeat}
+.m-laranja{background:url(img/mancha-laranja.png) center/contain no-repeat}
+.m-azul{background:url(img/arco-azul.png) center/contain no-repeat}
+
+/* rótulo magenta com letra de mão: "clube videira kids", "comemore brincando"… */
+.etiqueta{
+  display:inline-block;background:var(--rosa);color:#fff;
+  font-family:var(--f-mao);font-weight:700;font-size:1.7rem;line-height:1;
+  padding:.28em .7em .32em;
+}
 
 .titulo{
-  font-family:var(--f-titulo);font-weight:900;text-transform:uppercase;
-  color:var(--azul);line-height:.9;letter-spacing:.01em;margin:0;text-wrap:balance;
+  font-family:var(--f-titulo);font-weight:400;text-transform:uppercase;
+  color:var(--azul);line-height:.95;letter-spacing:.01em;margin:0;text-wrap:balance;
 }
+.titulo .c1{color:var(--azul)}.titulo .c2{color:var(--rosa)}.titulo .c3{color:var(--laranja)}.titulo .c4{color:var(--verde)}
 
-/* peça magnética: moldura colorida, centro translúcido */
-.peca{
-  --c:var(--azul);
-  position:relative;background:var(--c);border-radius:10px;
-  box-shadow:inset 0 0 0 3px rgba(255,255,255,.28),inset 0 0 0 7px color-mix(in srgb,var(--c) 78%,#000);
-}
-.peca::after{
-  content:"";position:absolute;inset:9px;border-radius:5px;
-  background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.12) 55%,rgba(255,255,255,.3));
-  pointer-events:none;
-}
-.c-azul{--c:var(--azul)}.c-vermelho{--c:var(--vermelho)}.c-amarelo{--c:var(--amarelo)}
-.c-verde{--c:var(--verde)}.c-roxo{--c:var(--roxo)}.c-laranja{--c:var(--laranja)}.c-rosa{--c:var(--rosa)}
-
-/* a Brinquedoteca: a sala da Videira Kids sendo montada pelas doações (desenhada em canvas por sala.js) */
-.sala{position:relative;width:100%;aspect-ratio:5/4;border-radius:16px;overflow:hidden;background:var(--creme-2)}
-.sala canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;touch-action:pan-y}
-.sala-legenda{margin:10px 0 0;text-align:center;font-size:.95rem;color:var(--tinta-2)}
+/* cartão de cor: cada item e cada destaque usa uma cor da paleta */
+.c-azul{--c:var(--azul)}.c-vermelho{--c:var(--vermelho)}.c-amarelo{--c:var(--ouro)}
+.c-verde{--c:var(--verde)}.c-roxo{--c:var(--roxo)}.c-laranja{--c:var(--laranja)}.c-rosa{--c:var(--rosa)}.c-ciano{--c:var(--ciano)}
 
 .botao{
   display:inline-flex;align-items:center;justify-content:center;gap:.5em;
-  min-height:56px;padding:0 26px;border:0;border-radius:14px;cursor:pointer;
-  font-family:var(--f-titulo);font-weight:900;font-size:1.7rem;letter-spacing:.03em;text-transform:uppercase;
-  background:var(--azul);color:#fff;
-  box-shadow:0 5px 0 var(--azul-esc);transition:transform .08s,box-shadow .08s;
+  min-height:58px;padding:0 28px;border:0;border-radius:999px;cursor:pointer;
+  font-family:var(--f-titulo);font-weight:400;font-size:1.55rem;letter-spacing:.03em;text-transform:uppercase;
+  background:var(--rosa);color:#fff;
+  box-shadow:0 5px 0 var(--rosa-esc);transition:transform .08s,box-shadow .08s;
 }
-.botao:active{transform:translateY(4px);box-shadow:0 1px 0 var(--azul-esc)}
+.botao:active{transform:translateY(4px);box-shadow:0 1px 0 var(--rosa-esc)}
 .botao[disabled]{opacity:.55;cursor:wait}
-.botao.sec{background:#fff;color:var(--azul-esc);box-shadow:0 5px 0 #D7C7A9;border:2px solid var(--creme-2)}
-.botao.sec:active{box-shadow:0 1px 0 #D7C7A9}
+.botao.sec{background:#fff;color:var(--azul);box-shadow:0 5px 0 var(--papel-2);border:2px solid var(--papel-2)}
+.botao.sec:active{box-shadow:0 1px 0 var(--papel-2)}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
+
+/* a sala "Brinquedos para o VK" (desenhada em canvas por sala.js) */
+.sala{position:relative;width:100%;aspect-ratio:5/4;border-radius:22px;overflow:hidden;background:var(--creme)}
+.sala canvas{position:absolute;inset:0;width:100%;height:100%;cursor:pointer;touch-action:pan-y}
+.sala-legenda{margin:10px 0 0;text-align:center;font-size:.95rem;color:var(--tinta-2)}
