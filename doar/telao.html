@@ -52,6 +52,33 @@
   @keyframes sai{to{transform:translateY(-3vh);opacity:0}}
   .espera{font-size:3vh;color:var(--tinta-2);text-align:center}
   #confete{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:7}
+  /* celular em pé: uma coluna, rolando a página, medidas em pixels em vez de altura da tela */
+  @media (max-aspect-ratio:1/1){
+    html,body{height:auto;overflow:auto;overflow-x:hidden}
+    body{font-size:16px}
+    .palco{height:auto;grid-template-columns:minmax(0,1fr);gap:28px;padding:18px 16px 40px}
+    .mancha.a{width:200px;height:190px;left:-80px;top:-60px}
+    .mancha.b{width:180px;height:146px;right:-70px;bottom:-40px}
+    .mancha.b,.mancha.c{display:none}
+    .esq .logo{height:auto;width:min(58vw,230px)}
+    .esq .etiqueta{font-size:2.6rem}
+    .esq .sub{font-size:1rem}
+    .qr{width:min(78vw,330px);padding:10px;border-width:8px;border-radius:22px;box-shadow:0 8px 0 var(--rosa-esc)}
+    .url{font-size:1rem}
+    .contador .n{font-size:5.4rem}
+    .contador .l{font-size:2.2rem}
+    .sala{height:auto;aspect-ratio:5/4;border-width:4px;border-radius:20px}
+    .contagem{gap:8px 10px}
+    .conta{font-size:1.15rem;padding:4px 14px 4px 4px}
+    .conta .ico{width:38px;height:38px}
+    .conta .ico svg,.conta .ico img{width:30px;height:30px}
+    .aviso{min-height:60px}
+    .brinde{font-size:1.1rem;padding:12px 20px}
+    .espera{font-size:1rem}
+    .cheio .titulo{font-size:5.5rem}
+    .cheio p{font-size:1.2rem;padding:0 20px}
+    .cheio img{height:150px}
+  }
 </style>
 </head>
 <body>
