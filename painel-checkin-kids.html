@@ -387,6 +387,7 @@
   }
   .sync-status[data-state="online"] .sync-dot { background: #0ca30c; }
   .sync-status[data-state="offline"] .sync-dot { background: #d03b3b; }
+  .sync-status + .sync-status { margin-left: 18px; }
 </style>
 </head>
 <body>
@@ -491,6 +492,7 @@
 
   <footer>
     <span class="sync-status" id="syncStatus" data-state="connecting"><span class="sync-dot"></span><span id="syncStatusText">Conectando…</span></span>
+    <span class="sync-status" id="mykidsSyncStatus" data-state="connecting"><span class="sync-dot"></span><span id="mykidsSyncStatusText">MyKids: aguardando…</span></span>
   </footer>
 </div>
 
@@ -541,6 +543,58 @@
     syncStatus.setAttribute('data-state', state);
     syncStatusText.textContent = text;
   }
+
+  // Pede pra função do Netlify sincronizar as vagas reais do MyKids — ela mesma já escreve
+  // direto no Firebase; como este painel está "ouvindo" esse banco (ref.on('value') mais
+  // abaixo), a tela atualiza sozinha quando o número mudar. Chama uma vez ao carregar a
+  // página e depois a cada 20 segundos, só enquanto esta aba estiver aberta.
+  // Fica ANTES do "if (typeof firebase === 'undefined') return" de propósito: essa chamada
+  // não depende do SDK do Firebase ter carregado (quem grava no banco é a função do Netlify,
+  // do lado do servidor) — então não pode ficar refém disso.
+  // Antes isso também falhava em silêncio (.catch vazio): se o token do MyKids vencesse ou a
+  // função desse qualquer erro, ninguém via nada, nem aqui no painel nem no F12. Agora o
+  // resultado de cada tentativa aparece no rodapé (bolinha verde/vermelha + texto) e no
+  // console do navegador, pra dar pra saber na hora o que está acontecendo.
+  var mykidsSyncStatus = document.getElementById('mykidsSyncStatus');
+  var mykidsSyncStatusText = document.getElementById('mykidsSyncStatusText');
+
+  function setMykidsSyncState(state, text) {
+    if (!mykidsSyncStatus) return;
+    mykidsSyncStatus.setAttribute('data-state', state);
+    mykidsSyncStatusText.textContent = text;
+  }
+
+  function horaAgora() {
+    return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function syncMyKidsVagas() {
+    fetch('/.netlify/functions/sync-mykids-vagas')
+      .then(function (res) {
+        return res.json().catch(function () { return null; }).then(function (body) {
+          if (!res.ok) throw new Error((body && body.error) || ('HTTP ' + res.status));
+          return body;
+        });
+      })
+      .then(function (report) {
+        console.log('[MyKids sync]', report);
+        var updated = report && report.updated ? Object.keys(report.updated) : [];
+        var errors = report && report.errors ? Object.keys(report.errors) : [];
+        if (errors.length) {
+          setMykidsSyncState('offline', 'MyKids: erro em ' + errors.join(', ') + ' (veja o console, F12)');
+        } else if (updated.length) {
+          setMykidsSyncState('online', 'MyKids: sincronizado às ' + horaAgora() + ' (' + updated.join(', ') + ')');
+        } else {
+          setMykidsSyncState('online', 'MyKids: sem check-in aberto agora (última checagem ' + horaAgora() + ')');
+        }
+      })
+      .catch(function (err) {
+        console.error('[MyKids sync] falhou:', err);
+        setMykidsSyncState('offline', 'MyKids: falha na sincronização — ' + err.message);
+      });
+  }
+  syncMyKidsVagas();
+  setInterval(syncMyKidsVagas, 20000);
 
   if (typeof firebase === 'undefined') {
     setSyncState('offline', 'Sem conexão com o servidor de sincronização');
@@ -623,16 +677,6 @@
     });
   });
 
-  // Pede pra função do Netlify sincronizar as vagas reais do MyKids — ela mesma
-  // já escreve direto no Firebase; como este painel já está "ouvindo" esse banco
-  // (ref.on('value') ali em cima), a tela atualiza sozinha quando o número mudar.
-  // Chama uma vez ao carregar a página e depois a cada 20 segundos, só enquanto
-  // esta aba estiver aberta.
-  function syncMyKidsVagas() {
-    fetch('/.netlify/functions/sync-mykids-vagas').catch(function () {});
-  }
-  syncMyKidsVagas();
-  setInterval(syncMyKidsVagas, 20000);
 })();
 </script>
 </body>
