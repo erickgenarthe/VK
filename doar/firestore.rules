@@ -1,0 +1,33 @@
+rules_version = '2';
+// Regras do "Outubro da Criança". Use um projeto Firebase só para este site
+// (se misturar com o SERVE, as regras abertas do SERVE liberam a leitura dos telefones).
+// Troque o e-mail abaixo pelo(s) e-mail(s) da liderança que podem ver as doações.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function admin() {
+      return request.auth != null && request.auth.token.email in ['ccvideiracm.voluntarios@gmail.com'];
+    }
+
+    // Quem escaneia o QR Code só consegue CRIAR uma doação (nunca ler as dos outros).
+    match /doacoes/{id} {
+      allow create: if request.resource.data.keys().hasOnly(['nome','whatsapp','itens','obs','status','criadoEm'])
+                    && request.resource.data.nome is string && request.resource.data.nome.size() >= 2 && request.resource.data.nome.size() <= 80
+                    && request.resource.data.whatsapp is string && request.resource.data.whatsapp.matches('^55[0-9]{10,11}$')
+                    && request.resource.data.itens is list && request.resource.data.itens.size() >= 1 && request.resource.data.itens.size() <= 8
+                    && request.resource.data.obs is string && request.resource.data.obs.size() <= 300
+                    && request.resource.data.status == 'novo'
+                    && request.resource.data.criadoEm == request.time;
+      allow read, update, delete: if admin();
+    }
+
+    // Telão e brinquedoteca: só NÚMEROS são públicos (total e quantos de cada item). Nenhum nome é público.
+    // O público só consegue somar 1 doação por vez.
+    match /publico/resumo {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasOnly(['total','porItem']) && request.resource.data.total == 1;
+      allow update: if request.resource.data.keys().hasOnly(['total','porItem']) && request.resource.data.total == resource.data.total + 1;
+      allow update, delete: if admin();
+    }
+  }
+}

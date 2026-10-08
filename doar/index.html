@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F4F0EA">
+<title>Clube Videira Kids — O que doar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:wght@400;500;700&family=Lilita+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="doar.css">
+<style>
+  body{padding-bottom:calc(40px + env(safe-area-inset-bottom,0px));overflow-x:hidden}
+  .miolo{position:relative;max-width:560px;margin-inline:auto;padding:0 16px}
+
+  /* capa: logo do clube, data e manchas de tinta */
+  .capa{position:relative;display:grid;justify-items:center;gap:10px;padding-block:22px 6px;text-align:center}
+  .capa .m-rosa{width:230px;height:220px;left:-110px;top:-40px}
+  .capa .m-laranja{width:200px;height:162px;right:-90px;top:-20px}
+  .capa .m-azul{width:90px;height:92px;right:-34px;top:230px}
+  .capa > *:not(.mancha){position:relative;z-index:1}
+  .capa .logo{width:min(46vw,196px);height:auto;filter:drop-shadow(0 3px 0 rgba(255,255,255,.7))}
+  .capa .data{width:min(58vw,250px);height:auto}
+  .capa .etiqueta{font-size:1.5rem}
+
+  h1.titulo{font-size:clamp(3.1rem,15vw,4.8rem);margin-top:14px}
+  .lead{margin:12px 0 0;font-size:1.1rem;color:var(--tinta-2);max-width:36ch}
+  .lead b{color:var(--tinta);font-weight:700}
+
+  .sala-card{margin-top:22px;padding:16px;border-radius:26px;background:#fff;box-shadow:0 6px 0 var(--papel-2)}
+  .sala-card header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .sala-card .num{font-family:var(--f-titulo);font-size:2.6rem;line-height:1;color:var(--rosa);font-variant-numeric:tabular-nums}
+
+  .grade{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:24px 0 0;padding:0;list-style:none}
+  .grade li:nth-child(odd){transform:rotate(-.8deg)}
+  .grade li:nth-child(even){transform:rotate(.8deg)}
+  .item{
+    position:relative;width:100%;min-height:172px;padding:14px 12px 16px;text-align:left;border:0;cursor:pointer;overflow:hidden;
+    display:grid;align-content:start;justify-items:start;gap:7px;background:#fff;border-radius:24px;
+    box-shadow:0 6px 0 var(--papel-2);transition:transform .15s cubic-bezier(.3,1.6,.5,1),box-shadow .15s;
+  }
+  .item::before{content:"";position:absolute;right:-26px;top:-26px;width:92px;height:92px;border-radius:46% 54% 50% 50%;background:var(--c);opacity:.2}
+  .item .ico,.escolha .ico,.chip .ico{position:relative;z-index:1;display:grid;place-items:center;border-radius:50%}
+  .item .ico{width:68px;height:68px;background:var(--c)}
+  .item .ico svg,.item .ico img{width:52px;height:52px}
+  .item .nome{position:relative;z-index:1;font-weight:700;font-size:1rem;line-height:1.2;color:var(--tinta);overflow-wrap:anywhere}
+  .item .det{position:relative;z-index:1;font-size:.78rem;line-height:1.3;color:var(--tinta-2);overflow-wrap:anywhere}
+  .item:hover{transform:translateY(-3px) rotate(0deg);box-shadow:0 9px 0 var(--papel-2)}
+  .item:active{transform:translateY(3px);box-shadow:0 2px 0 var(--papel-2)}
+  .item.escolhido{outline:4px solid var(--rosa);outline-offset:2px}
+  @media (min-width:420px){ .item .nome{font-size:1.06rem} }
+
+  /* painel que sobe de baixo */
+  .veu{position:fixed;inset:0;background:rgba(29,26,43,.55);opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+  .veu.aberto{opacity:1;pointer-events:auto}
+  .folha{
+    position:fixed;left:0;right:0;bottom:0;z-index:21;max-height:92%;overflow:auto;
+    max-width:560px;margin-inline:auto;background:var(--papel);border-radius:28px 28px 0 0;
+    padding:8px 18px calc(22px + env(safe-area-inset-bottom,0px));
+    transform:translateY(105%);transition:transform .38s cubic-bezier(.2,1,.3,1);
+    box-shadow:0 -10px 40px rgba(0,0,0,.25);
+  }
+  .folha.aberta{transform:none}
+  .folha .alca{width:48px;height:5px;border-radius:3px;background:#D4C8B6;margin:6px auto 30px}
+  .escolha{position:relative;display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:20px;background:var(--c);color:#fff;overflow:hidden}
+  .escolha .ico{width:58px;height:58px;flex:none;background:#fff}
+  .escolha .ico svg,.escolha .ico img{width:44px;height:44px}
+  .escolha small{display:block;font-family:var(--f-mao);font-size:1.25rem;font-weight:700;line-height:1;opacity:.95}
+  .escolha strong{display:block;font-size:1.05rem;line-height:1.2;overflow-wrap:anywhere}
+  .mais{margin:16px 0 6px;font-size:.9rem;color:var(--tinta-2)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 6px;padding:0;list-style:none}
+  .chip{border:2px solid var(--papel-2);background:#fff;border-radius:999px;padding:4px 12px 4px 5px;font-size:.84rem;cursor:pointer;display:inline-flex;gap:6px;align-items:center}
+  .chip .ico{width:24px;height:24px;background:var(--papel)}
+  .chip .ico svg,.chip .ico img{width:20px;height:20px}
+  .chip[aria-pressed="true"]{background:var(--azul);border-color:var(--azul);color:#fff}
+  label.campo{display:grid;gap:6px;margin-top:14px;font-weight:700;font-size:.95rem}
+  label.campo input,label.campo textarea{
+    width:100%;min-height:54px;padding:12px 14px;border-radius:16px;border:2px solid #DDD1BF;background:#fff;font-size:1.1rem;font-weight:400;
+  }
+  label.campo textarea{min-height:76px;resize:vertical;font-size:1rem}
+  label.campo input:focus,label.campo textarea:focus{outline:0;border-color:var(--rosa);box-shadow:0 0 0 4px rgba(228,63,185,.2)}
+  label.campo .dica{font-weight:400;font-size:.8rem;color:var(--tinta-2)}
+  label.campo .erro{font-weight:500;font-size:.85rem;color:var(--vermelho)}
+  .aceite{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:.85rem;color:var(--tinta-2)}
+  .aceite input{width:22px;height:22px;margin:1px 0 0;accent-color:var(--rosa);flex:none}
+  .acoes{display:grid;gap:10px;margin-top:18px}
+  .fechar{position:absolute;top:4px;right:8px;width:44px;height:44px;border:0;background:transparent;font-size:1.7rem;cursor:pointer;color:var(--tinta-2)}
+
+  /* agradecimento: selos de adesivo do clube */
+  .festa{position:fixed;inset:0;z-index:30;background:var(--papel);display:grid;align-content:center;justify-items:center;gap:12px;padding:24px 20px;text-align:center;overflow:auto;
+    opacity:0;pointer-events:none;transition:opacity .3s}
+  .festa.aberta{opacity:1;pointer-events:auto}
+  .festa .m-rosa{width:230px;height:220px;left:-120px;top:-60px}
+  .festa .m-laranja{width:210px;height:170px;right:-100px;bottom:-40px}
+  .festa > *:not(.mancha){position:relative;z-index:1}
+  #confete{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:3}
+  .festa .titulo{font-size:clamp(3rem,15vw,4.4rem);color:var(--azul)}
+  .festa .selos{display:flex;align-items:center;justify-content:center;gap:0;margin:2px 0}
+  .festa .selos img{width:min(42vw,160px);height:auto;filter:drop-shadow(0 4px 0 rgba(29,26,43,.12))}
+  .festa .selos img:first-child{transform:rotate(-7deg) translateX(4px);animation:selo .7s cubic-bezier(.2,1.5,.4,1) .15s both}
+  .festa .selos img:last-child{transform:rotate(6deg) translateX(-4px);animation:selo .7s cubic-bezier(.2,1.5,.4,1) .45s both}
+  @keyframes selo{from{opacity:0;scale:2.2}to{opacity:1;scale:1}}
+  .festa .sala-festa{width:min(100%,380px);margin-top:4px}
+  .festa p{margin:0;max-width:32ch;font-size:1.05rem}
+  .festa .numero{font-family:var(--f-mao);font-size:1.7rem;font-weight:700;color:var(--rosa);line-height:1}
+  .festa .botoes{display:grid;gap:10px;width:min(100%,320px)}
+  .rodape{margin-top:30px;text-align:center;font-size:.8rem;color:var(--tinta-2)}
+</style>
+</head>
+<body>
+<main class="miolo">
+  <section class="capa">
+    <span class="mancha m-rosa" aria-hidden="true"></span>
+    <span class="mancha m-laranja" aria-hidden="true"></span>
+    <span class="mancha m-azul" aria-hidden="true"></span>
+    <img class="logo" src="img/logo-clube.png" alt="Clube Videira Kids — ninguém fica de fora" width="196" height="206">
+    <span class="etiqueta">comemore brincando</span>
+    <img class="data" src="img/11-de-outubro.png" alt="11 de outubro" width="250" height="167">
+    <span class="etiqueta">dia das crianças</span>
+  </section>
+
+  <h1 class="titulo"><span class="c1">O que</span> <span class="c2">doar:</span></h1>
+  <p class="lead">Escolha <b>uma coisa</b> que você quer levar para as nossas crianças. Cada doação vira um brinquedo para o nosso VK.</p>
+
+  <section class="sala-card" aria-labelledby="t-sala">
+    <header>
+      <span class="etiqueta" id="t-sala">brinquedos para o VK</span>
+      <span class="num" id="sala-num">0</span>
+    </header>
+    <div class="sala" id="sala"></div>
+    <p class="sala-legenda" id="sala-txt">Carregando…</p>
+  </section>
+
+  <ul class="grade" id="grade"></ul>
+
+  <p class="rodape">Seu nome e WhatsApp ficam só com a equipe do Clube Videira Kids, que vai combinar com você a entrega.</p>
+  <nav class="nav-telas estatica" aria-label="Outras telas"><a href="telao.html" rel="nofollow">telão</a><a href="admin.html" rel="nofollow">painel de doações</a></nav>
+</main>
+
+<div class="veu" id="veu"></div>
+<form class="folha" id="folha" role="dialog" aria-modal="true" aria-labelledby="f-titulo" novalidate>
+  <div class="alca" aria-hidden="true"></div>
+  <button type="button" class="fechar" id="fechar" aria-label="Fechar">×</button>
+  <div class="escolha" id="escolha"></div>
+
+  <p class="mais" id="f-titulo">Quer doar mais alguma coisa? Toque para juntar:</p>
+  <ul class="chips" id="chips"></ul>
+
+  <label class="campo" for="nome">Seu nome
+    <input id="nome" name="nome" type="text" autocomplete="name" autocapitalize="words" maxlength="80" placeholder="Como podemos te chamar?" required>
+    <span class="erro" id="e-nome" hidden></span>
+  </label>
+  <label class="campo" for="whats">Seu WhatsApp
+    <input id="whats" name="whats" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(11) 91234-5678" maxlength="16" required>
+    <span class="dica">É por ele que a gente combina a entrega.</span>
+    <span class="erro" id="e-whats" hidden></span>
+  </label>
+  <label class="campo" for="obs">Quer doar mais? <span class="dica">(opcional)</span>
+    <textarea id="obs" name="obs" maxlength="300" placeholder="Ex.: 2 dinossauros e 1 pufe verde"></textarea>
+  </label>
+  <label class="aceite" for="aceite">
+    <input type="checkbox" id="aceite" checked>
+    <span>Pode me chamar no WhatsApp sobre a minha doação.</span>
+  </label>
+  <span class="erro" id="e-geral" style="color:var(--vermelho);font-size:.9rem" hidden></span>
+  <div class="acoes">
+    <button class="botao" id="enviar" type="submit">Quero doar</button>
+  </div>
+</form>
+
+<div class="festa" id="festa" role="status" aria-live="polite">
+  <span class="mancha m-rosa" aria-hidden="true"></span>
+  <span class="mancha m-laranja" aria-hidden="true"></span>
+  <canvas id="confete" aria-hidden="true"></canvas>
+  <h2 class="titulo" id="festa-titulo">Obrigado!</h2>
+  <div class="selos" aria-hidden="true">
+    <img src="img/selo-missao.png" alt="" width="170" height="158">
+    <img src="img/selo-membro.png" alt="" width="170" height="157">
+  </div>
+  <p id="festa-txt"></p>
+  <div class="sala sala-festa" id="sala-festa"></div>
+  <p class="numero" id="festa-num"></p>
+  <div class="botoes">
+    <button class="botao" id="mais" type="button">Quero doar mais</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="doar.js"></script>
+<script src="sala.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+let escolhidos = [];       // ids selecionados, o primeiro é o que a pessoa tocou
+let totalAtual = 0;
+let enviando = false;
+
+/* ---- grade de itens ---- */
+$('grade').innerHTML = ITENS.map(i => `
+  <li><button type="button" class="item c-${i.cor}" data-id="${i.id}" aria-label="Doar: ${escapaHtml(i.nome)}">
+    <span class="ico">${iconeSvg(i.id, 52)}</span>
+    <span class="nome">${escapaHtml(i.nome)}</span>
+    ${i.detalhe ? `<span class="det">${escapaHtml(i.detalhe)}</span>` : ''}
+  </button></li>`).join('');
+
+$('grade').addEventListener('click', e => {
+  const b = e.target.closest('.item'); if (!b) return;
+  somEncaixe();
+  escolhidos = [b.dataset.id];
+  abreFolha();
+});
+
+/* ---- sala ao vivo ---- */
+const salaPrincipal = new Sala($('sala'));
+let porVivo = {};
+Dados.aoVivoMural(({ total, porItem }) => {
+  totalAtual = total; porVivo = porItem;
+  salaPrincipal.atualiza(porItem);
+  const brinquedos = Object.values(porItem).reduce((a, b) => a + b, 0);
+  $('sala-num').textContent = brinquedos;
+  $('sala-txt').textContent = brinquedos === 0
+    ? 'Ainda não chegou nenhum brinquedo. O seu pode ser o primeiro! Toque na imagem para brincar.'
+    : `${brinquedos} ${brinquedos === 1 ? 'brinquedo já está a caminho' : 'brinquedos já estão a caminho'} do nosso VK. Toque na imagem para brincar!`;
+});
+
+/* ---- folha de doação ---- */
+function pintaFolha(){
+  const principal = itemPorId(escolhidos[0]);
+  const e = $('escolha');
+  e.className = 'escolha c-' + principal.cor;
+  e.innerHTML = `<span class="ico">${iconeSvg(principal.id, 44)}</span><span><small>você escolheu</small><strong>${escapaHtml(principal.nome)}</strong></span>`;
+  $('chips').innerHTML = ITENS.filter(i => i.id !== escolhidos[0]).map(i =>
+    `<li><button type="button" class="chip" data-id="${i.id}" aria-pressed="${escolhidos.includes(i.id)}"><span class="ico">${iconeSvg(i.id, 20)}</span> ${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</button></li>`).join('');
+  document.querySelectorAll('.item').forEach(b => b.classList.toggle('escolhido', escolhidos.includes(b.dataset.id)));
+}
+function abreFolha(){
+  pintaFolha();
+  ['e-nome','e-whats','e-geral'].forEach(id => $(id).hidden = true);
+  $('veu').classList.add('aberto'); $('folha').classList.add('aberta');
+  setTimeout(() => $('nome').focus({ preventScroll: true }), 380);
+}
+function fechaFolha(){
+  $('veu').classList.remove('aberto'); $('folha').classList.remove('aberta');
+  document.querySelectorAll('.item').forEach(b => b.classList.remove('escolhido'));
+}
+$('veu').addEventListener('click', fechaFolha);
+$('fechar').addEventListener('click', fechaFolha);
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ fechaFolha(); $('festa').classList.remove('aberta'); } });
+$('chips').addEventListener('click', e => {
+  const c = e.target.closest('.chip'); if (!c) return;
+  const id = c.dataset.id;
+  escolhidos = escolhidos.includes(id) ? escolhidos.filter(x => x !== id) : [...escolhidos, id];
+  somEncaixe(); pintaFolha();
+});
+$('whats').addEventListener('input', e => { e.target.value = mascaraWhats(e.target.value); });
+
+try{ // lembra quem já doou neste aparelho para não digitar de novo
+  const s = JSON.parse(localStorage.getItem('doar_pessoa') || 'null');
+  if (s){ $('nome').value = s.nome || ''; $('whats').value = s.whats || ''; }
+}catch(e){}
+
+function erro(id, msg){ const el = $(id); el.textContent = msg; el.hidden = !msg; }
+
+$('folha').addEventListener('submit', async e => {
+  e.preventDefault(); if (enviando) return;
+  const nome = $('nome').value.trim(), whats = $('whats').value;
+  erro('e-nome', nome.length < 2 ? 'Escreva seu nome para a gente saber com quem falar.' : '');
+  erro('e-whats', whatsValido(whats) ? '' : 'Confira o número com DDD. Exemplo: (11) 91234-5678');
+  if (nome.length < 2) return $('nome').focus();
+  if (!whatsValido(whats)) return $('whats').focus();
+  if (!$('aceite').checked){ erro('e-geral', 'Marque a caixinha para podermos te chamar no WhatsApp.'); return; }
+  erro('e-geral', '');
+  enviando = true; $('enviar').disabled = true; $('enviar').textContent = 'Enviando…';
+  const porAntes = { ...porVivo }, meus = escolhidos.slice();
+  try{
+    const r = await Dados.enviar({ nome, whatsapp: whats, itens: escolhidos, obs: $('obs').value });
+    try{ localStorage.setItem('doar_pessoa', JSON.stringify({ nome, whats })); }catch(_){}
+    $('obs').value = '';
+    fechaFolha(); celebra(nome, r.numero, porAntes, meus);
+  }catch(err){
+    console.error(err);
+    erro('e-geral', 'Não conseguimos salvar agora. Confira a internet e toque de novo.');
+  }finally{
+    enviando = false; $('enviar').disabled = false; $('enviar').textContent = 'Quero doar';
+  }
+});
+
+/* ---- agradecimento: selos do clube e a sala com o brinquedo da pessoa caindo lá dentro ---- */
+let salaFesta = null;
+function celebra(nome, numero, porAntes, meus){
+  $('festa-titulo').textContent = `Valeu, ${primeiroNome(nome)}!`;
+  $('festa-txt').textContent = meus.length > 1
+    ? `Seus ${meus.length} brinquedos já estão a caminho do nosso VK. Vamos te chamar no WhatsApp para combinar a entrega.`
+    : 'Seu brinquedo já está a caminho do nosso VK. Vamos te chamar no WhatsApp para combinar a entrega.';
+  $('festa-num').textContent = numero ? `você é o doador nº ${numero}` : '';
+  $('festa').classList.add('aberta');
+  if (salaFesta) salaFesta.destroy();
+  salaFesta = new Sala($('sala-festa'));
+  salaFesta.atualiza(porAntes);
+  const depois = { ...porAntes }; meus.forEach(id => { depois[id] = (depois[id] || 0) + 1; });
+  setTimeout(() => { salaFesta.atualiza(depois, primeiroNome(nome)); confete($('confete')); }, 600);
+  escolhidos = [];
+}
+$('mais').addEventListener('click', () => { $('festa').classList.remove('aberta'); window.scrollTo({ top: $('grade').offsetTop - 12, behavior: 'smooth' }); });
+</script>
+</body>
+</html>

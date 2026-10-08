@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Painel de Doações — Outubro da Criança</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=DM+Sans:wght@400;500;700&family=Lilita+One&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="doar.css">
+<style>
+  .miolo{max-width:900px;margin-inline:auto;padding:16px 16px 60px}
+  .topo-admin{position:relative;display:flex;align-items:center;gap:16px;padding:6px 0 4px;overflow:hidden}
+  .topo-admin .m-rosa{width:150px;height:143px;left:-80px;top:-50px}
+  .topo-admin .m-laranja{width:140px;height:114px;right:-60px;top:-40px}
+  .topo-admin > *:not(.mancha){position:relative;z-index:1}
+  .topo-admin img{width:96px;height:auto}
+  .topo-admin .etiqueta{font-size:1.3rem}
+  h1.titulo{font-size:2.8rem;margin-top:6px}
+  .barra{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-top:6px}
+  .barra .quem{font-size:.85rem;color:var(--tinta-2)}
+  .mini{min-height:42px;padding:0 14px;border-radius:10px;border:2px solid var(--papel-2);background:#fff;cursor:pointer;font-weight:600;font-size:.9rem}
+  .demo-aviso{margin:12px 0;padding:12px 14px;border-radius:12px;background:#FFF3C4;border:2px solid #F0D676;font-size:.9rem}
+  .login{max-width:380px;margin:40px auto;display:grid;gap:12px}
+  .login input{min-height:52px;padding:0 14px;border-radius:12px;border:2px solid #E3D3B6;background:#fff;font-size:1.05rem;width:100%}
+  .login .erro{color:var(--vermelho);font-size:.9rem}
+  .totais{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0 12px}
+  .total{background:#fff;border:2px solid var(--papel-2);border-radius:16px;padding:12px 14px;min-width:0}
+  .total b{display:block;font-family:var(--f-titulo);font-weight:400;font-size:3.2rem;line-height:.95;color:var(--azul);font-variant-numeric:tabular-nums}
+  .total span{font-size:.85rem;color:var(--tinta-2)}
+  .total.alerta b{color:var(--vermelho)}
+  .barras{background:#fff;border:2px solid var(--papel-2);border-radius:16px;padding:12px 14px;margin-bottom:12px;display:grid;gap:8px}
+  .barras h2{margin:0 0 2px;font-family:var(--f-titulo);font-weight:400;font-size:1.3rem;text-transform:uppercase;letter-spacing:.02em}
+  .barra-item{display:grid;grid-template-columns:28px minmax(0,11rem) 1fr 2.5rem;gap:10px;align-items:center;font-size:.9rem}
+  .barra-item .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .barra-item .trilho{height:14px;border-radius:7px;background:var(--papel)}
+  .barra-item .trilho i{display:block;height:100%;border-radius:7px;min-width:4px}
+  .barra-item .qt{font-family:var(--f-titulo);font-weight:400;font-size:1.3rem;text-align:right;font-variant-numeric:tabular-nums}
+  @media (max-width:520px){.barra-item{grid-template-columns:28px 1fr 2.5rem}.barra-item .trilho{grid-column:1 / -1;order:5}}
+  .resumo{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 8px}
+  .fil{border:2px solid var(--papel-2);background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.9rem;display:inline-flex;gap:8px;align-items:center}
+  .fil b{font-family:var(--f-titulo);font-weight:400;font-size:1.25rem;line-height:1}
+  .fil[aria-pressed="true"]{background:var(--tinta);border-color:var(--tinta);color:#fff}
+  .busca{width:100%;min-height:48px;border-radius:12px;border:2px solid #E3D3B6;background:#fff;padding:0 14px;font-size:1rem;margin:6px 0 14px}
+  .lista{display:grid;gap:12px;padding:0;margin:0;list-style:none}
+  .card{background:#fff;border:2px solid var(--papel-2);border-radius:16px;padding:14px;display:grid;gap:10px;min-width:0}
+  .card.entregue{opacity:.62}
+  .card .linha1{display:flex;gap:10px;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+  .card h3{margin:0;font-size:1.15rem;overflow-wrap:anywhere}
+  .card .quando{font-size:.8rem;color:var(--tinta-2)}
+  .tags{display:flex;gap:6px;flex-wrap:wrap}
+  .tag{padding:3px 10px;border-radius:999px;color:#fff;font-size:.8rem;font-weight:600}
+  .obs{margin:0;font-size:.92rem;color:var(--tinta-2);overflow-wrap:anywhere}
+  .acoes{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .zap{background:#1FAF5A;color:#fff;border:0;border-radius:10px;min-height:44px;padding:0 16px;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+  .fone{font-variant-numeric:tabular-nums;font-size:.92rem}
+  select.st{min-height:44px;border-radius:10px;border:2px solid var(--papel-2);background:#fff;color:var(--tinta);color-scheme:light;padding:0 10px;font:inherit;font-size:.92rem;font-weight:600}
+  select.st option{background:#fff;color:var(--tinta)}
+  .vazio{padding:40px 10px;text-align:center;color:var(--tinta-2)}
+</style>
+</head>
+<body>
+<main class="miolo">
+  <header class="topo-admin">
+    <span class="mancha m-laranja" aria-hidden="true"></span>
+    <img src="img/logo-clube.png" alt="Clube Videira Kids" width="96" height="101">
+    <div><span class="etiqueta">painel de doações</span><h1 class="titulo">Quem vai doar</h1></div>
+  </header>
+
+  <section id="entrada" class="login" hidden>
+    <p>Entre com o e-mail da liderança para ver quem quer doar.</p>
+    <input id="email" type="email" autocomplete="username" placeholder="E-mail" aria-label="E-mail">
+    <input id="senha" type="password" autocomplete="current-password" placeholder="Senha" aria-label="Senha">
+    <span class="erro" id="login-erro" hidden></span>
+    <button class="botao" id="entrar" type="button">Entrar</button>
+  </section>
+
+  <section id="painel" hidden>
+    <div class="barra">
+      <span class="quem" id="quem"></span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="mini" id="csv" type="button">Baixar planilha (CSV)</button>
+        <button class="mini" id="sair" type="button">Sair</button>
+      </span>
+    </div>
+    <div class="demo-aviso" id="demo" hidden>Atenção: o Firebase ainda não está ligado, então estas doações ficam só neste navegador e não são guardadas. Veja o README.</div>
+
+    <div class="totais" id="totais" aria-label="Totais"></div>
+    <section class="barras" id="barras" aria-labelledby="t-barras"></section>
+
+    <div class="resumo" id="resumo"></div>
+    <input class="busca" id="busca" type="search" placeholder="Buscar por nome ou telefone" aria-label="Buscar">
+    <ul class="lista" id="lista"></ul>
+  </section>
+</main>
+<nav class="nav-telas fixa" aria-label="Outras telas"><a href="index.html">doar</a><a href="telao.html">telão</a></nav>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-auth-compat.js"></script>
+<script src="doar.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const STATUS = { novo:'Novo', chamado:'Já chamei', confirmado:'Vai doar', entregue:'Entregue' };
+let todas = [], filtroItem = null, filtroStatus = null, busca = '';
+let parar = null;
+
+Dados.aoMudarLogin(u => {
+  if (parar){ parar(); parar = null; }
+  $('entrada').hidden = !!u; $('painel').hidden = !u;
+  if (!u) return;
+  $('quem').textContent = 'Logado: ' + u.email;
+  $('demo').hidden = !Dados.demo;
+  $('sair').hidden = Dados.demo;
+  parar = Dados.aoVivoDoacoes(l => { todas = l; desenha(); }, e => {
+    $('lista').innerHTML = '<li class="vazio">Sem permissão para ver as doações. Confira se este e-mail está nas regras do Firestore (veja o README).</li>';
+  });
+});
+$('entrar').addEventListener('click', async () => {
+  try{ $('login-erro').hidden = true; await Dados.entrar($('email').value.trim(), $('senha').value); }
+  catch(e){ $('login-erro').textContent = 'E-mail ou senha incorretos.'; $('login-erro').hidden = false; }
+});
+$('senha').addEventListener('keydown', e => { if (e.key === 'Enter') $('entrar').click(); });
+$('sair').addEventListener('click', () => Dados.sair());
+$('busca').addEventListener('input', e => { busca = e.target.value.toLowerCase().trim(); desenha(); });
+
+function msgWhats(d){
+  return DOAR_CONFIG.mensagemWhats.replace('{nome}', primeiroNome(d.nome)).replace('{itens}', d.itens.map(i => i.nome.toLowerCase()).join(', '));
+}
+function quando(ms){
+  const d = new Date(ms), hoje = new Date();
+  const hora = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  if (d.toDateString() === hoje.toDateString()) return 'hoje às ' + hora;
+  return d.toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }) + ' às ' + hora;
+}
+
+function desenha(){
+  // filtros (contagem por item e por status)
+  const porItem = {}, porStatus = {};
+  todas.forEach(d => { d.itens.forEach(i => porItem[i.id] = (porItem[i.id] || 0) + 1); porStatus[d.status] = (porStatus[d.status] || 0) + 1; });
+  // totais gerais e quanto chegou de cada item
+  const hoje = new Date().toDateString();
+  const itensTotal = Object.values(porItem).reduce((a, b) => a + b, 0);
+  const deHoje = todas.filter(d => new Date(d.criadoEm).toDateString() === hoje).length;
+  const aguardando = porStatus.novo || 0;
+  $('totais').innerHTML =
+    `<div class="total"><b>${todas.length}</b><span>${todas.length === 1 ? 'pessoa quer doar' : 'pessoas querem doar'}</span></div>` +
+    `<div class="total"><b>${itensTotal}</b><span>${itensTotal === 1 ? 'item prometido' : 'itens prometidos'} no total</span></div>` +
+    `<div class="total"><b>${deHoje}</b><span>${deHoje === 1 ? 'doação' : 'doações'} hoje</span></div>` +
+    `<div class="total ${aguardando ? 'alerta' : ''}"><b>${aguardando}</b><span>ainda sem contato no WhatsApp</span></div>`;
+  const maior = Math.max(1, ...Object.values(porItem));
+  $('barras').innerHTML = '<h2 id="t-barras">O que mais está chegando</h2>' + ITENS.map(i => {
+    const n = porItem[i.id] || 0;
+    return `<div class="barra-item"><span style="display:inline-flex">${iconeSvg(i.id, 26)}</span><span class="nm" title="${escapaHtml(i.nome)}">${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</span><span class="trilho"><i style="width:${n / maior * 100}%;background:${COR_HEX[i.cor]}"></i></span><span class="qt">${n}</span></div>`;
+  }).join('');
+
+  $('resumo').innerHTML =
+    `<button class="fil" data-k="todos" aria-pressed="${!filtroItem && !filtroStatus}"><b>${todas.length}</b> pessoas</button>` +
+    Object.keys(STATUS).map(s => `<button class="fil" data-s="${s}" aria-pressed="${filtroStatus === s}"><b>${porStatus[s] || 0}</b> ${STATUS[s].toLowerCase()}</button>`).join('') +
+    ITENS.filter(i => porItem[i.id]).map(i => `<button class="fil" data-i="${i.id}" aria-pressed="${filtroItem === i.id}"><span aria-hidden="true" style="display:inline-flex">${iconeSvg(i.id, 22)}</span> <b>${porItem[i.id]}</b> ${escapaHtml(i.nome.split(',')[0].split(' e ')[0])}</button>`).join('');
+
+  const vis = todas.filter(d =>
+    (!filtroItem || d.itens.some(i => i.id === filtroItem)) &&
+    (!filtroStatus || d.status === filtroStatus) &&
+    (!busca || d.nome.toLowerCase().includes(busca) || d.whatsapp.includes(soDigitos(busca) || '§')));
+
+  $('lista').innerHTML = vis.length ? vis.map(d => `
+    <li class="card ${d.status === 'entregue' ? 'entregue' : ''}">
+      <div class="linha1"><h3>${escapaHtml(d.nome)}</h3><span class="quando">${quando(d.criadoEm)}</span></div>
+      <div class="tags">${d.itens.map(i => `<span class="tag" style="background:${COR_HEX[(itemPorId(i.id) || {}).cor || 'azul']}">${escapaHtml(i.nome)}</span>`).join('')}</div>
+      ${d.obs ? `<p class="obs">“${escapaHtml(d.obs)}”</p>` : ''}
+      <div class="acoes">
+        <a class="zap" target="_blank" rel="noopener" data-id="${d.id}" href="https://wa.me/${d.whatsapp}?text=${encodeURIComponent(msgWhats(d))}">Chamar no WhatsApp</a>
+        <span class="fone">${formataWhats(d.whatsapp)}</span>
+        <select class="st" data-id="${d.id}" aria-label="Situação de ${escapaHtml(d.nome)}">
+          ${Object.entries(STATUS).map(([k, v]) => `<option value="${k}" ${d.status === k ? 'selected' : ''}>${v}</option>`).join('')}
+        </select>
+      </div>
+    </li>`).join('') : `<li class="vazio">${todas.length ? 'Ninguém com esse filtro.' : 'Ainda ninguém doou. Quando escanearem o QR Code, aparece aqui na hora.'}</li>`;
+}
+
+$('resumo').addEventListener('click', e => {
+  const b = e.target.closest('.fil'); if (!b) return;
+  if (b.dataset.k){ filtroItem = filtroStatus = null; }
+  else if (b.dataset.i){ filtroItem = filtroItem === b.dataset.i ? null : b.dataset.i; }
+  else { filtroStatus = filtroStatus === b.dataset.s ? null : b.dataset.s; }
+  desenha();
+});
+$('lista').addEventListener('change', e => {
+  const s = e.target.closest('select.st'); if (s) Dados.atualizar(s.dataset.id, { status: s.value });
+});
+$('lista').addEventListener('click', e => {
+  const z = e.target.closest('.zap'); // ao abrir o WhatsApp, marca como "já chamei" se ainda for novo
+  if (!z) return; const d = todas.find(x => x.id === z.dataset.id);
+  if (d && d.status === 'novo') Dados.atualizar(d.id, { status: 'chamado' });
+});
+
+$('csv').addEventListener('click', () => {
+  const aspas = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const linhas = [['Data', 'Nome', 'WhatsApp', 'Itens', 'Observação', 'Situação']].concat(
+    todas.map(d => [new Date(d.criadoEm).toLocaleString('pt-BR'), d.nome, '+' + d.whatsapp, d.itens.map(i => i.nome).join(' | '), d.obs, STATUS[d.status] || d.status]));
+  const blob = new Blob(['﻿' + linhas.map(l => l.map(aspas).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'doacoes-outubro-da-crianca.csv'; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+});
+</script>
+</body>
+</html>
