@@ -35,7 +35,7 @@ h3{margin:18px 0 8px;font-size:16px}
 .kpi{cursor:pointer;border-left:6px solid var(--line)}
 .kpi b{display:block;font-size:28px;line-height:1.1}
 .kpi span{color:var(--mut);font-size:13px}
-.kpi.venc{border-left-color:var(--red)}.kpi.prox{border-left-color:#e6a100}.kpi.sem{border-left-color:#5a7fa3}.kpi.ok{border-left-color:#2e9e5b}
+.kpi.venc{border-left-color:var(--red)}.kpi.pend{border-left-color:#c0602b}.kpi.prox{border-left-color:#e6a100}.kpi.sem{border-left-color:#5a7fa3}.kpi.ok{border-left-color:#2e9e5b}
 .kpi.sel{outline:2px solid var(--brand)}
 .bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
 input,select,textarea,button{font:inherit}
@@ -50,7 +50,7 @@ label{display:block;font-size:12.5px;font-weight:600;color:var(--mut);margin:0 0
 .btn:disabled{opacity:.5;cursor:default}
 .pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
 .pill.venc{background:var(--red-bg);color:var(--red)}.pill.prox{background:var(--amb-bg);color:var(--amb)}
-.pill.ok{background:var(--grn-bg);color:var(--grn)}.pill.sem{background:var(--blu-bg);color:var(--blu)}.pill.off{background:var(--line);color:var(--mut)}
+.pill.pend{background:var(--red-bg);color:var(--red);box-shadow:inset 0 0 0 1px var(--red)}.pill.ok{background:var(--grn-bg);color:var(--grn)}.pill.sem{background:var(--blu-bg);color:var(--blu)}.pill.off{background:var(--line);color:var(--mut)}
 .row{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;padding:11px 12px;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:0}
 .row .t{font-weight:600}.row .s{color:var(--mut);font-size:13px}
@@ -182,17 +182,18 @@ function ultimoEnvio(licId, itemId) {
 function calc(l, it) {
   const ult = ultimoEnvio(l.id, it.id);
   let venc = null, origem = '';
+  if (it.situacao === 'pendente') return { status: 'pend', venc: null, ult, dias: null, origem: 'Marcada como pendente — registre o envio quando for atendida' };
   if (it.modo === 'evento') return { status: 'evento', venc: null, ult, dias: null, origem: 'Sob demanda' };
   if (it.modo === 'derivado') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Pedido protocolado em ' + fmt(ult.data) }; venc = P.addDaysIso(l.validade, -120); origem = 'Licença vale até ' + fmt(l.validade) + ' (pedido ≥120 dias antes)'; }
   else if (it.modo === 'unica') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Comprovada em ' + fmt(ult.data) }; if (it.prazoInicial) { venc = it.prazoInicial.venceEm; origem = `Prazo único de ${it.prazoInicial.dias} dias após a emissão`; } }
   else if (ult && ult.validade) { venc = ult.validade; origem = 'Validade do documento enviado'; }
   else if (ult && it.periodoMeses) { venc = P.addMonthsIso(ult.data, it.periodoMeses); origem = `${it.periodoMeses} meses após o último envio (${fmt(ult.data)})`; }
-  if (!venc) return { status: 'sem', venc: null, ult, dias: null, origem: 'Informe a data do último envio' };
+  if (!venc) return { status: 'sem', venc: null, ult, dias: null, origem: it.situacao === 'atendida' ? 'Atendida — informe a data do último envio' : 'Informe a data do último envio' };
   const dias = diffDays(todayIso(), venc);
   const status = dias < 0 ? 'venc' : dias <= S.config.antecedencia ? 'prox' : 'ok';
   return { status, venc, ult, dias, origem };
 }
-const STATUS_TXT = { venc: 'Vencida', prox: 'Vence em breve', ok: 'Em dia', sem: 'Sem data', cumprida: 'Cumprida', evento: 'Sob demanda' };
+const STATUS_TXT = { pend: 'Precisa atender', venc: 'Vencida', prox: 'Vence em breve', ok: 'Em dia', sem: 'Sem data', cumprida: 'Cumprida', evento: 'Sob demanda' };
 function diasTxt(c) {
   if (c.dias == null) return '';
   if (c.dias < 0) return `venceu há ${-c.dias} dia${c.dias === -1 ? '' : 's'}`;
@@ -211,7 +212,7 @@ function todosItens(incluirSemAlerta = false) {
       out.push({ l, it, c });
     });
   });
-  const peso = { venc: 0, prox: 1, sem: 3, ok: 2 };
+  const peso = { venc: 0, pend: 1, prox: 2, ok: 4, sem: 3 };
   out.sort((a, b) => (peso[a.c.status] - peso[b.c.status]) || ((a.c.venc || '9') < (b.c.venc || '9') ? -1 : 1) || a.l.empreendedor.localeCompare(b.l.empreendedor));
   return out;
 }
@@ -324,6 +325,41 @@ function render() {
   ({ painel: vPainel, licencas: vLicencas, envio: vEnvio, historico: vHistorico, ajustes: vAjustes })[tab]();
 }
 
+/* ---- Situação de cada condicionante (editável pelo usuário) ---- */
+function sitOpts(it) {
+  const cur = !it.ativo ? 'na' : (it.situacao || '');
+  return [['', 'Situação…'], ['atendida', 'Já atendida'], ['pendente', 'Precisa atender'], ['na', 'Não se aplica']].map(([v, n]) => `<option value="${v}" ${cur === v ? 'selected' : ''}>${n}</option>`).join('');
+}
+function mudarSituacao(licId, itemId, v) {
+  const l = lic(licId), it = l.itens.find((x) => x.id === itemId);
+  if (v === 'atendida') { it.ativo = true; it.situacao = 'atendida'; save(); return atendidaForm(l, it); }
+  it.ativo = v !== 'na'; it.situacao = v === 'pendente' ? 'pendente' : '';
+  save(); render();
+}
+// Formulário rápido: informa a data do último envio (e validade) de algo já atendido.
+function atendidaForm(l, it) {
+  const usaVal = it.modo === 'validade' || it.cat === 'LAUDO';
+  const prazo = it.modo === 'unica' || it.modo === 'derivado' || it.modo === 'evento';
+  const bg = document.createElement('div'); bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal" style="max-width:560px"><div class="modal-h"><div><h2 style="margin:0">Já atendida</h2><div class="mut sm">${esc(l.empreendedor)} — ${esc(it.nome)}</div></div><button class="btn line sm" id="x">Cancelar</button></div>
+    <div class="card"><div class="two">
+      <div><label>Data em que foi enviada ao IDEMA</label><input type="date" id="qd" value="${todayIso()}"></div>
+      ${usaVal ? `<div><label>Validade do documento enviado</label><input type="date" id="qv"></div>` : '<div></div>'}
+      <div><label>Nº da mensagem no Comunic@ (opcional)</label><input type="text" id="qm"></div>
+      <div><label>Print do comprovante (opcional)</label><input type="file" id="qf" accept="image/*,application/pdf" multiple></div></div>
+      <p class="mut sm">${prazo ? 'Basta a data em que foi comprovado.' : 'O próximo vencimento será calculado a partir destas datas.'} Se não souber a data agora, cancele: o item fica marcado como “Já atendida” e você completa depois.</p>
+      <div class="bar" style="justify-content:flex-end"><button class="btn" id="qs">Salvar</button></div></div></div>`;
+  document.body.appendChild(bg);
+  $('#x', bg).onclick = () => { bg.remove(); render(); };
+  $('#qs', bg).onclick = async () => {
+    const data = $('#qd', bg).value; if (!data) return toast('Informe a data.');
+    const imgIds = []; for (const f of $('#qf', bg).files) { const k = uid(); await DB.setImg(k, f); imgIds.push(k); }
+    const itens = [{ itemId: it.id, validade: usaVal ? $('#qv', bg).value : '', referencia: '' }];
+    S.envios.push({ id: uid(), licId: l.id, data, mensagem: $('#qm', bg).value.trim(), itens, imgIds, criadoEm: Date.now(), texto: gerarTexto(l.id, data, itens) });
+    it.situacao = 'atendida'; save(); bg.remove(); toast('Registrado.'); render();
+  };
+}
+
 /* ============================================================
    PAINEL
    ============================================================ */
@@ -336,7 +372,7 @@ function vPainel() {
   const renov = all.filter((x) => x.it.cat === 'RENOVACAO' && (x.c.status === 'venc' || x.c.status === 'prox'));
   $('#view').innerHTML = `
     <div class="grid kpis">
-      ${[['venc', 'Vencidas'], ['prox', `Vencem em ${ant} dias`], ['sem', 'Sem data informada'], ['ok', 'Em dia']].map(([k, n]) =>
+      ${[['venc', 'Vencidas'], ['pend', 'Precisam ser atendidas'], ['prox', `Vencem em ${ant} dias`], ['sem', 'Sem data informada'], ['ok', 'Em dia']].map(([k, n]) =>
         `<div class="card kpi ${k} ${filtro.status === k ? 'sel' : ''}" data-f="${k}"><b>${cnt(k)}</b><span>${n}</span></div>`).join('')}
     </div>
     ${renov.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--red)"><b style="color:var(--red)">Atenção — renovação de licença</b>
@@ -353,7 +389,7 @@ function vPainel() {
           <div><div class="t">${esc(l.empreendedor)}</div>
             <div class="s">${esc(it.nome)} · ${esc(it.condRefs[0] ? 'Cond. ' + it.condRefs[0].numero + (it.condRefs[0].subitem ? it.condRefs[0].subitem.replace(')', '') : '') : '')}${l.municipio ? ' · ' + esc(l.municipio) : ''}</div>
             <div class="s">${c.venc ? `<b>${fmt(c.venc)}</b> — ${diasTxt(c)} · ` : ''}${esc(c.origem)}</div></div>
-          <div><button class="btn sec sm" data-env="${l.id}|${it.id}">Registrar envio</button></div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center"><select data-sit="${l.id}|${it.id}" style="width:auto" aria-label="Situação">${sitOpts(it)}</select><button class="btn sec sm" data-env="${l.id}|${it.id}">Registrar envio</button></div>
         </div>`).join('') : `<div class="empty">Nada por aqui${filtro.status || filtro.q ? ' com esse filtro' : ''}. 🎉</div>`}
     </div>`;
   $('#view').onclick = (e) => {
@@ -361,6 +397,7 @@ function vPainel() {
     if (e.target.id === 'limpa') { filtro.status = ''; return vPainel(); }
     const b = e.target.closest('[data-env]'); if (b) { const [li, ii] = b.dataset.env.split('|'); envioPre = { licId: li, itemId: ii }; go('envio'); }
   };
+  $('#view').onchange = (e) => { const s = e.target.closest('[data-sit]'); if (s) { const [li, ii] = s.dataset.sit.split('|'); mudarSituacao(li, ii, s.value); } };
   $('#q').oninput = (e) => { filtro.q = e.target.value; const pos = e.target.selectionStart; vPainel(); const n = $('#q'); n.focus(); n.setSelectionRange(pos, pos); };
 }
 
@@ -488,16 +525,17 @@ function abrirLicenca(id) {
       </div>
       <h3>Condicionantes acompanhadas</h3>
       <div class="card" style="padding:0;overflow-x:auto"><table>
-        <thead><tr><th>Condicionante</th><th>Cond. nº</th><th>Periodicidade</th><th>Próximo vencimento</th><th>Alerta</th><th></th></tr></thead>
+        <thead><tr><th>Condicionante</th><th>Cond. nº</th><th>Periodicidade</th><th>Próximo vencimento</th><th>Situação</th><th>Alerta</th><th></th></tr></thead>
         <tbody>${l.itens.map((it) => { const c = calc(l, it); return `<tr>
           <td><b>${esc(it.nome)}</b><div class="mut sm">${it.modo === 'unica' ? 'Prazo único' + (it.prazoInicial ? ` (${it.prazoInicial.dias} dias após a emissão)` : '') : it.modo === 'derivado' ? 'Calculado: validade − 120 dias' : it.modo === 'evento' ? 'Reapresentar quando houver alteração' : it.modo === 'validade' ? 'Vence na validade do documento' : 'Periódica'}</div></td>
           <td>${it.condRefs.map((r) => r.numero + (r.subitem ? r.subitem.replace(')', '') : '')).join(', ') || '—'}</td>
           <td>${['periodico', 'validade'].includes(it.modo) ? `<input type="number" min="1" max="120" style="width:70px" data-m="${it.id}" value="${it.periodoMeses || ''}"> meses` : '—'}</td>
           <td>${c.venc ? `<b>${fmt(c.venc)}</b><div class="mut sm">${diasTxt(c)}</div>` : '<span class="mut">—</span>'} <span class="pill ${c.status}">${STATUS_TXT[c.status]}</span></td>
+          <td><select data-dsit="${it.id}" style="width:auto">${sitOpts(it)}</select></td>
           <td><input type="checkbox" data-on="${it.id}" ${it.ativo ? 'checked' : ''} style="width:18px;height:18px"></td>
           <td style="white-space:nowrap"><button class="btn sec sm" data-env="${it.id}">Registrar envio</button> ${it.cat === 'OUTRA' ? `<button class="btn danger sm" data-del="${it.id}">×</button>` : ''}</td></tr>`; }).join('')}</tbody>
       </table></div>
-      <div class="mut sm" style="margin:6px 2px">Periodicidade em meses: usada quando o documento enviado não informa validade. AVCB e INMETRO: 12 meses; ANP e TOG: 3 meses. Laudo (60 meses) e treinamentos (12 meses) são prazos assumidos — ajuste se necessário. Placa (90 dias) e publicação (10 dias) contam da emissão da licença.</div>
+      <div class="mut sm" style="margin:6px 2px">Situação: “Já atendida” (informa a data) ou “Precisa atender”; “Não se aplica” tira do painel. Periodicidade em meses: usada quando o documento enviado não informa validade. AVCB e INMETRO: 12 meses; ANP e TOG: 3 meses. Laudo (60 meses) e treinamentos (12 meses) são prazos assumidos — ajuste se necessário. Placa (90 dias) e publicação (10 dias) contam da emissão da licença.</div>
       <div class="bar" style="margin-top:8px"><button class="btn line sm" id="novo">+ Condicionante personalizada</button></div>
       <details><summary>Texto integral das condicionantes (${l.condicionantes.length})</summary>
         ${l.condicionantes.map((c) => `<div class="cond ${l.itens.some((i) => i.condRefs.some((r) => r.numero === c.numero)) ? 'mon' : ''}"><b>${c.numero}.</b> ${esc(c.texto)}</div>`).join('')}
@@ -512,6 +550,7 @@ function abrirLicenca(id) {
     $('#x', bg).onclick = () => { bg.remove(); render(); };
     bg.querySelectorAll('[data-k]').forEach((i) => { i.onchange = () => { l[i.dataset.k] = i.value; if (i.dataset.k === 'validade') l.validadeEstimada = false; save(); if (i.dataset.k === 'validade') draw(); }; });
     bg.querySelectorAll('[data-m]').forEach((i) => { i.onchange = () => { const it = l.itens.find((x) => x.id === i.dataset.m); it.periodoMeses = Math.max(1, +i.value || 1); save(); draw(); }; });
+    bg.querySelectorAll('[data-dsit]').forEach((i) => { i.onchange = () => { const it = l.itens.find((x) => x.id === i.dataset.dsit); if (i.value === 'atendida') { bg.remove(); it.ativo = true; it.situacao = 'atendida'; save(); return atendidaForm(l, it); } it.ativo = i.value !== 'na'; it.situacao = i.value === 'pendente' ? 'pendente' : ''; save(); draw(); }; });
     bg.querySelectorAll('[data-on]').forEach((i) => { i.onchange = () => { l.itens.find((x) => x.id === i.dataset.on).ativo = i.checked; save(); draw(); }; });
     bg.querySelectorAll('[data-env]').forEach((b) => { b.onclick = () => { envioPre = { licId: l.id, itemId: b.dataset.env }; bg.remove(); go('envio'); }; });
     bg.querySelectorAll('[data-del]').forEach((b) => { b.onclick = () => { l.itens = l.itens.filter((x) => x.id !== b.dataset.del); save(); draw(); }; });
@@ -603,6 +642,7 @@ function vEnvio() {
     const imgIds = [];
     for (const f of envioImgs) { const k = uid(); await DB.setImg(k, f); imgIds.push(k); }
     S.envios.push({ id: uid(), licId: $('#elic').value, data: $('#edata').value, mensagem: $('#emsg').value.trim(), itens: s, imgIds, criadoEm: Date.now(), texto: $('#etxt').value });
+    s.forEach((o) => { const it = lic($('#elic').value).itens.find((x) => x.id === o.itemId); if (it) { it.situacao = 'atendida'; it.ativo = true; } });
     save(); envioPre = null; toast('Envio registrado. Próximos vencimentos atualizados.'); go('historico');
   };
   draw();
