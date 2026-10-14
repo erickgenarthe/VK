@@ -1,0 +1,734 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Condicionantes Ambientais</title>
+<meta name="theme-color" content="#1d5c46">
+<style>
+:root{
+  --bg:#f4f6f3; --card:#fff; --ink:#1c2a24; --mut:#5f6f67; --line:#dde4de;
+  --brand:#1d5c46; --brand-ink:#fff; --brand-soft:#e3f0ea;
+  --red:#b3261e; --red-bg:#fdecea; --amb:#8a5a00; --amb-bg:#fff3d6; --grn:#1b6b3a; --grn-bg:#e2f4e8; --blu:#34506b; --blu-bg:#e8eef4;
+  --radius:12px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#121916;--card:#1b2420;--ink:#e6eee9;--mut:#9fb0a7;--line:#2c3933;--brand:#58b895;--brand-ink:#0d1a14;--brand-soft:#1f3a2f;
+    --red:#ff8a80;--red-bg:#3a1c1a;--amb:#ffcf70;--amb-bg:#3a2e12;--grn:#7fdc9f;--grn-bg:#173323;--blu:#9cc0e0;--blu-bg:#1c2a38}
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:var(--brand);color:var(--brand-ink);padding:14px 16px 0}
+.top{max-width:1100px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
+.brand small{display:block;font-weight:400;opacity:.85;font-size:12px}
+nav{display:flex;gap:2px;margin-top:12px;overflow-x:auto}
+nav button{background:transparent;border:0;color:inherit;opacity:.8;padding:10px 14px;font:inherit;font-weight:600;cursor:pointer;border-radius:10px 10px 0 0;white-space:nowrap}
+nav button.on{background:var(--bg);color:var(--ink);opacity:1}
+main{max-width:1100px;margin:0 auto;padding:16px}
+h2{margin:0 0 12px;font-size:20px}
+h3{margin:18px 0 8px;font-size:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.grid{display:grid;gap:12px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:16px}
+.kpi{cursor:pointer;border-left:6px solid var(--line)}
+.kpi b{display:block;font-size:28px;line-height:1.1}
+.kpi span{color:var(--mut);font-size:13px}
+.kpi.venc{border-left-color:var(--red)}.kpi.prox{border-left-color:#e6a100}.kpi.sem{border-left-color:#5a7fa3}.kpi.ok{border-left-color:#2e9e5b}
+.kpi.sel{outline:2px solid var(--brand)}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input,select,textarea,button{font:inherit}
+input[type=text],input[type=date],input[type=number],input[type=search],select,textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink)}
+textarea{min-height:90px;resize:vertical}
+label{display:block;font-size:12.5px;font-weight:600;color:var(--mut);margin:0 0 3px}
+.btn{background:var(--brand);color:var(--brand-ink);border:0;padding:9px 14px;border-radius:9px;font-weight:600;cursor:pointer}
+.btn.sec{background:var(--brand-soft);color:var(--brand)}
+.btn.line{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:var(--red-bg);color:var(--red)}
+.btn.sm{padding:5px 10px;font-size:13px}
+.btn:disabled{opacity:.5;cursor:default}
+.pill{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}
+.pill.venc{background:var(--red-bg);color:var(--red)}.pill.prox{background:var(--amb-bg);color:var(--amb)}
+.pill.ok{background:var(--grn-bg);color:var(--grn)}.pill.sem{background:var(--blu-bg);color:var(--blu)}.pill.off{background:var(--line);color:var(--mut)}
+.row{display:grid;grid-template-columns:110px 1fr auto;gap:12px;align-items:center;padding:11px 12px;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:0}
+.row .t{font-weight:600}.row .s{color:var(--mut);font-size:13px}
+.list{padding:0}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.mut{color:var(--mut)}.sm{font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{background:var(--brand-soft);color:var(--brand);border-radius:8px;padding:2px 8px;font-size:12.5px;font-weight:600}
+.lic{cursor:pointer}
+.lic:hover{border-color:var(--brand)}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-start;justify-content:center;overflow:auto;padding:20px 10px;z-index:20}
+.modal{background:var(--bg);border-radius:14px;max-width:900px;width:100%;padding:16px}
+.modal-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}
+.thumb{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--line);cursor:zoom-in}
+.thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.item-sel{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:var(--card)}
+.item-sel.on{border-color:var(--brand);background:var(--brand-soft)}
+.item-sel .hd{display:flex;gap:8px;align-items:flex-start}
+.item-sel .hd input{margin-top:4px;width:18px;height:18px}
+.item-sel .more{display:none;margin-top:8px}
+.item-sel.on .more{display:grid}
+pre.txt{white-space:pre-wrap;word-wrap:break-word;font:inherit;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:0}
+details{margin:8px 0}summary{cursor:pointer;font-weight:600}
+.cond{border-left:3px solid var(--line);padding:2px 0 2px 10px;margin:8px 0;font-size:13.5px}
+.cond.mon{border-left-color:var(--brand)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:10px;z-index:50;font-size:14px}
+.empty{text-align:center;color:var(--mut);padding:26px}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em}
+@media (max-width:700px){
+  .two,.three{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr;gap:4px}
+}
+#print-area{display:none}
+@media print{
+  body{background:#fff;color:#000}
+  body>*:not(#print-area){display:none!important}
+  #print-area{display:block;padding:0}
+  #print-area pre.txt{border:0;padding:0;font-size:12pt}
+  #print-area img{max-width:100%;page-break-inside:avoid;border:1px solid #999;margin-top:10px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10z"/><path d="M2 21c0-3 1.9-5.4 5.2-6.4"/></svg>
+      <div>Condicionantes Ambientais<small>Acompanhamento de licenças e envios ao IDEMA/RN (Comunic@)</small></div>
+    </div>
+    <nav id="tabs"></nav>
+  </div>
+</header>
+<main id="view"></main>
+<div id="print-area"></div>
+
+<script src="parser.js"></script>
+<script src="seed.js"></script>
+<script>
+'use strict';
+/* ============================================================
+   Utilidades
+   ============================================================ */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const P = window.LicParser;
+const uid = P.uid;
+const pad2 = (n) => String(n).padStart(2, '0');
+const todayIso = () => { const d = new Date(); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+const fmt = (iso) => (iso ? iso.split('-').reverse().join('/') : '—');
+const diffDays = (a, b) => Math.round((Date.parse(b + 'T00:00:00Z') - Date.parse(a + 'T00:00:00Z')) / 86400000);
+const MESES_EXT = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+const extenso = (iso) => { const [y, m, d] = iso.split('-').map(Number); return `${d} de ${MESES_EXT[m - 1]} de ${y}`; };
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+
+/* ============================================================
+   Armazenamento: IndexedDB (estado + imagens dos comprovantes)
+   ============================================================ */
+const DB = (() => {
+  let db = null, mem = {}, memImg = {};
+  const open = () => new Promise((res) => {
+    try {
+      const rq = indexedDB.open('condicionantes', 1);
+      rq.onupgradeneeded = () => { rq.result.createObjectStore('kv'); rq.result.createObjectStore('img'); };
+      rq.onsuccess = () => { db = rq.result; res(); };
+      rq.onerror = () => res();
+    } catch (e) { res(); }
+  });
+  const tx = (store, mode, fn) => new Promise((res, rej) => {
+    if (!db) return res(fn(null));
+    const t = db.transaction(store, mode); const st = t.objectStore(store);
+    const r = fn(st); t.oncomplete = () => res(r && r.result !== undefined ? r.result : undefined); t.onerror = () => rej(t.error);
+  });
+  return {
+    open,
+    get: (k) => db ? new Promise((res) => { const r = db.transaction('kv').objectStore('kv').get(k); r.onsuccess = () => res(r.result); r.onerror = () => res(); }) : Promise.resolve(mem[k]),
+    set: (k, v) => db ? tx('kv', 'readwrite', (s) => s.put(v, k)) : (mem[k] = v, Promise.resolve()),
+    getImg: (k) => db ? new Promise((res) => { const r = db.transaction('img').objectStore('img').get(k); r.onsuccess = () => res(r.result); r.onerror = () => res(); }) : Promise.resolve(memImg[k]),
+    setImg: (k, v) => db ? tx('img', 'readwrite', (s) => s.put(v, k)) : (memImg[k] = v, Promise.resolve()),
+    delImg: (k) => db ? tx('img', 'readwrite', (s) => s.delete(k)) : (delete memImg[k], Promise.resolve()),
+  };
+})();
+
+let S = null; // estado
+let saveTimer = null;
+function save() { clearTimeout(saveTimer); saveTimer = setTimeout(() => DB.set('state', S), 150); }
+
+const dataUrlToBlob = (u) => { const [h, b] = u.split(','); const mime = /:(.*?);/.exec(h)[1]; const bin = atob(b); const a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Blob([a], { type: mime }); };
+const blobToDataUrl = (b) => new Promise((res) => { const r = new FileReader(); r.onload = () => res(r.result); r.readAsDataURL(b); });
+
+/* ============================================================
+   Regras de vencimento
+   ============================================================ */
+const CATS = P.CATS;
+const lic = (id) => S.licencas.find((l) => l.id === id);
+
+// Datas derivadas dos envios registrados (a "última data" que o usuário anexa).
+function ultimoEnvio(licId, itemId) {
+  let best = null;
+  S.envios.forEach((e) => {
+    if (e.licId !== licId) return;
+    const it = e.itens.find((x) => x.itemId === itemId);
+    if (it && (!best || e.data > best.data || (e.data === best.data && e.criadoEm > best.criadoEm))) best = { data: e.data, validade: it.validade || '', envio: e };
+  });
+  return best;
+}
+
+function calc(l, it) {
+  const ult = ultimoEnvio(l.id, it.id);
+  let venc = null, origem = '';
+  if (it.modo === 'evento') return { status: 'evento', venc: null, ult, dias: null, origem: 'Sob demanda' };
+  if (it.modo === 'derivado') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Pedido protocolado em ' + fmt(ult.data) }; venc = P.addDaysIso(l.validade, -120); origem = 'Licença vale até ' + fmt(l.validade) + ' (pedido ≥120 dias antes)'; }
+  else if (it.modo === 'unica') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Comprovada em ' + fmt(ult.data) }; if (it.prazoInicial) { venc = it.prazoInicial.venceEm; origem = `Prazo único de ${it.prazoInicial.dias} dias após a emissão`; } }
+  else if (ult && ult.validade) { venc = ult.validade; origem = 'Validade do documento enviado'; }
+  else if (ult && it.periodoMeses) { venc = P.addMonthsIso(ult.data, it.periodoMeses); origem = `${it.periodoMeses} meses após o último envio (${fmt(ult.data)})`; }
+  if (!venc) return { status: 'sem', venc: null, ult, dias: null, origem: 'Informe a data do último envio' };
+  const dias = diffDays(todayIso(), venc);
+  const status = dias < 0 ? 'venc' : dias <= S.config.antecedencia ? 'prox' : 'ok';
+  return { status, venc, ult, dias, origem };
+}
+const STATUS_TXT = { venc: 'Vencida', prox: 'Vence em breve', ok: 'Em dia', sem: 'Sem data', cumprida: 'Cumprida', evento: 'Sob demanda' };
+function diasTxt(c) {
+  if (c.dias == null) return '';
+  if (c.dias < 0) return `venceu há ${-c.dias} dia${c.dias === -1 ? '' : 's'}`;
+  if (c.dias === 0) return 'vence hoje';
+  return `faltam ${c.dias} dia${c.dias === 1 ? '' : 's'}`;
+}
+
+function todosItens(incluirSemAlerta = false) {
+  const out = [];
+  S.licencas.forEach((l) => {
+    if (l.arquivada) return;
+    l.itens.forEach((it) => {
+      if (!it.ativo && !incluirSemAlerta) return;
+      const c = calc(l, it);
+      if (c.status === 'evento' || c.status === 'cumprida') return;
+      out.push({ l, it, c });
+    });
+  });
+  const peso = { venc: 0, prox: 1, sem: 3, ok: 2 };
+  out.sort((a, b) => (peso[a.c.status] - peso[b.c.status]) || ((a.c.venc || '9') < (b.c.venc || '9') ? -1 : 1) || a.l.empreendedor.localeCompare(b.l.empreendedor));
+  return out;
+}
+
+/* ============================================================
+   Texto padrão (formal) para o Comunic@
+   ============================================================ */
+const semCoord = (s) => (s || '').replace(/,?\s*(localizad[oa]|com [áa]rea).*$/i, '').replace(/[.;,\s]+$/, '');
+function refCond(r) {
+  const sub = r.subitem ? `, alínea “${r.subitem.replace(')', '')}”` : '';
+  return `Condicionante nº ${r.numero}${sub}`;
+}
+function condTextoCitado(r) {
+  let t = r.texto.replace(/;$/, '.');
+  t = t.replace(/\s+[a-c]\)\s.*$/, '').trim(); // corta alíneas quando só a principal interessa
+  return t;
+}
+function paragrafoItem(l, it, o) {
+  const ref = it.condRefs[0];
+  const def = CATS[it.cat];
+  const val = o.validade ? fmt(o.validade) : '';
+  const per = o.referencia ? ` ${o.referencia}` : '';
+  let corpo;
+  switch (it.cat) {
+    case 'TOG':
+      corpo = `encaminha os resultados das análises trimestrais do Teor de Óleos e Graxas (TOG) do efluente proveniente do tratamento na Caixa Separadora de Água e Óleo${per ? ', referentes ao período' + per : ''}, para conhecimento e apreciação desse Instituto, em atendimento à obrigação de remessa semestral dos resultados.`; break;
+    case 'LAUDO':
+      corpo = `apresenta o Laudo de Estanqueidade/Integridade do sistema de armazenamento de combustíveis e das respectivas tubulações${val ? ', com validade até ' + val + ',' : ''} em conformidade com a normatização existente, ressaltando que a empresa responsável pela sua emissão é certificada pelo INMETRO, nos termos da Portaria INMETRO nº 259, de 24 de julho de 2008.`; break;
+    case 'AVCB':
+      corpo = `apresenta cópia do Atestado de Vistoria do Corpo de Bombeiros (AVCB) renovado${val ? ', com validade até ' + val : ''}, em cumprimento ao dever de comunicar a este Instituto a renovação do documento, que permanece válido e mantido no estabelecimento, em local visível, para fins de fiscalização.`; break;
+    case 'INMETRO':
+      corpo = `apresenta o Certificado de Conformidade das bombas de combustíveis, emitido pelo INMETRO${val ? ', com validade até ' + val : ''}, mantendo atualizada a documentação exigida pelo órgão ambiental.`; break;
+    case 'ANP':
+      corpo = `apresenta o Certificado de Posto Revendedor para combustíveis automotivos, emitido pela Agência Nacional do Petróleo, Gás Natural e Biocombustíveis (ANP)${val ? ', com validade até ' + val : ''}, mantendo atualizada a documentação exigida pelo órgão ambiental.`; break;
+    case 'TREINAMENTO':
+      corpo = `apresenta os Certificados de Treinamento Teórico e Prático em Operação, Manutenção e Resposta a Incidentes dos funcionários do empreendimento${val ? ', com validade até ' + val + ',' : ''} contemplando local, conteúdo, período de realização, carga horária e identificação do responsável pela ministração do treinamento.`; break;
+    case 'PLACA':
+      corpo = `demonstra o cumprimento da obrigação por meio de registro fotográfico da placa indicativa do empreendimento licenciado, afixada conforme o modelo disponibilizado por esse Instituto.`; break;
+    case 'PUBLICACAO':
+      corpo = `encaminha a cópia comprobatória da publicação da concessão da Licença no Diário Oficial do Estado e em periódico de grande circulação.`; break;
+    case 'RENOVACAO':
+      corpo = `requer a renovação da Licença de Operação, observada a antecedência mínima de 120 (cento e vinte) dias em relação ao término de sua validade (${fmt(l.validade)}), de modo a permitir a continuidade regular da operação do empreendimento.`; break;
+    case 'PGRS':
+      corpo = `reapresenta o Plano de Gerenciamento de Resíduos Sólidos (PGRS), com as alterações ocorridas${per ? ' (' + o.referencia + ')' : ''}, em observância à Lei Federal nº 12.305/2010 e demais instrumentos normativos aplicáveis.`; break;
+    default:
+      corpo = `encaminha a documentação comprobatória do cumprimento da exigência${per ? ' (' + o.referencia + ')' : ''}.`;
+  }
+  const refs = it.condRefs.length > 1 && it.cat !== 'RENOVACAO' ? it.condRefs.slice(0, 2).map(refCond).join(' e ') : refCond(ref);
+  return `${refs} — ${it.cat === 'OUTRA' ? it.nome : def.curto}\nExigência: “${condTextoCitado(ref)}”\nAtendimento: o empreendedor ${corpo}`;
+}
+
+function gerarTexto(licId, data, itensSel) {
+  const l = lic(licId); if (!l) return '';
+  const caract = semCoord(l.caracterizacao);
+  const abre = `Ao Instituto de Desenvolvimento Sustentável e Meio Ambiente do Rio Grande do Norte — IDEMA/RN\n\nAssunto: Atendimento a condicionantes — ${l.tipo} nº ${l.numero}${l.fatoGerador ? '\nFato gerador: ' + l.fatoGerador : ''}\n\n`;
+  const intro = `${l.empreendedor}, pessoa jurídica de direito privado inscrita no CNPJ sob o nº ${l.cnpj}${l.ie ? ', Inscrição Estadual nº ' + l.ie : ''}, titular da ${l.tipo} nº ${l.numero}, com validade até ${fmt(l.validade)}, expedida por esse Instituto para o empreendimento ${caract ? 'caracterizado como ' + caract.charAt(0).toLowerCase() + caract.slice(1) : 'licenciado'}, situado em ${l.endereco.replace(/[.\s]+$/, '')}, vem, respeitosamente, por meio do sistema Comunic@, apresentar a esse órgão ambiental a documentação discriminada a seguir, em atendimento às condicionantes da referida licença:\n\n`;
+  const paras = itensSel.map((o, i) => {
+    const it = l.itens.find((x) => x.id === o.itemId); if (!it) return '';
+    return `${i + 1}. ${paragrafoItem(l, it, o)}`;
+  }).filter(Boolean).join('\n\n');
+  const fecho = `\n\nOs documentos seguem anexos a esta mensagem. O empreendedor reafirma seu compromisso com o cumprimento integral das condicionantes da licença ambiental e da legislação aplicável, colocando-se à disposição desse Instituto para quaisquer esclarecimentos que se façam necessários.\n\nNesses termos, pede deferimento.\n\n${l.municipio || 'Natal'}/RN, ${extenso(data)}.\n\n${l.empreendedor}\nCNPJ ${l.cnpj}`;
+  return abre + intro + paras + fecho;
+}
+
+/* ============================================================
+   Estado inicial / migração
+   ============================================================ */
+async function init() {
+  await DB.open();
+  S = await DB.get('state');
+  if (!S) {
+    S = { v: 1, config: { antecedencia: 30, notifDia: '' }, licencas: JSON.parse(JSON.stringify(window.SEED_LICENCAS || [])), envios: [] };
+    // Exemplo fornecido: mensagem 3BG2O-0 do Posto Tibau (23/01/2026).
+    const t = S.licencas.find((l) => /TIBAU/.test(l.empreendedor));
+    if (t) {
+      t.fatoGerador = 'SISLIA-LO-SERVIÇOS-POSTO DE REVENDA DE COMBUSTIVEIS LIQUIDOS (GASOLINA COMUM, ETANOL E DIESEL S-10) COM CAPACIDADE DE ARMAZENAMENTO DE 60 M³. TIBAU-RN';
+      const id = (c) => t.itens.find((i) => i.cat === c).id;
+      const itens = [{ itemId: id('LAUDO'), validade: '', referencia: '' }, { itemId: id('ANP'), validade: '2026-03-01', referencia: '' }, { itemId: id('AVCB'), validade: '2026-04-01', referencia: '' }];
+      const env = { id: uid(), licId: t.id, data: '2026-01-23', mensagem: '3BG2O-0', itens, imgIds: [], criadoEm: Date.now(), texto: '' };
+      env.texto = gerarTexto(t.id, env.data, itens);
+      if (window.SEED_COMPROVANTE_TIBAU) { const k = uid(); await DB.setImg(k, dataUrlToBlob(window.SEED_COMPROVANTE_TIBAU)); env.imgIds.push(k); }
+      S.envios.push(env);
+    }
+    await DB.set('state', S);
+  }
+  render();
+  avisarNotificacoes();
+}
+
+/* ============================================================
+   Navegação
+   ============================================================ */
+let tab = 'painel';
+let filtro = { status: '', q: '' };
+let envioPre = null; // pré-seleção ao abrir "Registrar envio"
+const TABS = [['painel', 'Painel'], ['licencas', 'Licenças'], ['envio', 'Registrar envio'], ['historico', 'Histórico'], ['ajustes', 'Ajustes']];
+function go(t) { tab = t; render(); window.scrollTo(0, 0); }
+function render() {
+  $('#tabs').innerHTML = TABS.map(([k, n]) => `<button class="${k === tab ? 'on' : ''}" data-tab="${k}">${n}</button>`).join('');
+  $('#tabs').onclick = (e) => { const b = e.target.closest('button'); if (b) { if (b.dataset.tab === 'envio') envioPre = null; go(b.dataset.tab); } };
+  ({ painel: vPainel, licencas: vLicencas, envio: vEnvio, historico: vHistorico, ajustes: vAjustes })[tab]();
+}
+
+/* ============================================================
+   PAINEL
+   ============================================================ */
+function vPainel() {
+  const all = todosItens();
+  const cnt = (s) => all.filter((x) => x.c.status === s).length;
+  const lista = all.filter((x) => (!filtro.status || x.c.status === filtro.status) &&
+    (!filtro.q || (x.l.empreendedor + ' ' + x.l.municipio + ' ' + x.it.nome + ' ' + x.l.numero).toLowerCase().includes(filtro.q.toLowerCase())));
+  const ant = S.config.antecedencia;
+  const renov = all.filter((x) => x.it.cat === 'RENOVACAO' && (x.c.status === 'venc' || x.c.status === 'prox'));
+  $('#view').innerHTML = `
+    <div class="grid kpis">
+      ${[['venc', 'Vencidas'], ['prox', `Vencem em ${ant} dias`], ['sem', 'Sem data informada'], ['ok', 'Em dia']].map(([k, n]) =>
+        `<div class="card kpi ${k} ${filtro.status === k ? 'sel' : ''}" data-f="${k}"><b>${cnt(k)}</b><span>${n}</span></div>`).join('')}
+    </div>
+    ${renov.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--red)"><b style="color:var(--red)">Atenção — renovação de licença</b>
+      <div class="sm" style="margin-top:4px">${renov.map((x) => `${esc(x.l.empreendedor)}: pedido de renovação ${x.c.dias < 0 ? 'deveria ter sido protocolado até' : 'deve ser protocolado até'} <b>${fmt(x.c.venc)}</b> (${diasTxt(x.c)}). A licença vale até ${fmt(x.l.validade)}.`).join('<br>')}</div></div>` : ''}
+    <div class="bar">
+      <input type="search" id="q" placeholder="Buscar empresa, município, condicionante…" value="${esc(filtro.q)}" style="max-width:380px">
+      ${filtro.status ? `<button class="btn line sm" id="limpa">Limpar filtro</button>` : ''}
+      <span class="mut sm">${lista.length} item(ns) · aviso ${ant} dias antes do vencimento</span>
+    </div>
+    <div class="card list">
+      ${lista.length ? lista.map(({ l, it, c }) => `
+        <div class="row">
+          <div><span class="pill ${c.status}">${STATUS_TXT[c.status]}</span></div>
+          <div><div class="t">${esc(l.empreendedor)}</div>
+            <div class="s">${esc(it.nome)} · ${esc(it.condRefs[0] ? 'Cond. ' + it.condRefs[0].numero + (it.condRefs[0].subitem ? it.condRefs[0].subitem.replace(')', '') : '') : '')}${l.municipio ? ' · ' + esc(l.municipio) : ''}</div>
+            <div class="s">${c.venc ? `<b>${fmt(c.venc)}</b> — ${diasTxt(c)} · ` : ''}${esc(c.origem)}</div></div>
+          <div><button class="btn sec sm" data-env="${l.id}|${it.id}">Registrar envio</button></div>
+        </div>`).join('') : `<div class="empty">Nada por aqui${filtro.status || filtro.q ? ' com esse filtro' : ''}. 🎉</div>`}
+    </div>`;
+  $('#view').onclick = (e) => {
+    const k = e.target.closest('[data-f]'); if (k) { filtro.status = filtro.status === k.dataset.f ? '' : k.dataset.f; return vPainel(); }
+    if (e.target.id === 'limpa') { filtro.status = ''; return vPainel(); }
+    const b = e.target.closest('[data-env]'); if (b) { const [li, ii] = b.dataset.env.split('|'); envioPre = { licId: li, itemId: ii }; go('envio'); }
+  };
+  $('#q').oninput = (e) => { filtro.q = e.target.value; const pos = e.target.selectionStart; vPainel(); const n = $('#q'); n.focus(); n.setSelectionRange(pos, pos); };
+}
+
+/* ============================================================
+   LICENÇAS
+   ============================================================ */
+let licQ = '';
+function vLicencas() {
+  const ls = S.licencas.filter((l) => !licQ || (l.empreendedor + l.municipio + l.numero + l.cnpj).toLowerCase().includes(licQ.toLowerCase()))
+    .sort((a, b) => (a.arquivada - b.arquivada) || a.empreendedor.localeCompare(b.empreendedor));
+  $('#view').innerHTML = `
+    <div class="bar">
+      <h2 style="margin:0;flex:1">Licenças (${S.licencas.length})</h2>
+      <input type="search" id="lq" placeholder="Buscar licença…" value="${esc(licQ)}" style="max-width:260px">
+      <button class="btn" id="add">+ Adicionar licenças (PDF)</button>
+      <input type="file" id="file" accept="application/pdf" multiple hidden>
+    </div>
+    <p class="mut sm" style="margin-top:-4px">Selecione quantos PDFs quiser de uma vez (inclusive as 50+). O app lê o número, a validade e as condicionantes de cada licença e cria o acompanhamento automaticamente.</p>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(300px,1fr))">
+      ${ls.map((l) => {
+        const its = l.itens.filter((i) => i.ativo).map((i) => calc(l, i)).filter((c) => c.status !== 'evento' && c.status !== 'cumprida');
+        const n = (s) => its.filter((c) => c.status === s).length;
+        const rl = diffDays(todayIso(), l.validade);
+        return `<div class="card lic" data-lic="${l.id}" style="${l.arquivada ? 'opacity:.55' : ''}">
+          <div style="font-weight:700">${esc(l.empreendedor)}</div>
+          <div class="mut sm">${esc(l.tipo)} nº ${esc(l.numero)}</div>
+          <div class="mut sm">${esc(l.municipio)}/RN · CNPJ ${esc(l.cnpj)}</div>
+          <div class="sm" style="margin:6px 0">Validade: <b>${fmt(l.validade)}</b>${l.validadeEstimada ? ' (estimada)' : ''} <span class="pill ${rl < 0 ? 'venc' : rl < 180 ? 'prox' : 'ok'}">${rl < 0 ? 'licença vencida' : rl + ' dias'}</span></div>
+          <div class="chips">${l.arquivada ? '<span class="pill off">Arquivada</span>' : `${n('venc') ? `<span class="pill venc">${n('venc')} vencida(s)</span>` : ''}${n('prox') ? `<span class="pill prox">${n('prox')} em breve</span>` : ''}${n('sem') ? `<span class="pill sem">${n('sem')} sem data</span>` : ''}${n('ok') ? `<span class="pill ok">${n('ok')} em dia</span>` : ''}`}</div>
+        </div>`; }).join('') || '<div class="empty">Nenhuma licença.</div>'}
+    </div>`;
+  $('#lq').oninput = (e) => { licQ = e.target.value; const p = e.target.selectionStart; vLicencas(); const n = $('#lq'); n.focus(); n.setSelectionRange(p, p); };
+  $('#add').onclick = () => $('#file').click();
+  $('#file').onchange = (e) => importarPdfs([...e.target.files]);
+  $('#view').onclick = (e) => { const c = e.target.closest('[data-lic]'); if (c) abrirLicenca(c.dataset.lic); };
+}
+
+/* ---- Importação de PDFs (pdf.js sob demanda) ---- */
+let pdfjsReady = null;
+function carregarPdfJs() {
+  if (pdfjsReady) return pdfjsReady;
+  pdfjsReady = new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+    s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(window.pdfjsLib); };
+    s.onerror = () => { pdfjsReady = null; rej(new Error('Não foi possível carregar o leitor de PDF (verifique a conexão).')); };
+    document.head.appendChild(s);
+  });
+  return pdfjsReady;
+}
+async function lerPdf(file) {
+  const lib = await carregarPdfJs();
+  const doc = await lib.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+  let text = '';
+  for (let i = 1; i <= doc.numPages; i++) {
+    const pg = await doc.getPage(i); const c = await pg.getTextContent();
+    text += c.items.map((x) => x.str + (x.hasEOL ? '\n' : ' ')).join('') + '\n';
+  }
+  return text;
+}
+async function importarPdfs(files) {
+  if (!files.length) return;
+  const bg = document.createElement('div'); bg.className = 'modal-bg';
+  bg.innerHTML = `<div class="modal"><div class="modal-h"><h2>Lendo licenças…</h2></div><div id="prog" class="mut"></div></div>`;
+  document.body.appendChild(bg);
+  const res = [];
+  for (let i = 0; i < files.length; i++) {
+    $('#prog').textContent = `(${i + 1}/${files.length}) ${files[i].name}`;
+    try {
+      const p = P.parse(await lerPdf(files[i]), files[i].name);
+      p.itens = P.buildItens(p);
+      p.dup = S.licencas.find((l) => l.numero && l.numero === p.numero);
+      res.push(p);
+    } catch (e) { res.push({ arquivo: files[i].name, erro: e.message || String(e), itens: [], condicionantes: [], avisos: [] }); }
+  }
+  bg.remove();
+  revisarImportacao(res);
+}
+function revisarImportacao(res) {
+  const bg = document.createElement('div'); bg.className = 'modal-bg';
+  const ok = (p) => !p.erro && p.numero && p.empreendedor;
+  bg.innerHTML = `<div class="modal"><div class="modal-h"><h2>Revisar licenças lidas</h2><button class="btn line sm" id="x">Cancelar</button></div>
+    ${res.map((p, i) => `<div class="card" style="margin-bottom:10px">
+      <label style="display:flex;gap:8px;align-items:flex-start;font-size:15px;color:var(--ink)">
+        <input type="checkbox" data-i="${i}" ${ok(p) && !p.dup ? 'checked' : ''} ${ok(p) ? '' : 'disabled'} style="width:18px;height:18px;margin-top:2px">
+        <span><b>${esc(p.empreendedor || p.arquivo)}</b><br><span class="mut sm">${esc(p.tipo || '')} ${esc(p.numero || '')} · ${esc(p.municipio || '')} · validade ${fmt(p.validade)}${p.validadeEstimada ? ' (estimada)' : ''}</span></span></label>
+      ${p.erro ? `<div class="pill venc">Erro: ${esc(p.erro)}</div>` : `<div class="sm" style="margin-top:6px">${p.condicionantes.length} condicionantes lidas · ${p.itens.length} monitoradas: ${p.itens.map((x) => esc(CATS[x.cat].curto.split(' —')[0])).join(', ')}</div>`}
+      ${p.dup ? `<div class="pill prox" style="margin-top:6px">Já cadastrada — marque para substituir os dados (envios já registrados são mantidos quando possível)</div>` : ''}
+      ${(p.avisos || []).map((a) => `<div class="pill prox" style="margin-top:6px;white-space:normal">${esc(a)}</div>`).join('')}
+    </div>`).join('')}
+    <div class="bar" style="justify-content:flex-end"><button class="btn" id="ok">Adicionar selecionadas</button></div></div>`;
+  document.body.appendChild(bg);
+  $('#x', bg).onclick = () => bg.remove();
+  $('#ok', bg).onclick = () => {
+    let n = 0;
+    bg.querySelectorAll('input[data-i]:checked').forEach((cb) => {
+      const p = res[+cb.dataset.i];
+      const nova = { id: p.dup ? p.dup.id : uid(), arquivo: p.arquivo, numero: p.numero, tipo: p.tipo, empreendedor: p.empreendedor, cnpj: p.cnpj, ie: p.ie, endereco: p.endereco, municipio: p.municipio, caracterizacao: p.caracterizacao, fatoGerador: p.dup ? p.dup.fatoGerador : '', recebimento: p.recebimento, validade: p.validade, validadeEstimada: p.validadeEstimada, arquivada: false, condicionantes: p.condicionantes, itens: p.itens };
+      if (p.dup) { // preserva ids de itens por categoria para manter vínculos com envios
+        nova.itens.forEach((it) => { const old = p.dup.itens.find((o) => o.cat === it.cat); if (old) { S.envios.forEach((e) => { if (e.licId === nova.id) e.itens.forEach((x) => { if (x.itemId === old.id) x.itemId = it.id; }); }); it.ativo = old.ativo; it.periodoMeses = old.periodoMeses; } });
+        S.licencas[S.licencas.indexOf(p.dup)] = nova;
+      } else S.licencas.push(nova);
+      n++;
+    });
+    save(); bg.remove(); toast(`${n} licença(s) adicionada(s).`); render();
+  };
+}
+
+/* ---- Detalhe da licença ---- */
+function abrirLicenca(id) {
+  const l = lic(id); if (!l) return;
+  const bg = document.createElement('div'); bg.className = 'modal-bg';
+  const campos = [['empreendedor', 'Empreendedor'], ['cnpj', 'CNPJ'], ['ie', 'Inscrição Estadual'], ['numero', 'Nº da licença / processo'], ['municipio', 'Município'], ['endereco', 'Endereço do empreendimento']];
+  const draw = () => {
+    bg.innerHTML = `<div class="modal">
+      <div class="modal-h"><div><h2 style="margin:0">${esc(l.empreendedor)}</h2><div class="mut sm">${esc(l.tipo)} nº ${esc(l.numero)}</div></div><button class="btn line sm" id="x">Fechar</button></div>
+      <div class="card">
+        <div class="two">${campos.map(([k, n]) => `<div><label>${n}</label><input type="text" data-k="${k}" value="${esc(l[k])}"></div>`).join('')}</div>
+        <div class="two" style="margin-top:10px">
+          <div><label>Recebida no Comunic@ em</label><input type="date" data-k="recebimento" value="${esc(l.recebimento)}"></div>
+          <div><label>Validade da licença ${l.validadeEstimada ? '(estimada — confira)' : ''}</label><input type="date" data-k="validade" value="${esc(l.validade)}"></div>
+        </div>
+        <div style="margin-top:10px"><label>Fato gerador (como aparece no Comunic@ — opcional)</label><input type="text" data-k="fatoGerador" value="${esc(l.fatoGerador)}" placeholder="Ex.: SISLIA-LO-SERVIÇOS-POSTO DE REVENDA DE COMBUSTIVEIS LIQUIDOS …"></div>
+        <div style="margin-top:10px"><label>Caracterização do empreendimento</label><textarea data-k="caracterizacao">${esc(l.caracterizacao)}</textarea></div>
+      </div>
+      <h3>Condicionantes acompanhadas</h3>
+      <div class="card" style="padding:0;overflow-x:auto"><table>
+        <thead><tr><th>Condicionante</th><th>Cond. nº</th><th>Periodicidade</th><th>Próximo vencimento</th><th>Alerta</th><th></th></tr></thead>
+        <tbody>${l.itens.map((it) => { const c = calc(l, it); return `<tr>
+          <td><b>${esc(it.nome)}</b><div class="mut sm">${it.modo === 'unica' ? 'Prazo único' + (it.prazoInicial ? ` (${it.prazoInicial.dias} dias após a emissão)` : '') : it.modo === 'derivado' ? 'Calculado: validade − 120 dias' : it.modo === 'evento' ? 'Reapresentar quando houver alteração' : it.modo === 'validade' ? 'Vence na validade do documento' : 'Periódica'}</div></td>
+          <td>${it.condRefs.map((r) => r.numero + (r.subitem ? r.subitem.replace(')', '') : '')).join(', ') || '—'}</td>
+          <td>${['periodico', 'validade'].includes(it.modo) ? `<input type="number" min="1" max="120" style="width:70px" data-m="${it.id}" value="${it.periodoMeses || ''}"> meses` : '—'}</td>
+          <td>${c.venc ? `<b>${fmt(c.venc)}</b><div class="mut sm">${diasTxt(c)}</div>` : '<span class="mut">—</span>'} <span class="pill ${c.status}">${STATUS_TXT[c.status]}</span></td>
+          <td><input type="checkbox" data-on="${it.id}" ${it.ativo ? 'checked' : ''} style="width:18px;height:18px"></td>
+          <td style="white-space:nowrap"><button class="btn sec sm" data-env="${it.id}">Registrar envio</button> ${it.cat === 'OUTRA' ? `<button class="btn danger sm" data-del="${it.id}">×</button>` : ''}</td></tr>`; }).join('')}</tbody>
+      </table></div>
+      <div class="mut sm" style="margin:6px 2px">Periodicidade em meses: usada quando o documento enviado não informa validade. AVCB, INMETRO, ANP e treinamentos assumem 12 meses até você ajustar — a licença não define esse prazo.</div>
+      <div class="bar" style="margin-top:8px"><button class="btn line sm" id="novo">+ Condicionante personalizada</button></div>
+      <details><summary>Texto integral das condicionantes (${l.condicionantes.length})</summary>
+        ${l.condicionantes.map((c) => `<div class="cond ${l.itens.some((i) => i.condRefs.some((r) => r.numero === c.numero)) ? 'mon' : ''}"><b>${c.numero}.</b> ${esc(c.texto)}</div>`).join('')}
+      </details>
+      <div class="bar" style="margin-top:14px;justify-content:space-between">
+        <div><button class="btn line sm" id="arq">${l.arquivada ? 'Reativar licença' : 'Arquivar (parar avisos)'}</button> <button class="btn danger sm" id="del">Excluir licença</button></div>
+        <button class="btn" id="env">Registrar envio ao IDEMA</button>
+      </div></div>`;
+    bind();
+  };
+  const bind = () => {
+    $('#x', bg).onclick = () => { bg.remove(); render(); };
+    bg.querySelectorAll('[data-k]').forEach((i) => { i.onchange = () => { l[i.dataset.k] = i.value; if (i.dataset.k === 'validade') l.validadeEstimada = false; save(); if (i.dataset.k === 'validade') draw(); }; });
+    bg.querySelectorAll('[data-m]').forEach((i) => { i.onchange = () => { const it = l.itens.find((x) => x.id === i.dataset.m); it.periodoMeses = Math.max(1, +i.value || 1); save(); draw(); }; });
+    bg.querySelectorAll('[data-on]').forEach((i) => { i.onchange = () => { l.itens.find((x) => x.id === i.dataset.on).ativo = i.checked; save(); draw(); }; });
+    bg.querySelectorAll('[data-env]').forEach((b) => { b.onclick = () => { envioPre = { licId: l.id, itemId: b.dataset.env }; bg.remove(); go('envio'); }; });
+    bg.querySelectorAll('[data-del]').forEach((b) => { b.onclick = () => { l.itens = l.itens.filter((x) => x.id !== b.dataset.del); save(); draw(); }; });
+    $('#env', bg).onclick = () => { envioPre = { licId: l.id }; bg.remove(); go('envio'); };
+    $('#arq', bg).onclick = () => { l.arquivada = !l.arquivada; save(); draw(); };
+    $('#del', bg).onclick = () => { if (confirm('Excluir esta licença e seus envios registrados? Isso não pode ser desfeito.')) { S.licencas = S.licencas.filter((x) => x !== l); S.envios = S.envios.filter((e) => e.licId !== l.id); save(); bg.remove(); render(); } };
+    $('#novo', bg).onclick = () => {
+      const nome = prompt('Nome da condicionante (ex.: Relatório de monitoramento de poços):'); if (!nome) return;
+      const m = parseInt(prompt('A cada quantos meses deve ser enviada/renovada?', '12'), 10); if (!m) return;
+      const num = prompt('Nº da condicionante na licença (opcional):', '') || '';
+      const txt = prompt('Texto da condicionante, como está na licença (aparece no texto do Comunic@):', nome) || nome;
+      l.itens.push({ id: uid(), cat: 'OUTRA', nome, modo: 'periodico', periodoMeses: m, condRefs: [{ numero: num || '—', subitem: '', texto: txt }], ativo: true, prazoInicial: null });
+      save(); draw();
+    };
+  };
+  document.body.appendChild(bg); draw();
+}
+
+/* ============================================================
+   REGISTRAR ENVIO (última data + print do comprovante + texto)
+   ============================================================ */
+let envioImgs = []; // File[]
+function vEnvio() {
+  const ativas = S.licencas.filter((l) => !l.arquivada).sort((a, b) => a.empreendedor.localeCompare(b.empreendedor));
+  if (!ativas.length) { $('#view').innerHTML = '<div class="empty">Cadastre uma licença primeiro.</div>'; return; }
+  const sel = (envioPre && envioPre.licId && lic(envioPre.licId)) || ativas[0];
+  const preItem = envioPre && envioPre.itemId;
+  $('#view').innerHTML = `
+    <h2>Registrar envio ao IDEMA (Comunic@)</h2>
+    <p class="mut sm" style="margin-top:-6px">Informe a data do envio, marque as condicionantes atendidas, anexe o print do comprovante do Comunic@ e copie o texto padrão. A data registrada passa a ser a base do próximo aviso.</p>
+    <div class="grid" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:start" id="envgrid">
+      <div class="card">
+        <div><label>Licença</label><select id="elic">${ativas.map((l) => `<option value="${l.id}" ${l.id === sel.id ? 'selected' : ''}>${esc(l.empreendedor)} — ${esc(l.numero)}</option>`).join('')}</select></div>
+        <div class="two" style="margin-top:10px">
+          <div><label>Data do envio (publicação no Comunic@)</label><input type="date" id="edata" value="${todayIso()}"></div>
+          <div><label>Nº da mensagem (ex.: 3BG2O-0)</label><input type="text" id="emsg" placeholder="opcional"></div>
+        </div>
+        <h3>Condicionantes atendidas neste envio</h3>
+        <div id="eitens"></div>
+        <h3>Print do comprovante</h3>
+        <input type="file" id="eimg" accept="image/*,application/pdf" multiple>
+        <div class="thumbs" id="eprev" style="margin-top:8px"></div>
+        <p class="mut sm">Pode anexar agora ou depois, pelo Histórico.</p>
+        <div class="bar" style="margin-top:10px"><button class="btn" id="esave">Salvar envio</button></div>
+      </div>
+      <div class="card">
+        <div class="bar" style="justify-content:space-between"><b>Texto padrão para o Comunic@</b><button class="btn sec sm" id="ecopy">Copiar texto</button></div>
+        <textarea id="etxt" style="min-height:420px"></textarea>
+        <div class="mut sm">O texto é gerado a partir da licença e das condicionantes marcadas; pode editar antes de copiar.</div>
+      </div>
+    </div>`;
+  if (innerWidth < 900) $('#envgrid').style.gridTemplateColumns = '1fr';
+  const draw = () => {
+    const l = lic($('#elic').value);
+    $('#eitens').innerHTML = l.itens.filter((it) => it.modo !== 'derivado' || true).map((it) => {
+      const c = calc(l, it);
+      const usaVal = it.modo === 'validade' || it.cat === 'LAUDO';
+      const on = preItem ? it.id === preItem : (it.ativo && (c.status === 'venc' || c.status === 'prox'));
+      return `<div class="item-sel ${on ? 'on' : ''}" data-id="${it.id}">
+        <label class="hd" style="color:var(--ink);font-size:14.5px;margin:0"><input type="checkbox" ${on ? 'checked' : ''}><span><b>${esc(it.nome)}</b><br><span class="mut sm">Cond. ${it.condRefs.map((r) => r.numero + (r.subitem ? r.subitem.replace(')', '') : '')).join(', ')} · <span class="pill ${c.status}">${STATUS_TXT[c.status]}</span> ${c.venc ? fmt(c.venc) : ''}</span></span></label>
+        <div class="more two">
+          ${usaVal ? `<div><label>Validade do documento enviado</label><input type="date" data-val></div>` : ''}
+          <div style="${usaVal ? '' : 'grid-column:1/-1'}"><label>${it.cat === 'TOG' ? 'Período das análises (ex.: jan–jun/2026)' : 'Observação / referência (opcional)'}</label><input type="text" data-ref placeholder="${it.cat === 'TOG' ? 'de janeiro a junho de 2026' : ''}"></div>
+        </div></div>`;
+    }).join('');
+    $('#eitens').querySelectorAll('.item-sel').forEach((box) => {
+      const cb = $('input[type=checkbox]', box);
+      cb.onchange = () => { box.classList.toggle('on', cb.checked); texto(); };
+      box.querySelectorAll('input[data-val],input[data-ref]').forEach((i) => i.oninput = texto);
+    });
+    texto();
+  };
+  const selecionados = () => [...$('#eitens').querySelectorAll('.item-sel')].filter((b) => $('input[type=checkbox]', b).checked).map((b) => {
+    const v = $('[data-val]', b), r = $('[data-ref]', b);
+    return { itemId: b.dataset.id, validade: v ? v.value : '', referencia: r ? r.value.trim() : '' };
+  });
+  const texto = () => { const s = selecionados(); $('#etxt').value = s.length ? gerarTexto($('#elic').value, $('#edata').value || todayIso(), s) : 'Marque ao menos uma condicionante para gerar o texto.'; };
+  $('#elic').onchange = () => { envioPre = { licId: $('#elic').value }; draw(); };
+  $('#edata').onchange = texto;
+  $('#ecopy').onclick = async () => { try { await navigator.clipboard.writeText($('#etxt').value); } catch (e) { $('#etxt').select(); document.execCommand('copy'); } toast('Texto copiado.'); };
+  envioImgs = [];
+  $('#eimg').onchange = (e) => {
+    envioImgs = [...e.target.files];
+    $('#eprev').innerHTML = envioImgs.map((f) => f.type.startsWith('image/') ? `<img class="thumb" src="${URL.createObjectURL(f)}" alt="">` : `<span class="chip">${esc(f.name)}</span>`).join('');
+  };
+  $('#esave').onclick = async () => {
+    const s = selecionados(); if (!s.length) return toast('Marque ao menos uma condicionante.');
+    if (!$('#edata').value) return toast('Informe a data do envio.');
+    const imgIds = [];
+    for (const f of envioImgs) { const k = uid(); await DB.setImg(k, f); imgIds.push(k); }
+    S.envios.push({ id: uid(), licId: $('#elic').value, data: $('#edata').value, mensagem: $('#emsg').value.trim(), itens: s, imgIds, criadoEm: Date.now(), texto: $('#etxt').value });
+    save(); envioPre = null; toast('Envio registrado. Próximos vencimentos atualizados.'); go('historico');
+  };
+  draw();
+}
+
+/* ============================================================
+   HISTÓRICO
+   ============================================================ */
+async function vHistorico() {
+  const ev = [...S.envios].sort((a, b) => (b.data + b.criadoEm).localeCompare(a.data + a.criadoEm));
+  const blocks = [];
+  for (const e of ev) {
+    const l = lic(e.licId); if (!l) continue;
+    const imgs = [];
+    for (const k of e.imgIds) { const b = await DB.getImg(k); if (b) imgs.push({ k, b, url: URL.createObjectURL(b) }); }
+    blocks.push({ e, l, imgs });
+  }
+  $('#view').innerHTML = `<h2>Histórico de envios (${blocks.length})</h2>
+    ${blocks.length ? blocks.map(({ e, l, imgs }) => `<div class="card" style="margin-bottom:10px">
+      <div class="bar" style="justify-content:space-between;margin:0">
+        <div><b>${esc(l.empreendedor)}</b><div class="mut sm">${fmt(e.data)}${e.mensagem ? ' · Mensagem ' + esc(e.mensagem) : ''} · ${esc(l.numero)}</div></div>
+        ${imgs.length ? '<span class="pill ok">Comprovante anexado</span>' : '<span class="pill prox">Falta o comprovante</span>'}
+      </div>
+      <div class="chips" style="margin:8px 0">${e.itens.map((x) => { const it = l.itens.find((i) => i.id === x.itemId); return it ? `<span class="chip">${esc(CATS[it.cat] ? CATS[it.cat].curto.split(' —')[0] : it.nome)}${x.validade ? ' · val. ' + fmt(x.validade) : ''}</span>` : ''; }).join('')}</div>
+      <div class="thumbs">${imgs.map((i) => i.b.type.startsWith('image/') ? `<img class="thumb" src="${i.url}" data-big="${i.url}" alt="comprovante">` : `<a class="chip" href="${i.url}" target="_blank">PDF anexado</a>`).join('')}</div>
+      <div class="bar" style="margin:10px 0 0">
+        <button class="btn sec sm" data-act="ver|${e.id}">Ver texto / imprimir</button>
+        <button class="btn sec sm" data-act="copiar|${e.id}">Copiar texto</button>
+        <label class="btn line sm" style="margin:0;color:var(--ink)">+ Comprovante<input type="file" accept="image/*,application/pdf" multiple hidden data-add="${e.id}"></label>
+        <button class="btn danger sm" data-act="excluir|${e.id}">Excluir</button>
+      </div></div>`).join('') : '<div class="empty">Nenhum envio registrado ainda.</div>'}`;
+  $('#view').onclick = async (ev2) => {
+    const big = ev2.target.closest('[data-big]'); if (big) return window.open(big.dataset.big, '_blank');
+    const b = ev2.target.closest('[data-act]'); if (!b) return;
+    const [act, id] = b.dataset.act.split('|'); const e = S.envios.find((x) => x.id === id);
+    if (act === 'copiar') { try { await navigator.clipboard.writeText(e.texto); toast('Texto copiado.'); } catch (x) { toast('Não foi possível copiar.'); } }
+    if (act === 'ver') verEnvio(e);
+    if (act === 'excluir' && confirm('Excluir este envio? As datas de vencimento serão recalculadas.')) { for (const k of e.imgIds) await DB.delImg(k); S.envios = S.envios.filter((x) => x !== e); save(); vHistorico(); }
+  };
+  $('#view').onchange = async (ev2) => {
+    const inp = ev2.target.closest('[data-add]'); if (!inp) return;
+    const e = S.envios.find((x) => x.id === inp.dataset.add);
+    for (const f of inp.files) { const k = uid(); await DB.setImg(k, f); e.imgIds.push(k); }
+    save(); vHistorico();
+  };
+}
+async function verEnvio(e) {
+  const l = lic(e.licId);
+  const imgs = [];
+  for (const k of e.imgIds) { const b = await DB.getImg(k); if (b && b.type.startsWith('image/')) imgs.push(await blobToDataUrl(b)); }
+  const bg = document.createElement('div'); bg.className = 'modal-bg';
+  const html = `<pre class="txt">${esc(e.texto)}</pre>${imgs.map((u) => `<img src="${u}" style="max-width:100%;margin-top:12px;border-radius:8px;border:1px solid var(--line)" alt="comprovante">`).join('')}`;
+  bg.innerHTML = `<div class="modal"><div class="modal-h"><div><h2 style="margin:0">${esc(l.empreendedor)}</h2><div class="mut sm">Envio de ${fmt(e.data)}${e.mensagem ? ' · ' + esc(e.mensagem) : ''}</div></div>
+    <div><button class="btn sm" id="pr">Imprimir / salvar PDF</button> <button class="btn line sm" id="x">Fechar</button></div></div>${html}</div>`;
+  document.body.appendChild(bg);
+  $('#x', bg).onclick = () => bg.remove();
+  $('#pr', bg).onclick = () => { $('#print-area').innerHTML = html; window.print(); };
+}
+
+/* ============================================================
+   AJUSTES: antecedência, notificações, calendário, backup
+   ============================================================ */
+function vAjustes() {
+  const perm = 'Notification' in window ? Notification.permission : 'indisponível';
+  $('#view').innerHTML = `<h2>Ajustes</h2>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr))">
+      <div class="card"><h3 style="margin-top:0">Avisos</h3>
+        <label>Avisar quantos dias antes do vencimento?</label>
+        <input type="number" id="ant" min="1" max="365" value="${S.config.antecedencia}" style="max-width:120px">
+        <p class="sm mut">Notificações do navegador (aparecem ao abrir o app): <b>${perm === 'granted' ? 'ativadas' : perm === 'denied' ? 'bloqueadas no navegador' : perm === 'default' ? 'desativadas' : perm}</b></p>
+        <button class="btn sec sm" id="notif" ${perm === 'granted' || perm === 'denied' || perm === 'indisponível' ? 'disabled' : ''}>Ativar notificações</button>
+      </div>
+      <div class="card"><h3 style="margin-top:0">Lembretes no celular (calendário)</h3>
+        <p class="sm mut">Baixe um arquivo .ics com todos os vencimentos. Ao importar no Google Agenda, Outlook ou Apple Calendário, cada vencimento já vem com alarme <b>30 dias</b> e <b>7 dias</b> antes — assim o aviso chega mesmo com o app fechado. Reexporte quando registrar novos envios.</p>
+        <button class="btn sec sm" id="ics">Baixar calendário (.ics)</button>
+      </div>
+      <div class="card"><h3 style="margin-top:0">Backup</h3>
+        <p class="sm mut">Os dados ficam salvos neste navegador/aparelho. Para usar em outro computador ou guardar uma cópia, exporte o backup e importe no outro.</p>
+        <button class="btn sec sm" id="exp">Exportar backup (.json)</button>
+        <label class="btn line sm" style="margin:0 0 0 6px;color:var(--ink)">Importar backup<input type="file" id="imp" accept="application/json" hidden></label>
+      </div>
+    </div>`;
+  $('#ant').onchange = (e) => { S.config.antecedencia = Math.max(1, +e.target.value || 30); save(); toast('Salvo.'); };
+  $('#notif').onclick = async () => { await Notification.requestPermission(); vAjustes(); avisarNotificacoes(); };
+  $('#ics').onclick = exportarIcs;
+  $('#exp').onclick = exportarBackup;
+  $('#imp').onchange = importarBackup;
+}
+function baixar(nome, tipo, conteudo) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([conteudo], { type: tipo })); a.download = nome; document.body.appendChild(a); a.click(); a.remove(); }
+function exportarIcs() {
+  const fold = (s) => s.replace(/(.{70})/g, '$1\r\n ');
+  const t = (s) => String(s).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+  const L = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Condicionantes Ambientais//PT-BR', 'CALSCALE:GREGORIAN'];
+  let n = 0;
+  todosItens().forEach(({ l, it, c }) => {
+    if (!c.venc) return; n++;
+    const d = c.venc.replace(/-/g, ''); const fim = P.addDaysIso(c.venc, 1).replace(/-/g, '');
+    L.push('BEGIN:VEVENT', `UID:${it.id}-${d}@condicionantes`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`, `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${fim}`,
+      fold('SUMMARY:' + t(`Vence: ${it.nome} — ${l.empreendedor}`)), fold('DESCRIPTION:' + t(`${l.tipo} nº ${l.numero}\n${c.origem}`)));
+    [S.config.antecedencia, 7].forEach((dd) => L.push('BEGIN:VALARM', 'ACTION:DISPLAY', fold('DESCRIPTION:' + t(`Em ${dd} dias: ${it.nome} — ${l.empreendedor}`)), `TRIGGER:-P${dd}D`, 'END:VALARM'));
+    L.push('END:VEVENT');
+  });
+  L.push('END:VCALENDAR');
+  if (!n) return toast('Ainda não há vencimentos com data.');
+  baixar('condicionantes.ics', 'text/calendar', L.join('\r\n')); toast(`${n} vencimentos exportados.`);
+}
+async function exportarBackup() {
+  const imgs = {};
+  for (const e of S.envios) for (const k of e.imgIds) { const b = await DB.getImg(k); if (b) imgs[k] = await blobToDataUrl(b); }
+  baixar(`backup-condicionantes-${todayIso()}.json`, 'application/json', JSON.stringify({ estado: S, imgs }));
+}
+function importarBackup(ev) {
+  const f = ev.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = async () => {
+    try {
+      const d = JSON.parse(r.result); if (!d.estado || !Array.isArray(d.estado.licencas)) throw new Error('arquivo inválido');
+      if (!confirm('Importar este backup substitui TODOS os dados atuais. Continuar?')) return;
+      for (const k of Object.keys(d.imgs || {})) await DB.setImg(k, dataUrlToBlob(d.imgs[k]));
+      S = d.estado; await DB.set('state', S); toast('Backup importado.'); render();
+    } catch (e) { toast('Não foi possível importar: ' + e.message); }
+  };
+  r.readAsText(f);
+}
+function avisarNotificacoes() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (S.config.notifDia === todayIso()) return;
+  const al = todosItens().filter((x) => x.c.status === 'venc' || x.c.status === 'prox');
+  if (!al.length) return;
+  S.config.notifDia = todayIso(); save();
+  const top = al.slice(0, 3).map((x) => `${x.l.empreendedor}: ${x.it.nome} (${diasTxt(x.c)})`).join('\n');
+  try { new Notification(`${al.length} condicionante(s) exigem atenção`, { body: top }); } catch (e) { /* ignore */ }
+}
+
+init();
+</script>
+</body>
+</html>
