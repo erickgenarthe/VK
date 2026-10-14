@@ -317,12 +317,12 @@ async function init() {
 let tab = 'painel';
 let filtro = { status: '', q: '' };
 let envioPre = null; // pré-seleção ao abrir "Registrar envio"
-const TABS = [['painel', 'Painel'], ['licencas', 'Licenças'], ['envio', 'Registrar envio'], ['historico', 'Histórico'], ['ajustes', 'Ajustes']];
+const TABS = [['painel', 'Painel'], ['renov', 'Renovações'], ['licencas', 'Licenças'], ['envio', 'Registrar envio'], ['historico', 'Histórico'], ['ajustes', 'Ajustes']];
 function go(t) { tab = t; render(); window.scrollTo(0, 0); }
 function render() {
   $('#tabs').innerHTML = TABS.map(([k, n]) => `<button class="${k === tab ? 'on' : ''}" data-tab="${k}">${n}</button>`).join('');
   $('#tabs').onclick = (e) => { const b = e.target.closest('button'); if (b) { if (b.dataset.tab === 'envio') envioPre = null; go(b.dataset.tab); } };
-  ({ painel: vPainel, licencas: vLicencas, envio: vEnvio, historico: vHistorico, ajustes: vAjustes })[tab]();
+  ({ painel: vPainel, renov: vRenov, licencas: vLicencas, envio: vEnvio, historico: vHistorico, ajustes: vAjustes })[tab]();
 }
 
 /* ---- Situação de cada condicionante (editável pelo usuário) ---- */
@@ -399,6 +399,35 @@ function vPainel() {
   };
   $('#view').onchange = (e) => { const s = e.target.closest('[data-sit]'); if (s) { const [li, ii] = s.dataset.sit.split('|'); mudarSituacao(li, ii, s.value); } };
   $('#q').oninput = (e) => { filtro.q = e.target.value; const pos = e.target.selectionStart; vPainel(); const n = $('#q'); n.focus(); n.setSelectionRange(pos, pos); };
+}
+
+/* ============================================================
+   RENOVAÇÕES: matriz empresa × documento (AVCB, TOG, ANP)
+   ============================================================ */
+const RENOV_COLS = [['AVCB', 'AVCB'], ['TOG', 'TOG'], ['ANP', 'ANP']];
+let renovOrd = 'prazo';
+function vRenov() {
+  const linhas = S.licencas.filter((l) => !l.arquivada).map((l) => {
+    const cel = RENOV_COLS.map(([cat]) => { const it = l.itens.find((i) => i.cat === cat && i.ativo); return it ? { it, c: calc(l, it) } : null; });
+    const datas = cel.filter((x) => x && x.c.venc).map((x) => x.c.venc).sort();
+    return { l, cel, prox: datas[0] || '9999' };
+  });
+  linhas.sort((a, b) => renovOrd === 'prazo' ? (a.prox < b.prox ? -1 : a.prox > b.prox ? 1 : a.l.empreendedor.localeCompare(b.l.empreendedor)) : a.l.empreendedor.localeCompare(b.l.empreendedor));
+  const per = (cat) => { const it = S.licencas.flatMap((l) => l.itens).find((i) => i.cat === cat); return it ? it.periodoMeses : ''; };
+  $('#view').innerHTML = `
+    <div class="bar"><h2 style="margin:0;flex:1">Datas de renovação</h2>
+      <label style="margin:0">Ordenar por</label><select id="ord" style="width:auto"><option value="prazo" ${renovOrd === 'prazo' ? 'selected' : ''}>Vencimento mais próximo</option><option value="nome" ${renovOrd === 'nome' ? 'selected' : ''}>Empresa (A–Z)</option></select></div>
+    <p class="mut sm" style="margin-top:-4px">Cada célula mostra quando o documento precisa ser renovado e reenviado ao IDEMA. Clique em uma célula para informar ou atualizar a data. Ciclos: AVCB ${per('AVCB') || 12} meses, TOG e ANP ${per('ANP') || 3} meses (ou a validade do documento, quando informada).</p>
+    <div class="card" style="padding:0;overflow-x:auto"><table style="min-width:720px">
+      <thead><tr><th>Empresa</th>${RENOV_COLS.map(([, n]) => `<th>${n}</th>`).join('')}</tr></thead>
+      <tbody>${linhas.map(({ l, cel }) => `<tr><td><b>${esc(l.empreendedor)}</b><div class="mut sm">${esc(l.municipio)}/RN</div></td>${cel.map((x) => {
+        if (!x) return '<td class="mut">—</td>';
+        const { it, c } = x;
+        return `<td><button class="btn line sm" style="text-align:left;width:100%;white-space:normal" data-rc="${l.id}|${it.id}">${c.venc ? `<b>${fmt(c.venc)}</b><br><span class="sm mut">${diasTxt(c)}</span><br>` : ''}<span class="pill ${c.status}">${STATUS_TXT[c.status]}</span></button></td>`; }).join('')}</tr>`).join('')}</tbody>
+    </table></div>
+    <p class="mut sm">“—” indica que a licença não traz essa exigência (ou o item foi marcado como “Não se aplica”).</p>`;
+  $('#ord').onchange = (e) => { renovOrd = e.target.value; vRenov(); };
+  $('#view').onclick = (e) => { const b = e.target.closest('[data-rc]'); if (!b) return; const [li, ii] = b.dataset.rc.split('|'); const l = lic(li); atendidaForm(l, l.itens.find((x) => x.id === ii)); };
 }
 
 /* ============================================================
