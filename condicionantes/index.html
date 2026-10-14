@@ -237,7 +237,7 @@ function paragrafoItem(l, it, o) {
   let corpo;
   switch (it.cat) {
     case 'TOG':
-      corpo = `encaminha os resultados das análises trimestrais do Teor de Óleos e Graxas (TOG) do efluente proveniente do tratamento na Caixa Separadora de Água e Óleo${per ? ', referentes ao período' + per : ''}, para conhecimento e apreciação desse Instituto, em atendimento à obrigação de remessa semestral dos resultados.`; break;
+      corpo = `encaminha os resultados das análises trimestrais do Teor de Óleos e Graxas (TOG) do efluente proveniente do tratamento na Caixa Separadora de Água e Óleo${per ? ', referentes ao período' + per : ''}, para conhecimento e apreciação desse Instituto.`; break;
     case 'LAUDO':
       corpo = `apresenta o Laudo de Estanqueidade/Integridade do sistema de armazenamento de combustíveis e das respectivas tubulações${val ? ', com validade até ' + val + ',' : ''} em conformidade com a normatização existente, ressaltando que a empresa responsável pela sua emissão é certificada pelo INMETRO, nos termos da Portaria INMETRO nº 259, de 24 de julho de 2008.`; break;
     case 'AVCB':
@@ -296,6 +296,15 @@ async function init() {
       S.envios.push(env);
     }
     await DB.set('state', S);
+  }
+  if (S.v < 2) { // periodicidades definidas pelo usuário
+    S.licencas.forEach((l) => l.itens.forEach((it) => {
+      if (it.cat === 'TOG') { it.periodoMeses = 3; it.nome = 'Análise de Óleos e Graxas (TOG) — trimestral'; }
+      if (it.cat === 'ANP') it.periodoMeses = 3;
+      if (it.cat === 'AVCB' || it.cat === 'INMETRO') it.periodoMeses = 12;
+      if (it.cat === 'PLACA' || it.cat === 'PUBLICACAO') it.ativo = true;
+    }));
+    S.v = 2; await DB.set('state', S);
   }
   render();
   avisarNotificacoes();
@@ -488,7 +497,7 @@ function abrirLicenca(id) {
           <td><input type="checkbox" data-on="${it.id}" ${it.ativo ? 'checked' : ''} style="width:18px;height:18px"></td>
           <td style="white-space:nowrap"><button class="btn sec sm" data-env="${it.id}">Registrar envio</button> ${it.cat === 'OUTRA' ? `<button class="btn danger sm" data-del="${it.id}">×</button>` : ''}</td></tr>`; }).join('')}</tbody>
       </table></div>
-      <div class="mut sm" style="margin:6px 2px">Periodicidade em meses: usada quando o documento enviado não informa validade. AVCB, INMETRO, ANP e treinamentos assumem 12 meses até você ajustar — a licença não define esse prazo.</div>
+      <div class="mut sm" style="margin:6px 2px">Periodicidade em meses: usada quando o documento enviado não informa validade. AVCB e INMETRO: 12 meses; ANP e TOG: 3 meses. Laudo (60 meses) e treinamentos (12 meses) são prazos assumidos — ajuste se necessário. Placa (90 dias) e publicação (10 dias) contam da emissão da licença.</div>
       <div class="bar" style="margin-top:8px"><button class="btn line sm" id="novo">+ Condicionante personalizada</button></div>
       <details><summary>Texto integral das condicionantes (${l.condicionantes.length})</summary>
         ${l.condicionantes.map((c) => `<div class="cond ${l.itens.some((i) => i.condRefs.some((r) => r.numero === c.numero)) ? 'mon' : ''}"><b>${c.numero}.</b> ${esc(c.texto)}</div>`).join('')}

@@ -36,7 +36,7 @@
   // Categorias monitoráveis. mode: 'periodico' (a cada N meses desde a última entrega),
   // 'validade' (vence na validade do documento anexado), 'unica' (prazo único após a emissão), 'derivado'.
   const CATS = {
-    TOG:        { nome: 'Análise de Óleos e Graxas (TOG) — envio semestral', curto: 'Teor de Óleos e Graxas (TOG)', modo: 'periodico', meses: 6, docs: 'resultados das análises trimestrais do Teor de Óleos e Graxas (TOG) do efluente tratado na Caixa Separadora de Água e Óleo (CSAO)' },
+    TOG:        { nome: 'Análise de Óleos e Graxas (TOG) — trimestral', curto: 'Teor de Óleos e Graxas (TOG)', modo: 'periodico', meses: 3, docs: 'resultados das análises trimestrais do Teor de Óleos e Graxas (TOG) do efluente tratado na Caixa Separadora de Água e Óleo (CSAO)' },
     LAUDO:      { nome: 'Laudo de Estanqueidade/Integridade', curto: 'Laudo de Estanqueidade/Integridade do SASC', modo: 'periodico', meses: 60, docs: 'Laudo de Estanqueidade/Integridade do sistema de armazenamento subterrâneo de combustíveis (SASC) e respectivas tubulações, emitido por empresa certificada pelo INMETRO' },
     AVCB:       { nome: 'AVCB — Corpo de Bombeiros', curto: 'AVCB — Atestado de Vistoria do Corpo de Bombeiros', modo: 'validade', docs: 'Atestado de Vistoria do Corpo de Bombeiros (AVCB) renovado' },
     INMETRO:    { nome: 'Certificado de Conformidade das bombas (INMETRO)', curto: 'Certificado de Conformidade das bombas (INMETRO)', modo: 'validade', docs: 'Certificado de Conformidade das bombas de combustíveis, emitido pelo INMETRO' },
@@ -147,7 +147,7 @@
 
 
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-  const DEFAULT_MESES = { TOG: 6, LAUDO: 60, AVCB: 12, INMETRO: 12, ANP: 12, TREINAMENTO: 12 };
+  const DEFAULT_MESES = { TOG: 3, LAUDO: 60, AVCB: 12, INMETRO: 12, ANP: 3, TREINAMENTO: 12 };
 
   // Consolida as condicionantes classificadas em UM item monitorado por categoria.
   function buildItens(p) {
@@ -165,7 +165,7 @@
         id: uid(), cat, nome: def.nome, modo: def.modo,
         periodoMeses: fixo ? fixo.periodoMeses : (DEFAULT_MESES[cat] || null),
         condRefs: [rec].concat(refs.filter((r) => r !== rec)).map((r) => ({ numero: r.numero, subitem: r.subitem || '', texto: r.texto })),
-        ativo: !(def.modo === 'unica' || def.modo === 'evento'),
+        ativo: def.modo !== 'evento',
         prazoInicial: null,
       };
       if (prazoRef && prazoRef.dias && p.recebimento && cat !== 'RENOVACAO') item.prazoInicial = { dias: prazoRef.dias, venceEm: addDaysIso(p.recebimento, prazoRef.dias) };
