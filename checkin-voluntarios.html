@@ -684,7 +684,8 @@ function startVagasWatcher() {
 
 const AREAS = [
   "LDC", "Ninho", "Arca", "Reino", "Safári", "Connect",
-  "Farol", "Check-in", "Louvor", "Produção", "Mentor L.Jr", "Comunicadores"
+  "Farol", "Check-in", "Louvor", "Produção", "Mentor L.Jr", "Comunicadores",
+  "Comunicador Sala de Culto"
 ];
 
 function todayKey() {
@@ -977,7 +978,7 @@ function renderPessoasList(elId, names) {
 }
 
 function renderMapaRotacao(records) {
-  const arcaNomes = [...nomesPorArea(records, 'Arca'), ...nomesPorArea(records, 'Louvor')];
+  const arcaNomes = [...nomesPorArea(records, 'Arca'), ...nomesPorArea(records, 'Louvor'), ...nomesPorArea(records, 'Comunicadores')];
   const ninhoNomes = [...nomesPorArea(records, 'Ninho'), ...nomesPorArea(records, 'Comunicadores')];
   renderPessoasList('mapaPessoas-Arca', arcaNomes);
   renderPessoasList('mapaPessoas-Ninho', ninhoNomes);
@@ -986,15 +987,20 @@ function renderMapaRotacao(records) {
   const assignment = currentStationAssignment();
   const faseLabel = document.getElementById('mapaFaseLabel');
 
+  // A Estação Entrega é a "sala de culto" da rotação — o Comunicador de lá fica fixo ali,
+  // independente de qual grupo (Connect/Reino/Safári) está girando por ela no momento.
+  const entregaFixos = nomesPorArea(records, 'Comunicador Sala de Culto');
+
   ['Energia', 'Criativa', 'Entrega'].forEach(station => {
     const badgeEl = document.getElementById('mapaBadge-' + station);
     const area = assignment ? Object.keys(assignment).find(a => assignment[a] === station) : null;
+    const fixos = station === 'Entrega' ? entregaFixos : [];
     if (area) {
       badgeEl.innerHTML = `<span class="mapa-badge-area">${AREA_ICON[area] || ''} ${escapeHtml(area)}</span>`;
-      renderPessoasList('mapaPessoas-' + station, nomesPorArea(records, area));
+      renderPessoasList('mapaPessoas-' + station, [...nomesPorArea(records, area), ...fixos]);
     } else {
       badgeEl.innerHTML = `<span class="mapa-badge-vazia">Aguardando o culto começar</span>`;
-      renderPessoasList('mapaPessoas-' + station, []);
+      renderPessoasList('mapaPessoas-' + station, fixos);
     }
   });
 
