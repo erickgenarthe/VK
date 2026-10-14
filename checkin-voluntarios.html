@@ -325,9 +325,9 @@
           <option value="Líder de Sala">Líder de Sala</option>
           <option value="Líder de Horário">Líder de Horário</option>
           <option value="Auxiliar de Sala ou Horário">Auxiliar de Sala ou Horário</option>
-          <option value="Voluntário">Voluntário</option>
-          <option value="Supervisor">Supervisor</option>
-          <option value="Coordenador">Coordenador</option>
+          <option value="Voluntário(a)">Voluntário(a)</option>
+          <option value="Supervisor(a)">Supervisor(a)</option>
+          <option value="Coordenador(a)">Coordenador(a)</option>
           <option value="Trainee">Trainee</option>
         </select>
       </div>
@@ -410,9 +410,9 @@
         <option value="Líder de Sala">Líder de Sala</option>
         <option value="Líder de Horário">Líder de Horário</option>
         <option value="Auxiliar de Sala ou Horário">Auxiliar de Sala ou Horário</option>
-        <option value="Voluntário">Voluntário</option>
-        <option value="Supervisor">Supervisor</option>
-        <option value="Coordenador">Coordenador</option>
+        <option value="Voluntário(a)">Voluntário(a)</option>
+        <option value="Supervisor(a)">Supervisor(a)</option>
+        <option value="Coordenador(a)">Coordenador(a)</option>
         <option value="Trainee">Trainee</option>
       </select>
     </div>
@@ -962,8 +962,8 @@ function currentStationAssignment() {
 
 function nomesPorArea(records, area) {
   return records
-    .filter(r => !r.borrowed && !r.checkoutTs && r.area === area)
-    .map(r => r.name);
+    .filter(r => !r.checkoutTs && r.area === area)
+    .map(r => r.borrowed ? r.name + ' (emprestado)' : r.name);
 }
 
 function renderPessoasList(elId, names) {
@@ -1088,7 +1088,7 @@ function leadingNumber(s) {
 // o formato padrão HH:MM na hora de exibir/agrupar, mesmo antes de rodar a correção definitiva.
 const HORARIO_GROUPS = [
   { label: 'Domingo', options: ['09:00', '11:00', '17:00', '19:00'] },
-  { label: 'Quarta-feira', options: ['17:30'] }
+  { label: 'Quarta-feira', options: ['19:30'] }
 ];
 let sporadicHorarios = [];
 // Última leitura de check-ins de hoje (cache local), usada pra filtro de busca e checagem de duplicados
@@ -1119,7 +1119,7 @@ function normalizeHorario(raw) {
   let s = String(raw).trim().toLowerCase();
   if (!s) return 'Sem horário informado';
 
-  const canonical = ['09:00', '11:00', '17:00', '17:30', '19:00'];
+  const canonical = ['09:00', '11:00', '17:00', '19:00', '19:30'];
   if (canonical.includes(s)) return s;
 
   const words = {
@@ -1328,7 +1328,7 @@ function showLabel(rec) {
   document.getElementById('pl-name').textContent = rec.name;
   document.getElementById('pl-area').textContent = rec.area;
   document.getElementById('pl-num').textContent = '#' + String(rec.seq).padStart(3,'0');
-  document.getElementById('pl-role').textContent = rec.role ? rec.role : 'Voluntário';
+  document.getElementById('pl-role').textContent = rec.role ? rec.role : 'Voluntário(a)';
   document.getElementById('pl-date').textContent = todayDisplay();
 
   const tag = document.getElementById('pl-tag');
