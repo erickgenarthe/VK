@@ -649,7 +649,7 @@ async function lerPlanilha(arquivo){
   } else {
     const buf = await arquivo.arrayBuffer();
     let txt = new TextDecoder('utf-8').decode(buf);
-    if (txt.includes('�')) txt = new TextDecoder('windows-1252').decode(buf);
+    if (txt.includes('\uFFFD')) txt = new TextDecoder('windows-1252').decode(buf);
     matriz = parseCSV(txt);
   }
   matriz = matriz.filter(l => l.some(c => String(c).trim()));
