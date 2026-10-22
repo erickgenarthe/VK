@@ -42,6 +42,7 @@
     INMETRO:    { nome: 'Certificado de Conformidade das bombas (INMETRO)', curto: 'Certificado de Conformidade das bombas (INMETRO)', modo: 'validade', docs: 'Certificado de Conformidade das bombas de combustíveis, emitido pelo INMETRO' },
     ANP:        { nome: 'Certificado de Posto Revendedor (ANP)', curto: 'Certificado de Posto Revendedor (ANP)', modo: 'validade', docs: 'Certificado de Posto Revendedor para combustíveis automotivos, emitido pela ANP' },
     TREINAMENTO:{ nome: 'Certificados de treinamento dos funcionários', curto: 'Certificados de Treinamento Teórico e Prático', modo: 'validade', docs: 'Certificados de Treinamento Teórico e Prático em Operação, Manutenção e Resposta a Incidentes dos funcionários' },
+    RESIDUOS:   { nome: 'Relatório semestral de resíduos oleosos', curto: 'Relatório de resíduos oleosos (coleta e destinação)', modo: 'periodico', meses: 6, docs: 'relatório e comprovantes de coleta, transporte e destinação final dos resíduos oleosos' },
     PLACA:      { nome: 'Placa indicativa do empreendimento', curto: 'Placa indicativa do empreendimento licenciado', modo: 'unica', docs: 'registro fotográfico da placa indicativa do empreendimento licenciado' },
     PUBLICACAO: { nome: 'Publicação da licença (D.O.E. e jornal)', curto: 'Publicação da concessão da licença', modo: 'unica', docs: 'cópia comprobatória da publicação da concessão da licença no Diário Oficial do Estado e em periódico de grande circulação' },
     RENOVACAO:  { nome: 'Requerimento de renovação da licença', curto: 'Requerimento de renovação da Licença de Operação', modo: 'derivado', docs: 'requerimento de renovação da Licença de Operação' },
@@ -80,6 +81,7 @@
     if (/certificados? de treinamento/.test(t)) out.push({ ...base, cat: 'TREINAMENTO', recorrente: /manter .*atualizad/.test(t), dias: diasDe(txt) });
     if (/placa indicativa/.test(t)) out.push({ ...base, cat: 'PLACA', dias: diasDe(txt) });
     if (/publicar a concess[ãa]o/.test(t)) out.push({ ...base, cat: 'PUBLICACAO', dias: diasDe(txt) });
+    if (/semestralmente/.test(t) && /res[íi]duos/.test(t) && /oleos/.test(t)) out.push({ ...base, cat: 'RESIDUOS', dias: null });
     if (/plano de gerenciamento de res[íi]duos/.test(t)) out.push({ ...base, cat: 'PGRS', dias: null });
     if (/tem validade de .*renova[çc][ãa]o/.test(t)) out.push({ ...base, cat: 'RENOVACAO', dias: 120 });
     return out;
@@ -91,7 +93,8 @@
     const pick = (re) => { const m = re.exec(s); return m ? m[1].trim() : ''; };
 
     const numero = pick(/N[º°o]\s*(\d{4}-\d+\/[A-Z]+\/[A-Z]+-\d+)/);
-    const tipo = /RENOVA[ÇC][ÃA]O DE LICEN[ÇC]A DE OPERA[ÇC][ÃA]O/.test(s) ? 'Renovação de Licença de Operação'
+    const tipo = /LICEN[ÇC]A DE REGULARIZA[ÇC][ÃA]O DE OPERA[ÇC][ÃA]O/.test(s) ? 'Licença de Regularização de Operação'
+      : /RENOVA[ÇC][ÃA]O DE LICEN[ÇC]A DE OPERA[ÇC][ÃA]O/.test(s) ? 'Renovação de Licença de Operação'
       : /LICEN[ÇC]A DE OPERA[ÇC][ÃA]O/.test(s) ? 'Licença de Operação'
       : /LICEN[ÇC]A PR[ÉE]VIA/.test(s) ? 'Licença Prévia'
       : /LICEN[ÇC]A DE INSTALA[ÇC][ÃA]O/.test(s) ? 'Licença de Instalação' : 'Licença';
@@ -104,7 +107,12 @@
       brToIso(pick(/Natal\(RN\),\s*(\d{2}\/\d{2}\/\d{4})/));
     let validade = brToIso(pick(/Data de Validade:\s*(\d{2}\/\d{2}\/\d{4})/));
     let validadeEstimada = false;
-    if (!validade && recebimento) { validade = addMonthsIso(recebimento, 72); validadeEstimada = true; warn.push('Data de validade não consta no PDF: calculada como 6 anos a partir do recebimento.'); }
+    if (!validade && recebimento) {
+      const mv = /tem validade de\s*(\d+)\s*\(?[a-zê]*\)?\s*anos?/i.exec(s);
+      const anos = mv ? parseInt(mv[1], 10) : 6;
+      validade = addMonthsIso(recebimento, anos * 12); validadeEstimada = true;
+      warn.push(`Data de validade não consta no PDF: calculada como ${anos} anos a partir do recebimento.`);
+    }
     const codigo = pick(/informando o c[óo]digo:\s*([A-Z0-9-]+)/);
     // município (UF)
     const mun = /Munic[íi]pio de ([^,.\/]+?)(?:\s*\/\s*([A-Z]{2}))?[.,]/.exec(endereco + '.') ||
@@ -122,8 +130,8 @@
     let pos = 0, n = 1;
     const starts = [];
     for (;;) {
-      const re = new RegExp('(?:^|\\s)' + n + '\\.\\s+(?=\\S)');
-      const m = re.exec(body.slice(pos));
+      let m = new RegExp('(?:^|\\s)' + n + '\\.\\s+(?=\\S)').exec(body.slice(pos));
+      if (!m) m = new RegExp('(?:^|\\s)' + n + '\\s+(?=[A-ZÀ-Ú]\\s+[A-ZÀ-Ú][a-zà-ú]|[A-ZÀ-Ú][a-zà-ú])').exec(body.slice(pos)); // “2 O Empreendedor” (ponto faltando)
       if (!m) break;
       starts.push({ n, i: pos + m.index + m[0].length - 0, head: pos + m.index });
       pos = pos + m.index + m[0].length;
@@ -147,7 +155,7 @@
 
 
   const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-4);
-  const DEFAULT_MESES = { TOG: 3, LAUDO: 60, AVCB: 12, INMETRO: 12, ANP: 3, TREINAMENTO: 12 };
+  const DEFAULT_MESES = { RESIDUOS: 6, TOG: 3, LAUDO: 60, AVCB: 12, INMETRO: 12, ANP: 3, TREINAMENTO: 12 };
 
   // Consolida as condicionantes classificadas em UM item monitorado por categoria.
   function buildItens(p) {
@@ -171,7 +179,7 @@
       if (prazoRef && prazoRef.dias && p.recebimento && cat !== 'RENOVACAO') item.prazoInicial = { dias: prazoRef.dias, venceEm: addDaysIso(p.recebimento, prazoRef.dias) };
       itens.push(item);
     });
-    const ordem = ['RENOVACAO', 'AVCB', 'INMETRO', 'ANP', 'LAUDO', 'TOG', 'TREINAMENTO', 'PGRS', 'PLACA', 'PUBLICACAO'];
+    const ordem = ['RENOVACAO', 'AVCB', 'INMETRO', 'ANP', 'LAUDO', 'TOG', 'RESIDUOS', 'TREINAMENTO', 'PGRS', 'PLACA', 'PUBLICACAO'];
     itens.sort((a, b) => ordem.indexOf(a.cat) - ordem.indexOf(b.cat));
     return itens;
   }

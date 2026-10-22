@@ -184,6 +184,7 @@ function calc(l, it) {
   let venc = null, origem = '';
   if (it.situacao === 'pendente') return { status: 'pend', venc: null, ult, dias: null, origem: 'Marcada como pendente — registre o envio quando for atendida' };
   if (it.modo === 'evento') return { status: 'evento', venc: null, ult, dias: null, origem: 'Sob demanda' };
+  if ((it.modo === 'unica' || it.modo === 'derivado') && it.situacao === 'atendida' && !ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Marcada como já atendida' };
   if (it.modo === 'derivado') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Pedido protocolado em ' + fmt(ult.data) }; venc = P.addDaysIso(l.validade, -120); origem = 'Licença vale até ' + fmt(l.validade) + ' (pedido ≥120 dias antes)'; }
   else if (it.modo === 'unica') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Comprovada em ' + fmt(ult.data) }; if (it.prazoInicial) { venc = it.prazoInicial.venceEm; origem = `Prazo único de ${it.prazoInicial.dias} dias após a emissão`; } }
   else if (ult && ult.validade) { venc = ult.validade; origem = 'Validade do documento enviado'; }
@@ -239,6 +240,8 @@ function paragrafoItem(l, it, o) {
   switch (it.cat) {
     case 'TOG':
       corpo = `encaminha os resultados das análises trimestrais do Teor de Óleos e Graxas (TOG) do efluente proveniente do tratamento na Caixa Separadora de Água e Óleo${per ? ', referentes ao período' + per : ''}, para conhecimento e apreciação desse Instituto.`; break;
+    case 'RESIDUOS':
+      corpo = `encaminha o relatório semestral e os respectivos comprovantes de coleta, transporte e destinação final dos resíduos oleosos gerados no empreendimento${per ? ', referentes ao período' + per : ''}, para conhecimento e apreciação desse Instituto.`; break;
     case 'LAUDO':
       corpo = `apresenta o Laudo de Estanqueidade/Integridade do sistema de armazenamento de combustíveis e das respectivas tubulações${val ? ', com validade até ' + val + ',' : ''} em conformidade com a normatização existente, ressaltando que a empresa responsável pela sua emissão é certificada pelo INMETRO, nos termos da Portaria INMETRO nº 259, de 24 de julho de 2008.`; break;
     case 'AVCB':
@@ -307,6 +310,11 @@ async function init() {
     }));
     S.v = 2; await DB.set('state', S);
   }
+  if (S.v < 3) { // novas licenças da base inicial (não duplica as já existentes)
+    const tem = new Set(S.licencas.map((l) => l.numero));
+    (window.SEED_LICENCAS || []).forEach((l) => { if (!tem.has(l.numero)) S.licencas.push(JSON.parse(JSON.stringify(l))); });
+    S.v = 3; await DB.set('state', S);
+  }
   render();
   avisarNotificacoes();
 }
@@ -343,7 +351,7 @@ function atendidaForm(l, it) {
   const bg = document.createElement('div'); bg.className = 'modal-bg';
   bg.innerHTML = `<div class="modal" style="max-width:560px"><div class="modal-h"><div><h2 style="margin:0">Já atendida</h2><div class="mut sm">${esc(l.empreendedor)} — ${esc(it.nome)}</div></div><button class="btn line sm" id="x">Cancelar</button></div>
     <div class="card"><div class="two">
-      <div><label>Data em que foi enviada ao IDEMA</label><input type="date" id="qd" value="${todayIso()}"></div>
+      <div><label>Data em que foi enviada ao IDEMA${prazo ? ' (opcional)' : ''}</label><input type="date" id="qd" value="${prazo ? '' : todayIso()}"></div>
       ${usaVal ? `<div><label>Validade do documento enviado</label><input type="date" id="qv"></div>` : '<div></div>'}
       <div><label>Nº da mensagem no Comunic@ (opcional)</label><input type="text" id="qm"></div>
       <div><label>Print do comprovante (opcional)</label><input type="file" id="qf" accept="image/*,application/pdf" multiple></div></div>
@@ -352,7 +360,9 @@ function atendidaForm(l, it) {
   document.body.appendChild(bg);
   $('#x', bg).onclick = () => { bg.remove(); render(); };
   $('#qs', bg).onclick = async () => {
-    const data = $('#qd', bg).value; if (!data) return toast('Informe a data.');
+    const data = $('#qd', bg).value;
+    if (!data && prazo) { it.situacao = 'atendida'; save(); bg.remove(); toast('Marcada como já atendida.'); return render(); }
+    if (!data) return toast('Informe a data.');
     const imgIds = []; for (const f of $('#qf', bg).files) { const k = uid(); await DB.setImg(k, f); imgIds.push(k); }
     const itens = [{ itemId: it.id, validade: usaVal ? $('#qv', bg).value : '', referencia: '' }];
     S.envios.push({ id: uid(), licId: l.id, data, mensagem: $('#qm', bg).value.trim(), itens, imgIds, criadoEm: Date.now(), texto: gerarTexto(l.id, data, itens) });
@@ -380,6 +390,7 @@ function vPainel() {
     <div class="bar">
       <input type="search" id="q" placeholder="Buscar empresa, município, condicionante…" value="${esc(filtro.q)}" style="max-width:380px">
       ${filtro.status ? `<button class="btn line sm" id="limpa">Limpar filtro</button>` : ''}
+      <button class="btn line sm" id="bulk" title="Prazos únicos (90 e 10 dias após a emissão) que você já cumpriu">Placa e publicação: marcar todas como já atendidas</button>
       <span class="mut sm">${lista.length} item(ns) · aviso ${ant} dias antes do vencimento</span>
     </div>
     <div class="card list">
@@ -395,6 +406,7 @@ function vPainel() {
   $('#view').onclick = (e) => {
     const k = e.target.closest('[data-f]'); if (k) { filtro.status = filtro.status === k.dataset.f ? '' : k.dataset.f; return vPainel(); }
     if (e.target.id === 'limpa') { filtro.status = ''; return vPainel(); }
+    if (e.target.id === 'bulk') { if (!confirm('Marcar placa e publicação de TODAS as licenças como já atendidas?')) return; let n = 0; S.licencas.forEach((l) => l.itens.forEach((it) => { if ((it.cat === 'PLACA' || it.cat === 'PUBLICACAO') && it.situacao !== 'atendida') { it.situacao = 'atendida'; it.ativo = true; n++; } })); save(); toast(n + ' item(ns) marcados.'); return vPainel(); }
     const b = e.target.closest('[data-env]'); if (b) { const [li, ii] = b.dataset.env.split('|'); envioPre = { licId: li, itemId: ii }; go('envio'); }
   };
   $('#view').onchange = (e) => { const s = e.target.closest('[data-sit]'); if (s) { const [li, ii] = s.dataset.sit.split('|'); mudarSituacao(li, ii, s.value); } };
