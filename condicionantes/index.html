@@ -110,6 +110,7 @@ th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.03em
 
 <script src="parser.js"></script>
 <script src="seed.js"></script>
+<script src="docs.js"></script>
 <script>
 'use strict';
 /* ============================================================
@@ -187,8 +188,14 @@ function calc(l, it) {
   if ((it.modo === 'unica' || it.modo === 'derivado') && it.situacao === 'atendida' && !ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Marcada como já atendida' };
   if (it.modo === 'derivado') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Pedido protocolado em ' + fmt(ult.data) }; venc = P.addDaysIso(l.validade, -120); origem = 'Licença vale até ' + fmt(l.validade) + ' (pedido ≥120 dias antes)'; }
   else if (it.modo === 'unica') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Comprovada em ' + fmt(ult.data) }; if (it.prazoInicial) { venc = it.prazoInicial.venceEm; origem = `Prazo único de ${it.prazoInicial.dias} dias após a emissão`; } }
-  else if (ult && ult.validade) { venc = ult.validade; origem = 'Validade do documento enviado'; }
-  else if (ult && it.periodoMeses) { venc = P.addMonthsIso(ult.data, it.periodoMeses); origem = `${it.periodoMeses} meses após o último envio (${fmt(ult.data)})`; }
+  else {
+    // fonte mais recente entre o envio registrado no Comunic@ e o documento encontrado na pasta
+    const d = it.doc;
+    const usaDoc = d && (!ult || d.data > ult.data);
+    const fonte = usaDoc ? { data: d.data, validade: d.validade || '', rotulo: 'Documento na pasta: ' + (d.obs || fmt(d.data)) } : ult ? { data: ult.data, validade: ult.validade, rotulo: null } : null;
+    if (fonte && fonte.validade) { venc = fonte.validade; origem = fonte.rotulo || 'Validade do documento enviado'; }
+    else if (fonte && it.periodoMeses) { venc = P.addMonthsIso(fonte.data, it.periodoMeses); origem = fonte.rotulo ? `${fonte.rotulo} → +${it.periodoMeses} meses` : `${it.periodoMeses} meses após o último envio (${fmt(fonte.data)})`; }
+  }
   if (!venc) return { status: 'sem', venc: null, ult, dias: null, origem: it.situacao === 'atendida' ? 'Atendida — informe a data do último envio' : 'Informe a data do último envio' };
   const dias = diffDays(todayIso(), venc);
   const status = dias < 0 ? 'venc' : dias <= S.config.antecedencia ? 'prox' : 'ok';
@@ -326,8 +333,45 @@ async function init() {
     });
     S.v = 4; await DB.set('state', S);
   }
+  if (S.v < 5) await migrarDocs();
   render();
   avisarNotificacoes();
+}
+
+/* Documentos das pastas (docs.js): licenças novas, datas dos documentos e protocolos reais do Comunic@. */
+async function migrarDocs() {
+  const d2 = (s) => (s || '').replace(/\D/g, '');
+  const tem = new Set(S.licencas.map((l) => l.numero));
+  (window.SEED_LICENCAS || []).forEach((l) => { if (!tem.has(l.numero)) S.licencas.push(JSON.parse(JSON.stringify(l))); });
+  const ord = ['RENOVACAO', 'AVCB', 'INMETRO', 'ANP', 'LAUDO', 'TOG', 'RESIDUOS', 'TREINAMENTO', 'PGRS', 'PLACA', 'PUBLICACAO', 'OUTRA'];
+  S.licencas.forEach((l) => {
+    const docs = (window.DOCS_PASTAS || {})[d2(l.cnpj)]; if (!docs) return;
+    Object.keys(docs).forEach((cat) => {
+      const dd = docs[cat];
+      if (cat === 'IBAMA') {
+        let it = l.itens.find((i) => i.extra === 'IBAMA');
+        if (!it) { it = { id: uid(), cat: 'OUTRA', extra: 'IBAMA', nome: 'IBAMA — Certificado de Regularidade (CTF/APP)', modo: 'validade', periodoMeses: 3, condRefs: [{ numero: '—', subitem: '', texto: 'Obrigação federal (IBAMA/CTF-APP), não é condicionante da licença do IDEMA.' }], ativo: true, prazoInicial: null }; l.itens.push(it); }
+        it.doc = dd; return;
+      }
+      const it = l.itens.find((i) => i.cat === cat); if (it) it.doc = dd;
+    });
+    l.itens.sort((a, b) => ord.indexOf(a.cat) - ord.indexOf(b.cat));
+  });
+  // Posto da Serra: protocolos reais já enviados ao IDEMA
+  const serra = S.licencas.find((l) => d2(l.cnpj) === '29120373000188');
+  if (serra && !S.envios.some((e) => e.licId === serra.id)) {
+    for (const p of (window.ENVIOS_SERRA || [])) {
+      const itens = p.cats.map((c) => serra.itens.find((i) => i.cat === c)).filter(Boolean).map((i) => ({ itemId: i.id, validade: '', referencia: '' }));
+      const env = { id: uid(), licId: serra.id, data: p.data, mensagem: p.mensagem, itens, imgIds: [], criadoEm: Date.now(), texto: gerarTexto(serra.id, p.data, itens) };
+      const b64 = (window.SEED_COMPROVANTES_SERRA || {})[p.mensagem];
+      if (b64) { const k = uid(); await DB.setImg(k, dataUrlToBlob('data:image/jpeg;base64,' + b64)); env.imgIds.push(k); }
+      S.envios.push(env);
+      itens.forEach((o) => { const it = serra.itens.find((i) => i.id === o.itemId); it.situacao = 'atendida'; });
+    }
+  }
+  // Tibau: o laudo reenviado em 23/01/2026 é o teste de 26/07/2021 (vale 5 anos a partir do teste)
+  S.envios.forEach((e) => e.itens.forEach((x) => { const l = lic(e.licId); const it = l && l.itens.find((i) => i.id === x.itemId); if (it && it.cat === 'LAUDO' && e.mensagem === '3BG2O-0' && !x.validade) x.validade = '2026-07-26'; }));
+  S.v = 5; await DB.set('state', S);
 }
 
 /* ============================================================
@@ -582,7 +626,7 @@ function abrirLicenca(id) {
           <td><b>${esc(it.nome)}</b><div class="mut sm">${it.modo === 'unica' ? 'Prazo único' + (it.prazoInicial ? ` (${it.prazoInicial.dias} dias após a emissão)` : '') : it.modo === 'derivado' ? 'Calculado: validade − 120 dias' : it.modo === 'evento' ? 'Reapresentar quando houver alteração' : it.modo === 'validade' ? 'Vence na validade do documento' : 'Periódica'}</div></td>
           <td>${it.condRefs.map((r) => r.numero + (r.subitem ? r.subitem.replace(')', '') : '')).join(', ') || '—'}</td>
           <td>${['periodico', 'validade'].includes(it.modo) ? `<input type="number" min="1" max="120" style="width:70px" data-m="${it.id}" value="${it.periodoMeses || ''}"> meses` : '—'}</td>
-          <td>${c.venc ? `<b>${fmt(c.venc)}</b><div class="mut sm">${diasTxt(c)}</div>` : '<span class="mut">—</span>'} <span class="pill ${c.status}">${STATUS_TXT[c.status]}</span></td>
+          <td>${c.venc ? `<b>${fmt(c.venc)}</b><div class="mut sm">${diasTxt(c)}</div>` : '<span class="mut">—</span>'} <span class="pill ${c.status}">${STATUS_TXT[c.status]}</span><div class="mut sm">${esc(c.origem)}</div></td>
           <td><select data-dsit="${it.id}" style="width:auto">${sitOpts(it)}</select></td>
           <td><input type="checkbox" data-on="${it.id}" ${it.ativo ? 'checked' : ''} style="width:18px;height:18px"></td>
           <td style="white-space:nowrap"><button class="btn sec sm" data-env="${it.id}">Registrar envio</button> ${it.cat === 'OUTRA' ? `<button class="btn danger sm" data-del="${it.id}">×</button>` : ''}</td></tr>`; }).join('')}</tbody>
