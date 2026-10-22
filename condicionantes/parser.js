@@ -15,6 +15,7 @@
     /Website:\s*\S+/g,
     /E-mail:\s*\S+/g,
     /Governo do Estado do Rio Grande do Norte\s*Secretaria de Estado do Meio Ambiente e Recursos H[íi]dricos\s*Instituto de Desenvolvimento Sustent[áa]vel\s*e Meio Ambiente do Rio Grande do Norte/g,
+    /Revisado em [a-zç]+ \d{4}\s+P[áa]gina \d+ de \d+/gi,
     /Powered by TCPDF \(www\.tcpdf\.org\)/g,
     /Natal\(RN\),\s*\d{2}\/\d{2}\/\d{4}/g,
   ];
@@ -77,13 +78,13 @@
       kinds.forEach((c) => out.push({ ...base, cat: c, recorrente: false, dias: diasDe(txt), periodoMeses: /60 \(sessenta\) meses/.test(txt) ? 60 : null }));
     }
     if (/teor de [óo]leos e graxas/.test(t)) out.push({ ...base, cat: 'TOG', dias: null });
-    if (/\bavcb\b/.test(t) && /apresentar a este instituto sempre que renovado/.test(t)) out.push({ ...base, cat: 'AVCB', dias: null });
+    if (/\bavcb\b|corpo de bombeiros/.test(t)) out.push({ ...base, cat: 'AVCB', dias: null });
     if (/certificados? de treinamento/.test(t)) out.push({ ...base, cat: 'TREINAMENTO', recorrente: /manter .*atualizad/.test(t), dias: diasDe(txt) });
     if (/placa indicativa/.test(t)) out.push({ ...base, cat: 'PLACA', dias: diasDe(txt) });
     if (/publicar a concess[ãa]o/.test(t)) out.push({ ...base, cat: 'PUBLICACAO', dias: diasDe(txt) });
     if (/semestralmente/.test(t) && /res[íi]duos/.test(t) && /oleos/.test(t)) out.push({ ...base, cat: 'RESIDUOS', dias: null });
     if (/plano de gerenciamento de res[íi]duos/.test(t)) out.push({ ...base, cat: 'PGRS', dias: null });
-    if (/tem validade de .*renova[çc][ãa]o/.test(t)) out.push({ ...base, cat: 'RENOVACAO', dias: 120 });
+    if (/tem validade de .*(renova[çc][ãa]o|licen[çc]a subsequente)/.test(t)) out.push({ ...base, cat: 'RENOVACAO', dias: 120 });
     return out;
   }
 
@@ -170,7 +171,7 @@
       const fixo = refs.find((r) => r.periodoMeses);
       const prazoRef = def.modo === 'unica' ? refs.find((r) => r.dias) : unica[0];
       const item = {
-        id: uid(), cat, nome: def.nome, modo: def.modo,
+        id: uid(), cat, nome: cat === 'AVCB' && refs.some((r) => /CLCB/.test(r.texto)) ? 'AVCB ou CLCB — Corpo de Bombeiros' : def.nome, modo: def.modo,
         periodoMeses: fixo ? fixo.periodoMeses : (DEFAULT_MESES[cat] || null),
         condRefs: [rec].concat(refs.filter((r) => r !== rec)).map((r) => ({ numero: r.numero, subitem: r.subitem || '', texto: r.texto })),
         ativo: def.modo !== 'evento',

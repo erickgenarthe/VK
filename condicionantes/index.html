@@ -245,7 +245,7 @@ function paragrafoItem(l, it, o) {
     case 'LAUDO':
       corpo = `apresenta o Laudo de Estanqueidade/Integridade do sistema de armazenamento de combustíveis e das respectivas tubulações${val ? ', com validade até ' + val + ',' : ''} em conformidade com a normatização existente, ressaltando que a empresa responsável pela sua emissão é certificada pelo INMETRO, nos termos da Portaria INMETRO nº 259, de 24 de julho de 2008.`; break;
     case 'AVCB':
-      corpo = `apresenta cópia do Atestado de Vistoria do Corpo de Bombeiros (AVCB) renovado${val ? ', com validade até ' + val : ''}, em cumprimento ao dever de comunicar a este Instituto a renovação do documento, que permanece válido e mantido no estabelecimento, em local visível, para fins de fiscalização.`; break;
+      corpo = `apresenta cópia do Atestado de Vistoria do Corpo de Bombeiros (AVCB)${/CLCB/.test(ref.texto) ? ' ou do Certificado de Licenciamento do Corpo de Bombeiros (CLCB)' : ''} renovado${val ? ', com validade até ' + val : ''}, em cumprimento à exigência de manter o documento válido no estabelecimento, em local visível, para fins de fiscalização, comunicando a este Instituto a sua renovação.`; break;
     case 'INMETRO':
       corpo = `apresenta o Certificado de Conformidade das bombas de combustíveis, emitido pelo INMETRO${val ? ', com validade até ' + val : ''}, mantendo atualizada a documentação exigida pelo órgão ambiental.`; break;
     case 'ANP':
@@ -314,6 +314,17 @@ async function init() {
     const tem = new Set(S.licencas.map((l) => l.numero));
     (window.SEED_LICENCAS || []).forEach((l) => { if (!tem.has(l.numero)) S.licencas.push(JSON.parse(JSON.stringify(l))); });
     S.v = 3; await DB.set('state', S);
+  }
+  if (S.v < 4) { // revisão: itens que o leitor antigo não reconheceu (ex.: AVCB sem a frase “sempre que renovado”)
+    S.licencas.forEach((l) => {
+      const sd = (window.SEED_LICENCAS || []).find((x) => x.numero === l.numero); if (!sd) return;
+      l.condicionantes = sd.condicionantes;
+      sd.itens.forEach((it) => { if (!l.itens.some((i) => i.cat === it.cat)) l.itens.push(JSON.parse(JSON.stringify(it))); });
+      const ord = ['RENOVACAO', 'AVCB', 'INMETRO', 'ANP', 'LAUDO', 'TOG', 'RESIDUOS', 'TREINAMENTO', 'PGRS', 'PLACA', 'PUBLICACAO', 'OUTRA'];
+      l.itens.sort((a, b) => ord.indexOf(a.cat) - ord.indexOf(b.cat));
+      l.itens.forEach((i) => { if (i.cat === 'AVCB' && i.condRefs.some((r) => /CLCB/.test(r.texto))) i.nome = 'AVCB ou CLCB — Corpo de Bombeiros'; });
+    });
+    S.v = 4; await DB.set('state', S);
   }
   render();
   avisarNotificacoes();
