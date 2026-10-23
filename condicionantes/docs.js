@@ -90,6 +90,39 @@ window.DOCS_PASTAS = {
     TOG: { data: '2026-06-17', arq: 'TOG (06.287.722 0001-55 ESTEVAM E CASTRO).pdf', obs: 'Coleta em 17/06/2026' },
     TCFA: { data: '2024-01-29', validade: '2024-01-31', arq: 'BOLETOS IBAMA EM ABERTO (6 boletos)', obs: '6 boletos TCFA em aberto na pasta: 2022/3 a 2023/4, todos com vencimento em 31/01/2024' },
   },
+  // 18 — Posto Central São Sebastião (Coronel João Pessoa)
+  '12203201000175': {
+    AVCB: { data: '2024-08-22', validade: '2025-08-22', arq: 'AVCB_POSTO CENTRAL SAO SEBASTIAO LTDA.pdf', obs: 'AVCB emitido em 22/08/2024' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP POSTO CENTRAL SAO SEBASTIAO LTDA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '12.203.201 0001-75 POSTO CENTRAL SAO SEBASTIAO LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+    LAUDO: { data: '2022-08-25', validade: '2027-08-25', arq: 'TESTE DE ESTANQUEIDADE_POSTO CENTRAL SAO SEBASTIAO LTDA.pdf', obs: 'Ensaio de 25/08/2022; 5 anos' },
+    IBAMA: { data: '2026-07-24', validade: '2026-10-24', arq: 'IBAMA POSTO CENTRAL SÃO SEBASTIÃO.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 24/07/2026' },
+  },
+  // 19 — Posto Elgiano / Posto Gomes (Gomes Comércio de Combustíveis)
+  '40973051000114': {
+    AVCB: { data: '2025-05-21', validade: '2026-05-21', arq: 'AVCB_POSTO GOMES.pdf', obs: 'AVCB emitido em 21/05/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP POSTO GOMES.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '40.973.051 0001-14 GOMES COMERCIO DE COMBUSTIVEIS LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+  },
+  // 20 — Auto Posto Pais e Filhos (licença do IDEMA não está na pasta)
+  '15479953000151': {
+    AVCB: { data: '2025-04-24', validade: '2026-04-24', arq: 'AVCB_AUTO POSTO PAIS & FILHOS.pdf', obs: 'AVCB nº 61155 emitido em 24/04/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP AUTO POSTO PAIS&FILHOS LTDA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '15.479.953 0001-51 AUTO POSTO PAIS FILHOS LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+  },
+  // 21 — Auto Posto Maioridade (Martins)
+  '23475547000149': {
+    AVCB: { data: '2025-10-14', validade: '2026-10-14', arq: 'AVCB_ POSTO MAIORIDADE.pdf', obs: 'AVCB nº 65330 emitido em 14/10/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP AUTO POSTO MAIORIDADE.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '23.475.547 0001-49 AUTO POSTO MAIORIDADE LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+  },
+  // 22 — Marcos Antonio Gurgel Costa (Posto Imperatriz, Martins)
+  '01119969000149': {
+    AVCB: { data: '2025-10-14', validade: '2026-10-14', arq: 'AVCB_POSTO IMPERATRIZ.pdf', obs: 'AVCB emitido em 14/10/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP MARCOS ANTONIO GURGEL COSTA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '01.119.969 0001-49 MARCOS ANTONIO GURGEL COSTA.pdf', obs: 'Coleta em 16/06/2026' },
+    IBAMA: { data: '2026-06-07', validade: '2026-09-07', arq: 'LICENÇA IBAMA.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 07/06/2026' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
