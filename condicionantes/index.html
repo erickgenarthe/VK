@@ -467,6 +467,17 @@ function vPainel() {
     </div>
     ${renov.length ? `<div class="card" style="margin-bottom:14px;border-color:var(--red)"><b style="color:var(--red)">Atenção — renovação de licença</b>
       <div class="sm" style="margin-top:4px">${renov.map((x) => `${esc(x.l.empreendedor)}: pedido de renovação ${x.c.dias < 0 ? 'deveria ter sido protocolado até' : 'deve ser protocolado até'} <b>${fmt(x.c.venc)}</b> (${diasTxt(x.c)}). A licença vale até ${fmt(x.l.validade)}.`).join('<br>')}</div></div>` : ''}
+    ${(() => {
+      const nomes = { RENOVACAO: 'Renovação da licença', AVCB: 'AVCB / CLCB (Bombeiros)', INMETRO: 'INMETRO (bombas)', ANP: 'ANP (posto revendedor)', LAUDO: 'Laudo de estanqueidade', TOG: 'TOG (óleos e graxas)', RESIDUOS: 'Resíduos oleosos', TREINAMENTO: 'Treinamento', PLACA: 'Placa', PUBLICACAO: 'Publicação', OUTRA: 'IBAMA / outras' };
+      const m = {}; all.forEach(({ it, c }) => { const k = it.cat; m[k] = m[k] || { venc: 0, prox: 0, sem: 0, ok: 0, pend: 0 }; m[k][c.status] = (m[k][c.status] || 0) + 1; });
+      const rows = Object.keys(m).map((k) => ({ k, ...m[k], tot: m[k].venc + m[k].prox + m[k].sem + m[k].ok + m[k].pend })).sort((a, b) => (b.venc + b.sem) - (a.venc + a.sem));
+      const max = Math.max(1, ...rows.map((r) => r.venc + r.sem + r.pend));
+      return `<details class="card" style="margin-bottom:14px" open><summary>Pendências por tipo de condicionante (vencidas e sem data)</summary>
+        <div style="overflow-x:auto"><table><thead><tr><th>Condicionante</th><th>Vencidas</th><th>Sem data</th><th>Vencem em breve</th><th>Em dia</th><th style="min-width:160px"></th></tr></thead><tbody>
+        ${rows.map((r) => `<tr><td>${esc(nomes[r.k] || r.k)}</td><td><b style="color:var(--red)">${r.venc}</b></td><td>${r.sem}</td><td>${r.prox}</td><td>${r.ok}</td>
+          <td><div style="display:flex;height:10px;border-radius:5px;overflow:hidden;background:var(--line)"><span style="width:${(r.venc / max) * 100}%;background:var(--red)"></span><span style="width:${((r.sem + r.pend) / max) * 100}%;background:#5a7fa3"></span></div></td></tr>`).join('')}
+        </tbody></table></div><div class="mut sm">Barra: vermelho = vencidas, azul = sem data. Não inclui o que foi marcado como “já atendido”.</div></details>`;
+    })()}
     <div class="bar">
       <input type="search" id="q" placeholder="Buscar empresa, município, condicionante…" value="${esc(filtro.q)}" style="max-width:380px">
       ${filtro.status ? `<button class="btn line sm" id="limpa">Limpar filtro</button>` : ''}
