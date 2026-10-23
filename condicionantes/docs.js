@@ -301,6 +301,10 @@ window.DOCS_PASTAS = {
     ANP: { data: '2026-09-09', validade: '2026-12-09', arq: 'ANP_G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'Certificado emitido em 09/09/2026, válido por 3 meses' },
     TOG: { data: '2026-06-16', arq: '70.156.112 0001-11 G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'Coleta em 16/06/2026' },
   },
+  // 53 — Posto Bessa (licença em nome de Francisco Glauber Sousa Bessa, CPF; empresa: Posto Bessa Ltda, CNPJ 47.327.357/0001-42)
+  '03207857426': {
+    ANP: { data: '2026-06-10', validade: '2026-09-10', arq: 'POSTO BESSA LTDA.pdf', obs: 'Certificado da empresa Posto Bessa Ltda emitido em 10/06/2026, válido por 3 meses (o único da pasta)' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
