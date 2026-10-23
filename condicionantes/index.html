@@ -334,6 +334,12 @@ async function init() {
     S.v = 4; await DB.set('state', S);
   }
   if (S.v < 9) await migrarDocs();
+  if (S.v < 10) { // placa e publicação: marcadas como já atendidas (conferência depois); licenças emitidas em 2026 ficam para revisão
+    S.licencas.forEach((l) => l.itens.forEach((it) => {
+      if ((it.cat === 'PLACA' || it.cat === 'PUBLICACAO') && !(l.recebimento || '').startsWith('2026')) { it.situacao = 'atendida'; it.ativo = true; }
+    }));
+    S.v = 10; await DB.set('state', S);
+  }
   render();
   avisarNotificacoes();
 }
