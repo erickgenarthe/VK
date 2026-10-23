@@ -137,6 +137,47 @@ window.DOCS_PASTAS = {
     TOG: { data: '2026-06-17', arq: '23.761.095 0001-61 FERNANDES E PINHEIRO LTDA.pdf', obs: 'Coleta em 17/06/2026' },
     IBAMA: { data: '2026-06-08', validade: '2026-09-08', arq: 'IBAMA.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 08/06/2026' },
   },
+  // 24 — Relene Maria Lima Fontes (Marcelino Vieira)
+  '03287515000102': {
+    AVCB: { data: '2025-04-15', validade: '2026-04-15', arq: 'AVCB_RELENE MARIA LIMA.pdf', obs: 'AVCB emitido em 15/04/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP RELENE MARIA LIMA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '03.287.515 0001-02 RELENE MARIA LIMA FONTES.pdf', obs: 'Coleta em 17/06/2026' },
+    IBAMA: { data: '2026-08-18', validade: '2026-11-18', arq: 'IBAMA RELENE MARIA.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 18/08/2026' },
+  },
+  // 25 — J P da Silva Lopes (Posto Pezão, CNPJ 0003-40)
+  '33917013000340': {
+    AVCB: { data: '2024-12-06', validade: '2025-12-06', arq: 'AVCB - J P DA SILVA LOPES.pdf', obs: 'AVCB emitido em 06/12/2024' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP J P SA SILVA LOPES.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '33.917.013 0003-40 J P DA SILVA LOPES LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+    IBAMA: { data: '2026-06-09', validade: '2026-09-09', arq: 'IBAMA POSTO.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 09/06/2026' },
+  },
+  // 26 — Posto Riachão (Pau dos Ferros)
+  '51707011000147': {
+    TOG: { data: '2025-10-21', arq: '51.707.011 0001-47 POSTO RIACHAO LTDA.pdf', obs: 'Coleta em 21/10/2025 (laudo emitido em 20/07/2026)' },
+  },
+  // 27 — Katarina Lavya de Freitas Cardozo (Posto Vieirense, Marcelino Vieira)
+  '17148809000168': {
+    AVCB: { data: '2023-08-10', validade: '2024-08-10', arq: 'AVCB POSTO VIEIRENSE.pdf', obs: 'AVCB emitido em 10/08/2023' },
+    ANP: { data: '2025-12-02', validade: '2026-03-02', arq: 'ANP KATARINA LAVYA VALIDADE 01 03 2026.pdf', obs: 'Certificado emitido em 02/12/2025, válido por 3 meses (o mais recente da pasta)' },
+    TOG: { data: '2023-12-05', arq: 'TOG POSTO VIEIRENSE LTDA VALIDADE 12 04 2024.pdf', obs: 'Coleta em 05/12/2023 (o mais recente da pasta)' },
+    IBAMA: { data: '2024-10-02', validade: '2025-01-02', arq: 'IBAMA POSTO VIEIRENSE LTDA VALIDADE 02 01 2025.pdf', obs: 'Certificado de Regularidade (CTF/APP) com validade até 02/01/2025 — o último da pasta' },
+    PLACA: { data: '2023-08-21', arq: 'FOTOS DA PLACA KATARINA LAVYA.pdf', obs: 'Fotos da placa de 21/08/2023' },
+    PUBLICACAO: { data: '2023-11-15', arq: 'Publicacao diario oficial_KATARINA LAVYA DE FREITAS.pdf', obs: 'Publicada no Diário Oficial de 15/11/2023' },
+  },
+  // 28 — F de Oliveira Pinto (Posto Iromar, José da Penha)
+  '29440003000128': {
+    AVCB: { data: '2026-06-24', validade: '2027-06-24', arq: 'AVCB_F DE OLIVEIRA PINTO.pdf', obs: 'AVCB nº 69123 emitido em 24/06/2026' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP F DE OLIVEIRA PINTO.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '29.440.003 0001-28 F I JR CARVALHO LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+    IBAMA: { data: '2026-09-15', validade: '2026-12-15', arq: 'tmpvsvV4P.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 15/09/2026' },
+  },
+  // 30 — Posto Portal da Serra (Maria Orlete Nunes, Luís Gomes)
+  '02197161000142': {
+    AVCB: { data: '2025-10-28', validade: '2026-10-28', arq: 'AVCB_MARIA ORLETE NUNES.pdf', obs: 'AVCB nº 65396, válido até 28/10/2026' },
+    INMETRO: { data: '2024-06-10', validade: '2025-06-10', arq: 'INMETRO_MARIA ORLETE.pdf', obs: 'Notificação de verificação de 10/06/2024 (a última da pasta); renovação anual' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP MARIA ORLETE.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '02.197.161 0001-42 MARIA ORLETE NUNES.pdf', obs: 'Coleta em 16/06/2026' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
@@ -144,8 +185,13 @@ window.DOCS_PASTAS = {
   },
 };
 /* Protocolos reais no Comunic@ do Posto da Serra (mensagens enviadas pelo usuário). */
-window.ENVIOS_SERRA = [
-  { data: '2021-10-11', mensagem: '1YI4E-6', cats: ['AVCB', 'LAUDO', 'PLACA'] },
-  { data: '2022-11-30', mensagem: '2CEJZ-1', cats: ['TOG'] },
-  { data: '2023-09-02', mensagem: '2M7Y9-4', cats: ['TOG'] },
-];
+window.ENVIOS_PASTAS = {
+  '29120373000188': [ // Posto da Serra
+    { data: '2021-10-11', mensagem: '1YI4E-6', cats: ['AVCB', 'LAUDO', 'PLACA'] },
+    { data: '2022-11-30', mensagem: '2CEJZ-1', cats: ['TOG'] },
+    { data: '2023-09-02', mensagem: '2M7Y9-4', cats: ['TOG'] },
+  ],
+  '17148809000168': [ // Katarina Lavya (Posto Vieirense)
+    { data: '2023-09-02', mensagem: '2M7XY-0', cats: ['TOG', 'ANP'] },
+  ],
+};

@@ -187,7 +187,7 @@ function calc(l, it) {
   if (it.modo === 'evento') return { status: 'evento', venc: null, ult, dias: null, origem: 'Sob demanda' };
   if ((it.modo === 'unica' || it.modo === 'derivado') && it.situacao === 'atendida' && !ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Marcada como já atendida' };
   if (it.modo === 'derivado') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Pedido protocolado em ' + fmt(ult.data) }; venc = P.addDaysIso(l.validade, -120); origem = 'Licença vale até ' + fmt(l.validade) + ' (pedido ≥120 dias antes)'; }
-  else if (it.modo === 'unica') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Comprovada em ' + fmt(ult.data) }; if (it.prazoInicial) { venc = it.prazoInicial.venceEm; origem = `Prazo único de ${it.prazoInicial.dias} dias após a emissão`; } }
+  else if (it.modo === 'unica') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Comprovada em ' + fmt(ult.data) }; if (it.doc) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Documento na pasta: ' + (it.doc.obs || '') }; if (it.prazoInicial) { venc = it.prazoInicial.venceEm; origem = `Prazo único de ${it.prazoInicial.dias} dias após a emissão`; } }
   else {
     // fonte mais recente entre o envio registrado no Comunic@ e o documento encontrado na pasta
     const d = it.doc;
@@ -333,7 +333,7 @@ async function init() {
     });
     S.v = 4; await DB.set('state', S);
   }
-  if (S.v < 6) await migrarDocs();
+  if (S.v < 7) await migrarDocs();
   render();
   avisarNotificacoes();
 }
@@ -358,21 +358,23 @@ async function migrarDocs() {
     });
     l.itens.sort((a, b) => ord.indexOf(a.cat) - ord.indexOf(b.cat));
   });
-  // Posto da Serra: protocolos reais já enviados ao IDEMA
-  const serra = S.licencas.find((l) => d2(l.cnpj) === '29120373000188');
-  if (serra && !S.envios.some((e) => e.licId === serra.id)) {
-    for (const p of (window.ENVIOS_SERRA || [])) {
-      const itens = p.cats.map((c) => serra.itens.find((i) => i.cat === c)).filter(Boolean).map((i) => ({ itemId: i.id, validade: '', referencia: '' }));
-      const env = { id: uid(), licId: serra.id, data: p.data, mensagem: p.mensagem, itens, imgIds: [], criadoEm: Date.now(), texto: gerarTexto(serra.id, p.data, itens) };
+  // Protocolos reais já enviados ao IDEMA (mensagens do Comunic@ fornecidas pelo usuário)
+  for (const cnpj of Object.keys(window.ENVIOS_PASTAS || {})) {
+    const lc = S.licencas.find((l) => d2(l.cnpj) === cnpj); if (!lc) continue;
+    for (const p of window.ENVIOS_PASTAS[cnpj]) {
+      if (S.envios.some((e) => e.licId === lc.id && e.mensagem === p.mensagem)) continue;
+      const itens = p.cats.map((c) => lc.itens.find((i) => i.cat === c)).filter(Boolean).map((i) => ({ itemId: i.id, validade: '', referencia: '' }));
+      if (!itens.length) continue;
+      const env = { id: uid(), licId: lc.id, data: p.data, mensagem: p.mensagem, itens, imgIds: [], criadoEm: Date.now(), texto: gerarTexto(lc.id, p.data, itens) };
       const b64 = (window.SEED_COMPROVANTES_SERRA || {})[p.mensagem];
       if (b64) { const k = uid(); await DB.setImg(k, dataUrlToBlob('data:image/jpeg;base64,' + b64)); env.imgIds.push(k); }
       S.envios.push(env);
-      itens.forEach((o) => { const it = serra.itens.find((i) => i.id === o.itemId); it.situacao = 'atendida'; });
+      itens.forEach((o) => { lc.itens.find((i) => i.id === o.itemId).situacao = 'atendida'; });
     }
   }
   // Tibau: o laudo reenviado em 23/01/2026 é o teste de 26/07/2021 (vale 5 anos a partir do teste)
   S.envios.forEach((e) => e.itens.forEach((x) => { const l = lic(e.licId); const it = l && l.itens.find((i) => i.id === x.itemId); if (it && it.cat === 'LAUDO' && e.mensagem === '3BG2O-0' && !x.validade) x.validade = '2026-07-26'; }));
-  S.v = 6; await DB.set('state', S);
+  S.v = 7; await DB.set('state', S);
 }
 
 /* ============================================================
