@@ -335,7 +335,7 @@ async function init() {
     });
     S.v = 4; await DB.set('state', S);
   }
-  if (S.v < 9) await migrarDocs();
+  if (S.v < 9 || (window.SEED_LICENCAS || []).some((l) => !S.licencas.some((x) => x.numero === l.numero))) await migrarDocs();
   if (S.v < 10) { // placa e publicação: marcadas como já atendidas (conferência depois); licenças emitidas em 2026 ficam para revisão
     S.licencas.forEach((l) => l.itens.forEach((it) => {
       if ((it.cat === 'PLACA' || it.cat === 'PUBLICACAO') && !(l.recebimento || '').startsWith('2026')) { it.situacao = 'atendida'; it.ativo = true; }
@@ -372,7 +372,12 @@ async function init() {
 async function migrarDocs() {
   const d2 = (s) => (s || '').replace(/\D/g, '');
   const tem = new Set(S.licencas.map((l) => l.numero));
-  (window.SEED_LICENCAS || []).forEach((l) => { if (!tem.has(l.numero)) S.licencas.push(JSON.parse(JSON.stringify(l))); });
+  (window.SEED_LICENCAS || []).forEach((l) => {
+    if (tem.has(l.numero)) return;
+    const n = JSON.parse(JSON.stringify(l));
+    if (S.v >= 10 && !(n.recebimento || '').startsWith('2026')) n.itens.forEach((it) => { if (['PLACA', 'PUBLICACAO', 'TREINAMENTO', 'INMETRO', 'LAUDO'].includes(it.cat)) { it.situacao = 'atendida'; it.ativo = true; } });
+    S.licencas.push(n);
+  });
   const ord = ['RENOVACAO', 'AVCB', 'INMETRO', 'ANP', 'LAUDO', 'TOG', 'RESIDUOS', 'TREINAMENTO', 'PGRS', 'PLACA', 'PUBLICACAO', 'OUTRA'];
   S.licencas.forEach((l) => {
     const docs = Object.assign({}, (window.DOCS_PASTAS || {})[d2(l.cnpj)] || {});
@@ -406,7 +411,7 @@ async function migrarDocs() {
   }
   // Tibau: o laudo reenviado em 23/01/2026 é o teste de 26/07/2021 (vale 5 anos a partir do teste)
   S.envios.forEach((e) => e.itens.forEach((x) => { const l = lic(e.licId); const it = l && l.itens.find((i) => i.id === x.itemId); if (it && it.cat === 'LAUDO' && e.mensagem === '3BG2O-0' && !x.validade) x.validade = '2026-07-26'; }));
-  S.v = 9; await DB.set('state', S);
+  S.v = Math.max(S.v, 9); await DB.set('state', S);
 }
 
 /* ============================================================
