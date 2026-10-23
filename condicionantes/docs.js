@@ -250,6 +250,47 @@ window.DOCS_PASTAS = {
     ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP_POSTO GARCIA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
     TOG: { data: '2026-06-15', arq: '37.063.855 0001-71 POSTO DE COMBUSTIVEIS GARCIA LTDA.pdf', obs: 'Coleta em 15/06/2026' },
   },
+  // 52 — Posto Santa Apolônia (C. Dantas Teixeira)
+  '10325617000130': {
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP_POSTO SANTA APOLONIA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    IBAMA: { data: '2026-07-08', validade: '2026-10-08', arq: 'IBAMA SANTA APOLONIA.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 08/07/2026' },
+  },
+  // 54 — Posto Santa Terezinha (R C F Silva, Janduís)
+  '24594640000216': {
+    AVCB: { data: '2025-08-25', validade: '2026-08-25', arq: 'AVCB_POSTO SANTA TEREZINHA.pdf', obs: 'AVCB emitido em 25/08/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP R C F SILVA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-15', arq: '24.594.640 0002-16 R C F SILVA.pdf', obs: 'Coleta em 15/06/2026' },
+    LAUDO: { data: '2026-09-25', validade: '2031-09-25', arq: 'LAUDO Posto Santa Teresinha - Janduís - RN - ASSINADO.pdf', obs: 'Teste de 25/09/2026; 5 anos' },
+  },
+  // 56 — Maria Eliana de Sousa Combustíveis (licença do posto, RLO-0421)
+  '03601442000181|RLO-0421': {
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP MARIA ELIANA DE SOUSA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-18', arq: '03.601.442 0001-81 MARIA ELIANA DE SOUSA COMBUSTIVEIS_LTDA.pdf', obs: 'Coleta em 18/06/2026' },
+  },
+  // 58 — Posto Milmares (Mar Azul Combustíveis, Mossoró)
+  '26210818000122': {
+    AVCB: { data: '2026-03-20', validade: '2027-03-20', arq: 'AVCB 2026.pdf', obs: 'AVCB emitido em 20/03/2026' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP MILMMARES.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+  },
+  // 59 — Posto Santa Isabel (Comercial de Petróleo M & M Santos, Carnaubais)
+  '18630311000108': {
+    AVCB: { data: '2026-06-09', validade: '2027-06-09', arq: 'AVCB (5204C021….pdf)', obs: 'AVCB emitido em 09/06/2026' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP POSTO SANTA IZABEL.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+  },
+  // 60 — Posto Esperança (Auto Posto Santo Expedito, Tenente Ananias)
+  '03445752000154': {
+    AVCB: { data: '2026-05-21', validade: '2027-05-21', arq: 'AVCB.pdf', obs: 'AVCB emitido em 21/05/2026' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP POSTO ESPERANÇA TENENTE ANANIAS.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+  },
+  // 61 — Posto Esperança (Comercial Freitas, Almino Afonso)
+  '12640314000138': {
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP POSTO ESPERANÇA ALMINO AFONSO.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    IBAMA: { data: '2026-08-20', validade: '2026-11-20', arq: 'ctf c. freitas.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 20/08/2026' },
+  },
+  // 62 — Posto Zé da Volta (Comercial Rodrigues dos Santos)
+  '24186793000143': {
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP ZÉ DA VOLTA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },

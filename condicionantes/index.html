@@ -333,7 +333,7 @@ async function init() {
     });
     S.v = 4; await DB.set('state', S);
   }
-  if (S.v < 8) await migrarDocs();
+  if (S.v < 9) await migrarDocs();
   render();
   avisarNotificacoes();
 }
@@ -376,7 +376,7 @@ async function migrarDocs() {
   }
   // Tibau: o laudo reenviado em 23/01/2026 é o teste de 26/07/2021 (vale 5 anos a partir do teste)
   S.envios.forEach((e) => e.itens.forEach((x) => { const l = lic(e.licId); const it = l && l.itens.find((i) => i.id === x.itemId); if (it && it.cat === 'LAUDO' && e.mensagem === '3BG2O-0' && !x.validade) x.validade = '2026-07-26'; }));
-  S.v = 8; await DB.set('state', S);
+  S.v = 9; await DB.set('state', S);
 }
 
 /* ============================================================
