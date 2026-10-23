@@ -291,6 +291,11 @@ window.DOCS_PASTAS = {
   '24186793000143': {
     ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP ZÉ DA VOLTA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
   },
+  // 23 — Coronel Gás (revenda de GLP, Coronel João Pessoa)
+  '43720210000167': {
+    AVCB: { data: '2025-10-28', validade: '2026-10-28', arq: 'AVCB_CORONELGAS.pdf', obs: 'AVCB nº 65101 emitido em 28/10/2025' },
+    ANP: { data: '2025-12-01', validade: '2026-03-01', arq: 'ANP_CORONELGAS.pdf', obs: 'Certificado emitido em 01/12/2025, válido por 3 meses (o mais recente da pasta)' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },

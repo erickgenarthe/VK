@@ -94,7 +94,8 @@
     const pick = (re) => { const m = re.exec(s); return m ? m[1].trim() : ''; };
 
     const numero = pick(/N[º°o]\s*(\d{4}-\d+\/[A-Z]+\/[A-Z]+-\d+)/);
-    const tipo = /LICEN[ÇC]A DE REGULARIZA[ÇC][ÃA]O DE OPERA[ÇC][ÃA]O/.test(s) ? 'Licença de Regularização de Operação'
+    const tipo = /LICEN[ÇC]A SIMPLIFICADA/.test(s) ? 'Licença Simplificada'
+      : /LICEN[ÇC]A DE REGULARIZA[ÇC][ÃA]O DE OPERA[ÇC][ÃA]O/.test(s) ? 'Licença de Regularização de Operação'
       : /RENOVA[ÇC][ÃA]O DE LICEN[ÇC]A DE OPERA[ÇC][ÃA]O/.test(s) ? 'Renovação de Licença de Operação'
       : /LICEN[ÇC]A DE OPERA[ÇC][ÃA]O/.test(s) ? 'Licença de Operação'
       : /LICEN[ÇC]A PR[ÉE]VIA/.test(s) ? 'Licença Prévia'
