@@ -296,6 +296,11 @@ window.DOCS_PASTAS = {
     AVCB: { data: '2025-10-28', validade: '2026-10-28', arq: 'AVCB_CORONELGAS.pdf', obs: 'AVCB nº 65101 emitido em 28/10/2025' },
     ANP: { data: '2025-12-01', validade: '2026-03-01', arq: 'ANP_CORONELGAS.pdf', obs: 'Certificado emitido em 01/12/2025, válido por 3 meses (o mais recente da pasta)' },
   },
+  // 29 — G J Santos de Oliveira (Areia Branca)
+  '70156112000111': {
+    ANP: { data: '2026-09-09', validade: '2026-12-09', arq: 'ANP_G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'Certificado emitido em 09/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '70.156.112 0001-11 G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
