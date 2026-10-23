@@ -333,7 +333,7 @@ async function init() {
     });
     S.v = 4; await DB.set('state', S);
   }
-  if (S.v < 5) await migrarDocs();
+  if (S.v < 6) await migrarDocs();
   render();
   avisarNotificacoes();
 }
@@ -348,9 +348,10 @@ async function migrarDocs() {
     const docs = (window.DOCS_PASTAS || {})[d2(l.cnpj)]; if (!docs) return;
     Object.keys(docs).forEach((cat) => {
       const dd = docs[cat];
-      if (cat === 'IBAMA') {
-        let it = l.itens.find((i) => i.extra === 'IBAMA');
-        if (!it) { it = { id: uid(), cat: 'OUTRA', extra: 'IBAMA', nome: 'IBAMA — Certificado de Regularidade (CTF/APP)', modo: 'validade', periodoMeses: 3, condRefs: [{ numero: '—', subitem: '', texto: 'Obrigação federal (IBAMA/CTF-APP), não é condicionante da licença do IDEMA.' }], ativo: true, prazoInicial: null }; l.itens.push(it); }
+      if (cat === 'IBAMA' || cat === 'TCFA') {
+        const nome = cat === 'IBAMA' ? 'IBAMA — Certificado de Regularidade (CTF/APP)' : 'IBAMA — TCFA em aberto';
+        let it = l.itens.find((i) => i.extra === cat);
+        if (!it) { it = { id: uid(), cat: 'OUTRA', extra: cat, nome, modo: 'validade', periodoMeses: 3, condRefs: [{ numero: '—', subitem: '', texto: 'Obrigação federal (IBAMA), não é condicionante da licença do IDEMA.' }], ativo: true, prazoInicial: null }; l.itens.push(it); }
         it.doc = dd; return;
       }
       const it = l.itens.find((i) => i.cat === cat); if (it) it.doc = dd;
@@ -371,7 +372,7 @@ async function migrarDocs() {
   }
   // Tibau: o laudo reenviado em 23/01/2026 é o teste de 26/07/2021 (vale 5 anos a partir do teste)
   S.envios.forEach((e) => e.itens.forEach((x) => { const l = lic(e.licId); const it = l && l.itens.find((i) => i.id === x.itemId); if (it && it.cat === 'LAUDO' && e.mensagem === '3BG2O-0' && !x.validade) x.validade = '2026-07-26'; }));
-  S.v = 5; await DB.set('state', S);
+  S.v = 6; await DB.set('state', S);
 }
 
 /* ============================================================

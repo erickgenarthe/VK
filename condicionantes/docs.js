@@ -55,6 +55,41 @@ window.DOCS_PASTAS = {
     TREINAMENTO: { data: '2019-07-13', arq: 'CERTIFICADO FRENTISTA_POSTO AMIGOS.pdf', obs: 'NR-20 Básico (1 funcionário), concluído em 13/07/2019' },
     IBAMA: { data: '2025-03-15', validade: '2025-06-15', arq: 'CERTIFICADO IBAMA_POSTO AMIGOS.pdf', obs: 'Certificado de Regularidade (CTF/APP) válido até 15/06/2025 — o último da pasta' },
   },
+  // 10 — Posto Carioca (Pau dos Ferros)
+  '11287738000106': {
+    AVCB: { data: '2025-12-23', validade: '2026-12-23', arq: 'AVCB_POSTO CARIOCA.pdf', obs: 'AVCB emitido em 23/12/2025' },
+    INMETRO: { data: '2025-07-15', validade: '2026-07-15', arq: 'INMETRO_POSTO CARIOCA.pdf', obs: 'Notificação/verificação de 15/07/2025 (aprovado); renovação anual' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP_POSTO CARIOCA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: 'TOG POSTO CARIOCA LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+    LAUDO: { data: '2019-07-24', validade: '2024-07-24', arq: 'TESTE DE ESTANQUEIDADE_POSTO CARIOCA.pdf', obs: 'Laudo de 24/07/2019 (teste de jul/2019); 5 anos' },
+  },
+  // 11 — Posto Serrano (Francisco Valentim Gonçalves, São Miguel)
+  '07951495000183': {
+    INMETRO: { data: '2021-02-10', validade: '2022-02-10', arq: 'INMETRO_FRANCISCO VALENTIM.pdf', obs: 'Verificação de 10/02/2021 (aprovado) — o último da pasta; renovação anual' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP_FRANCISCO VALENTIM.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: 'TOG FRANCISCO VALENTIM GONCALVES.pdf', obs: 'Coleta em 17/06/2026' },
+  },
+  // 12 — Posto Fufa Venha Ver (Damiana Maria de Jesus Dantas)
+  '10973484000109': {
+    AVCB: { data: '2025-07-22', validade: '2026-07-22', arq: 'AVCB_DAMIANA MARIA.pdf', obs: 'AVCB emitido em 22/07/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP DAMIANA MARIA DE JESUS DANTAS VAREJISTA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: 'TOG DAMIANA MARIA DE JESUS DANTAS VAREJISTA.pdf', obs: 'Coleta em 17/06/2026' },
+    LAUDO: { data: '2022-03-30', validade: '2027-03-30', arq: 'TESTE DE ESTANQUEIDADE_DAMIANA MARIA.pdf', obs: 'Teste de 30/03/2022; 5 anos' },
+  },
+  // 13 — Posto Fufa Encanto (Fábio Maciel Dantas)
+  '15479978000155': {
+    AVCB: { data: '2025-10-28', validade: '2026-10-28', arq: 'AVCB_FABIO MACIEL DANTAS VAREJISTA.pdf', obs: 'AVCB nº 65104 emitido em 28/10/2025' },
+    INMETRO: { data: '2020-10-09', validade: '2021-10-09', arq: 'IMETRO01–09_FABIO MACIEL DANTAS VAREJUISTA.pdf', obs: 'Verificação de 09/10/2020 (aprovado) — a última da pasta; renovação anual' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP FABIO MACIEL DANTAS VAREJISTA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: 'TOG (15.479.978 0001-55 FABIO MACIEL DANTAS VAREJISTA).pdf', obs: 'Coleta em 17/06/2026' },
+  },
+  // 14 — Nosso Posto Encanto (Estevam e Castro)
+  '06287722000155': {
+    AVCB: { data: '2025-08-05', validade: '2026-08-05', arq: 'AVCB_ESTEVAM E CASTRO.pdf', obs: 'AVCB emitido em 05/08/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP ESTEVAM E CASTRO POSTO DE COMBUSTIVEL LTDA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: 'TOG (06.287.722 0001-55 ESTEVAM E CASTRO).pdf', obs: 'Coleta em 17/06/2026' },
+    TCFA: { data: '2024-01-29', validade: '2024-01-31', arq: 'BOLETOS IBAMA EM ABERTO (6 boletos)', obs: '6 boletos TCFA em aberto na pasta: 2022/3 a 2023/4, todos com vencimento em 31/01/2024' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
