@@ -312,6 +312,12 @@ window.DOCS_PASTAS = {
     INMETRO: { data: '2025-11-14', validade: '2026-11-14', arq: 'INMETRO - Posto Gangorra - 14-11-25.pdf', obs: 'Verificação de 14/11/2025 (pasta 57); renovação anual' },
     LAUDO: { data: '2023-01-30', validade: '2028-01-30', arq: 'LAUDO POSTO GANGORRA ASSSINADO.pdf', obs: 'Teste de 30/01/2023; 5 anos (pasta 57)' },
   },
+  // 31 — Gildo Alves de Carvalho (Posto Boa Vista, Severiano Melo) — licença do posto, LO-0268
+  '04993854000177|LO-0268': {
+    AVCB: { data: '2025-04-22', validade: '2026-04-22', arq: 'AVCB_GILDO ALVES DE CARVALHO.pdf', obs: 'AVCB nº 60927 emitido em 22/04/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP GILDO ALVEZ DE CARVALHO.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '04.993.854 0001-77 GILDO ALVES DE CARVALHO.pdf', obs: 'Coleta em 16/06/2026' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
