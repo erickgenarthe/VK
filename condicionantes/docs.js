@@ -178,6 +178,78 @@ window.DOCS_PASTAS = {
     ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP MARIA ORLETE.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
     TOG: { data: '2026-06-16', arq: '02.197.161 0001-42 MARIA ORLETE NUNES.pdf', obs: 'Coleta em 16/06/2026' },
   },
+  // 33 — Posto Santa Rita III (São Miguel)
+  '37679042000100': {
+    AVCB: { data: '2025-03-26', validade: '2026-03-26', arq: 'AVCB_POSTO ST RITA III.pdf', obs: 'AVCB nº 60381 emitido em 26/03/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP POSTO SANTA RITA III.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-15', arq: '37.679.042 0001-00 POSTO ISOMAR CESARIO LTDA.pdf', obs: 'Coleta em 15/06/2026' },
+  },
+  // 36 — Coronel Gás II
+  '56086886000192': {
+    AVCB: { data: '2024-12-04', validade: '2025-12-04', arq: 'AVCB_CORONEL GAS II LTDA.pdf', obs: 'AVCB emitido em 04/12/2024' },
+    ANP: { data: '2025-12-02', validade: '2026-03-02', arq: 'ANP_CORONEL GAS II LTDA.pdf', obs: 'Certificado emitido em 02/12/2025, válido por 3 meses (o mais recente da pasta)' },
+  },
+  // 37 — Auto Posto Lopes (Posto Viçosa)
+  '22497882000185': {
+    AVCB: { data: '2024-12-04', validade: '2025-12-04', arq: 'AVCB_AUTO POSTO LOPES COMBUSTIVEIS.pdf', obs: 'AVCB emitido em 04/12/2024' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP AUTO POSTO LOPES.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '22.497.882 0001-85 AUTO POSTO LOPES COMBUSTIVEIS LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+    IBAMA: { data: '2026-09-15', validade: '2026-12-15', arq: 'tmp7JuMhH.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 15/09/2026' },
+  },
+  // 38 — G J Santos de Oliveira (Macau)
+  '70156112000164': {
+    AVCB: { data: '2026-08-10', validade: '2027-08-10', arq: 'AVCB_G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'AVCB nº 69568 emitido em 10/08/2026' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP G J SANTOS DE OLIVEIRA MACAU.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '70.156.112 0004-64 G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+  },
+  // 39 — G J Santos de Oliveira (Umarizal)
+  '70156112000200': {
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP G J SANTOS DE OLEVEIRA UMARIZAL.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '70.156.112 0002-00 G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+  },
+  // 40 — G J Santos de Oliveira (Itaú)
+  '70156112000383': {
+    AVCB: { data: '2024-08-29', validade: '2025-08-29', arq: 'AVCB-ITAU….pdf', obs: 'AVCB nº 55769 emitido em 29/08/2024' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP G J SANTOS DE OLIVEIRA LTDA - ITAU.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '70.156.112 0003-83 G J SANTOS DE OLIVEIRA LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+  },
+  // 41 — Posto Centro Norte (licença do posto, RLO-0943)
+  '09500928000100|RLO-0943': {
+    AVCB: { data: '2026-03-31', validade: '2027-03-31', arq: 'AVCB - POSTO CENTRAL NORTE.pdf', obs: 'AVCB emitido em 31/03/2026' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP POSTO CENTRO NORTE.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '09.500.928 0001-00 POSTO CENTRO NORTE LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+    LAUDO: { data: '2026-07-15', validade: '2027-07-15', arq: 'LAUDO_POSTO_CENTRO_NORTE_LTDA_1-00_15-7-2026.pdf', obs: 'Ensaio de 15/07/2026; o próprio laudo informa validade de 1 ano' },
+    PLACA: { data: '', arq: 'FOTO DA PLACA.jpeg', obs: 'Foto da placa na pasta' },
+  },
+  // 43 — João Paulo da Silva Lopes (Posto Pezão 02)
+  '52439755000190': {
+    AVCB: { data: '2026-03-03', validade: '2027-03-03', arq: 'AVCB- AUTO DE ANÁLISE TÉCNICA- POSTO PEZÃO-VAL 03 03 27.pdf', obs: 'AVCB válido até 03/03/2027 (data pelo nome do arquivo; o anterior vencia em 06/12/2025)' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP_JOAO PAULO DA SILVA LOPES.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '52.439.755 0001-90 JOAO PAULO DA SILVA LOPES.pdf', obs: 'Coleta em 16/06/2026' },
+    IBAMA: { data: '2026-07-21', validade: '2026-10-21', arq: 'IBAMA JOAO PAULO 02.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 21/07/2026' },
+  },
+  // 47 — Comércio de Combustíveis Santo Antônio (Gildo)
+  '58058585000180': {
+    AVCB: { data: '2025-12-05', validade: '2026-12-05', arq: 'AVCB - SANTO ANTONIO GILDO.pdf', obs: 'AVCB emitido em 05/12/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP - SANTO ANTONIO GILDO.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-16', arq: '58.058.585 0001-80 COMERCIO DE COMBUSTIVEIS SANTO ANTONIO LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+  },
+  // 48 — R J Combustíveis (Touros)
+  '21071555000102': {
+    AVCB: { data: '2025-09-11', validade: '2026-09-11', arq: 'AVCB_R J COMBUSTIVEIS LTDA.pdf', obs: 'AVCB emitido em 11/09/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP R J COMBUSTIVEIS LTDA - EPP.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+  },
+  // 49 — Revendedora de Combustíveis R & R (Maxaranguape)
+  '27918902000168': {
+    AVCB: { data: '2025-09-11', validade: '2026-09-11', arq: 'AVCB_REVENDEDORA DE COMBUSTÍVEIS R & R EIRELI.pdf', obs: 'AVCB emitido em 11/09/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP REVENDEDORA DE COMBUSTIVEIS.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+  },
+  // 50 — Posto Garcia
+  '37063855000171': {
+    AVCB: { data: '2025-04-15', validade: '2026-04-15', arq: 'AVCB_POSTO GARCI.pdf', obs: 'AVCB emitido em 15/04/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP_POSTO GARCIA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-15', arq: '37.063.855 0001-71 POSTO DE COMBUSTIVEIS GARCIA LTDA.pdf', obs: 'Coleta em 15/06/2026' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },

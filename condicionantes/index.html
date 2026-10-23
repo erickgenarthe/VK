@@ -333,7 +333,7 @@ async function init() {
     });
     S.v = 4; await DB.set('state', S);
   }
-  if (S.v < 7) await migrarDocs();
+  if (S.v < 8) await migrarDocs();
   render();
   avisarNotificacoes();
 }
@@ -345,7 +345,9 @@ async function migrarDocs() {
   (window.SEED_LICENCAS || []).forEach((l) => { if (!tem.has(l.numero)) S.licencas.push(JSON.parse(JSON.stringify(l))); });
   const ord = ['RENOVACAO', 'AVCB', 'INMETRO', 'ANP', 'LAUDO', 'TOG', 'RESIDUOS', 'TREINAMENTO', 'PGRS', 'PLACA', 'PUBLICACAO', 'OUTRA'];
   S.licencas.forEach((l) => {
-    const docs = (window.DOCS_PASTAS || {})[d2(l.cnpj)]; if (!docs) return;
+    const docs = Object.assign({}, (window.DOCS_PASTAS || {})[d2(l.cnpj)] || {});
+    Object.keys(window.DOCS_PASTAS || {}).forEach((k) => { const [c, suf] = k.split('|'); if (suf && c === d2(l.cnpj) && l.numero.includes(suf)) Object.assign(docs, window.DOCS_PASTAS[k]); });
+    if (!Object.keys(docs).length) return;
     Object.keys(docs).forEach((cat) => {
       const dd = docs[cat];
       if (cat === 'IBAMA' || cat === 'TCFA') {
@@ -374,7 +376,7 @@ async function migrarDocs() {
   }
   // Tibau: o laudo reenviado em 23/01/2026 é o teste de 26/07/2021 (vale 5 anos a partir do teste)
   S.envios.forEach((e) => e.itens.forEach((x) => { const l = lic(e.licId); const it = l && l.itens.find((i) => i.id === x.itemId); if (it && it.cat === 'LAUDO' && e.mensagem === '3BG2O-0' && !x.validade) x.validade = '2026-07-26'; }));
-  S.v = 7; await DB.set('state', S);
+  S.v = 8; await DB.set('state', S);
 }
 
 /* ============================================================
