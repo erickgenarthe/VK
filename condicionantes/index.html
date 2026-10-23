@@ -197,6 +197,7 @@ function calc(l, it) {
     if (fonte && fonte.validade) { venc = fonte.validade; origem = fonte.rotulo || 'Validade do documento enviado'; }
     else if (fonte && it.periodoMeses) { venc = P.addMonthsIso(fonte.data, it.periodoMeses); origem = fonte.rotulo ? `${fonte.rotulo} → +${it.periodoMeses} meses` : `${it.periodoMeses} meses após o último envio (${fmt(fonte.data)})`; }
   }
+  if (it.situacao === 'atendida' && (it.cat === 'INMETRO' || it.cat === 'LAUDO') && (!venc || venc < todayIso())) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Marcada como já atendida' + (venc ? ` (documento da pasta venceu em ${fmt(venc)}: conferir)` : '') };
   if (!venc) return { status: 'sem', venc: null, ult, dias: null, origem: it.situacao === 'atendida' ? 'Atendida — informe a data do último envio' : 'Informe a data do último envio' };
   const dias = diffDays(todayIso(), venc);
   const status = dias < 0 ? 'venc' : dias <= S.config.antecedencia ? 'prox' : 'ok';
@@ -346,6 +347,12 @@ async function init() {
       if (it.cat === 'TREINAMENTO' && !(l.recebimento || '').startsWith('2026')) { it.situacao = 'atendida'; it.ativo = true; }
     }));
     S.v = 11; await DB.set('state', S);
+  }
+  if (S.v < 12) { // INMETRO e laudo de estanqueidade: marcados como já atendidos (exceto licenças emitidas em 2026)
+    S.licencas.forEach((l) => l.itens.forEach((it) => {
+      if ((it.cat === 'INMETRO' || it.cat === 'LAUDO') && !(l.recebimento || '').startsWith('2026')) { it.situacao = 'atendida'; it.ativo = true; }
+    }));
+    S.v = 12; await DB.set('state', S);
   }
   render();
   avisarNotificacoes();
