@@ -354,6 +354,16 @@ async function init() {
     }));
     S.v = 12; await DB.set('state', S);
   }
+  if (S.v < 13) { // IBAMA: Certificado de Regularidade e TCFA são a mesma exigência — um item só
+    S.licencas.forEach((l) => {
+      const tc = l.itens.filter((i) => i.extra === 'TCFA'); if (!tc.length) return;
+      const ib = l.itens.find((i) => i.extra === 'IBAMA');
+      tc.forEach((t) => { if (ib) { if (!ib.doc || (t.doc && t.doc.data > ib.doc.data)) { /* mantém o documento mais recente */ } } else { t.extra = 'IBAMA'; } });
+      l.itens = l.itens.filter((i) => i.extra !== 'TCFA');
+    });
+    S.licencas.forEach((l) => l.itens.forEach((i) => { if (i.extra === 'IBAMA') i.nome = 'IBAMA — Certificado de Regularidade / TCFA'; }));
+    S.v = 13; await DB.set('state', S);
+  }
   render();
   avisarNotificacoes();
 }
@@ -370,10 +380,10 @@ async function migrarDocs() {
     if (!Object.keys(docs).length) return;
     Object.keys(docs).forEach((cat) => {
       const dd = docs[cat];
-      if (cat === 'IBAMA' || cat === 'TCFA') {
-        const nome = cat === 'IBAMA' ? 'IBAMA — Certificado de Regularidade (CTF/APP)' : 'IBAMA — TCFA em aberto';
-        let it = l.itens.find((i) => i.extra === cat);
-        if (!it) { it = { id: uid(), cat: 'OUTRA', extra: cat, nome, modo: 'validade', periodoMeses: 3, condRefs: [{ numero: '—', subitem: '', texto: 'Obrigação federal (IBAMA), não é condicionante da licença do IDEMA.' }], ativo: true, prazoInicial: null }; l.itens.push(it); }
+      if (cat === 'IBAMA') {
+        const nome = 'IBAMA — Certificado de Regularidade / TCFA';
+        let it = l.itens.find((i) => i.extra === 'IBAMA');
+        if (!it) { it = { id: uid(), cat: 'OUTRA', extra: 'IBAMA', nome, modo: 'validade', periodoMeses: 3, condRefs: [{ numero: '—', subitem: '', texto: 'Obrigação federal (IBAMA): Certificado de Regularidade do CTF/APP, que depende da TCFA em dia. Não é condicionante da licença do IDEMA.' }], ativo: true, prazoInicial: null }; l.itens.push(it); }
         it.doc = dd; return;
       }
       const it = l.itens.find((i) => i.cat === cat); if (it) it.doc = dd;

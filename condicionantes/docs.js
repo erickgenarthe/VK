@@ -88,7 +88,7 @@ window.DOCS_PASTAS = {
     AVCB: { data: '2025-08-05', validade: '2026-08-05', arq: 'AVCB_ESTEVAM E CASTRO.pdf', obs: 'AVCB emitido em 05/08/2025' },
     ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP ESTEVAM E CASTRO POSTO DE COMBUSTIVEL LTDA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
     TOG: { data: '2026-06-17', arq: 'TOG (06.287.722 0001-55 ESTEVAM E CASTRO).pdf', obs: 'Coleta em 17/06/2026' },
-    TCFA: { data: '2024-01-29', validade: '2024-01-31', arq: 'BOLETOS IBAMA EM ABERTO (6 boletos)', obs: '6 boletos TCFA em aberto na pasta: 2022/3 a 2023/4, todos com vencimento em 31/01/2024' },
+    IBAMA: { data: '2024-01-29', validade: '2024-01-31', arq: 'BOLETOS IBAMA EM ABERTO (6 boletos)', obs: 'Sem certificado na pasta; 6 boletos TCFA em aberto (2022/3 a 2023/4), todos vencidos em 31/01/2024' },
   },
   // 18 — Posto Central São Sebastião (Coronel João Pessoa)
   '12203201000175': {
