@@ -123,6 +123,20 @@ window.DOCS_PASTAS = {
     TOG: { data: '2026-06-16', arq: '01.119.969 0001-49 MARCOS ANTONIO GURGEL COSTA.pdf', obs: 'Coleta em 16/06/2026' },
     IBAMA: { data: '2026-06-07', validade: '2026-09-07', arq: 'LICENÇA IBAMA.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 07/06/2026' },
   },
+  // 16 — E D A de Sousa (Auto Posto Taboleiro)
+  '51502654000154': {
+    AVCB: { data: '2025-05-08', validade: '2026-05-08', arq: 'AVCB_E D A DE SOUSA.pdf', obs: 'AVCB emitido em 08/05/2025' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP E D A DE SOUSA COMBUSTIVEIS LTDA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '51.502.654 0001-54 AUTO POSTO TABOLEIRO LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+    LAUDO: { data: '2021-01-20', validade: '2026-01-20', arq: 'Teste de Estanqueidade_E D A DE SOUSA COMBUSTIVEIS LTDA.pdf', obs: 'Ensaio de 20/01/2021; 5 anos' },
+  },
+  // 17 — Fernandes e Pinheiro (Venha-Ver)
+  '23761095000161': {
+    INMETRO: { data: '2025-11-11', validade: '2026-11-11', arq: 'INMETRO_FERNANDES E PINHEIRO LTDA.pdf', obs: 'Verificação de 11/11/2025 (aprovado); renovação anual' },
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP_FERNANDES E PINHEIRO LTDA.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
+    TOG: { data: '2026-06-17', arq: '23.761.095 0001-61 FERNANDES E PINHEIRO LTDA.pdf', obs: 'Coleta em 17/06/2026' },
+    IBAMA: { data: '2026-06-08', validade: '2026-09-08', arq: 'IBAMA.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 08/06/2026' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
