@@ -184,6 +184,7 @@ function calc(l, it) {
   const ult = ultimoEnvio(l.id, it.id);
   let venc = null, origem = '';
   if (it.situacao === 'pendente') return { status: 'pend', venc: null, ult, dias: null, origem: 'Marcada como pendente — registre o envio quando for atendida' };
+  if (it.cat === 'TREINAMENTO' && it.situacao === 'atendida') return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Marcada como já atendida' };
   if (it.modo === 'evento') return { status: 'evento', venc: null, ult, dias: null, origem: 'Sob demanda' };
   if ((it.modo === 'unica' || it.modo === 'derivado') && it.situacao === 'atendida' && !ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Marcada como já atendida' };
   if (it.modo === 'derivado') { if (ult) return { status: 'cumprida', venc: null, ult, dias: null, origem: 'Pedido protocolado em ' + fmt(ult.data) }; venc = P.addDaysIso(l.validade, -120); origem = 'Licença vale até ' + fmt(l.validade) + ' (pedido ≥120 dias antes)'; }
@@ -339,6 +340,12 @@ async function init() {
       if ((it.cat === 'PLACA' || it.cat === 'PUBLICACAO') && !(l.recebimento || '').startsWith('2026')) { it.situacao = 'atendida'; it.ativo = true; }
     }));
     S.v = 10; await DB.set('state', S);
+  }
+  if (S.v < 11) { // certificados de treinamento: marcados como já atendidos (exceto licenças emitidas em 2026, que ficam para revisão)
+    S.licencas.forEach((l) => l.itens.forEach((it) => {
+      if (it.cat === 'TREINAMENTO' && !(l.recebimento || '').startsWith('2026')) { it.situacao = 'atendida'; it.ativo = true; }
+    }));
+    S.v = 11; await DB.set('state', S);
   }
   render();
   avisarNotificacoes();
