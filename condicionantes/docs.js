@@ -305,6 +305,13 @@ window.DOCS_PASTAS = {
   '03207857426': {
     ANP: { data: '2026-06-10', validade: '2026-09-10', arq: 'POSTO BESSA LTDA.pdf', obs: 'Certificado da empresa Posto Bessa Ltda emitido em 10/06/2026, válido por 3 meses (o único da pasta)' },
   },
+  // 57 — Posto Gangorra (documentos da pasta 57 "Alexandre's Combustíveis" — CNPJ da pasta difere do da licença: confirmar)
+  '03365159000106': {
+    ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP - Posto Gangorra (1).pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses (pasta 57: confirmar se é a mesma empresa)' },
+    TOG: { data: '2026-06-15', arq: '19.688.384 0001-05 ALEXANDRE S COMBUSTIVEIS LTDA.pdf', obs: 'Coleta em 15/06/2026 (pasta 57, CNPJ 19.688.384/0001-05: confirmar se é a mesma empresa)' },
+    INMETRO: { data: '2025-11-14', validade: '2026-11-14', arq: 'INMETRO - Posto Gangorra - 14-11-25.pdf', obs: 'Verificação de 14/11/2025 (pasta 57); renovação anual' },
+    LAUDO: { data: '2023-01-30', validade: '2028-01-30', arq: 'LAUDO POSTO GANGORRA ASSSINADO.pdf', obs: 'Teste de 30/01/2023; 5 anos (pasta 57)' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
     AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
