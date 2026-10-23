@@ -318,9 +318,19 @@ window.DOCS_PASTAS = {
     ANP: { data: '2026-09-08', validade: '2026-12-08', arq: 'ANP GILDO ALVEZ DE CARVALHO.pdf', obs: 'Certificado emitido em 08/09/2026, válido por 3 meses' },
     TOG: { data: '2026-06-16', arq: '04.993.854 0001-77 GILDO ALVES DE CARVALHO.pdf', obs: 'Coleta em 16/06/2026' },
   },
+  // 09 — C & A Ltda (Posto Independência, Pau dos Ferros)
+  '03426530000194': {
+    AVCB: { data: '2025-10-15', validade: '2026-10-15', arq: 'AVCB POSTO C&A VALIDADE 15.10.2026.pdf', obs: 'AVCB com validade até 15/10/2026 (data pelo nome do arquivo)' },
+    ANP: { data: '2025-12-01', validade: '2026-03-01', arq: 'C & A LTDA ANP 01 03 2026.pdf', obs: 'Certificado emitido em 01/12/2025, válido por 3 meses (o mais recente da pasta)' },
+    TOG: { data: '2023-08-15', arq: 'C & A LTDA 03.426.530 0001-94 AGOSTO.2023.pdf', obs: 'Coleta em 15/08/2023 (a mais recente da pasta)' },
+    LAUDO: { data: '2021-06-26', validade: '2026-06-26', arq: 'LAUDO DE ESTANQUEIDADE COMPLETO.pdf', obs: 'Teste de 26/06/2021 (laudo de 07/07/2021); 5 anos' },
+    IBAMA: { data: '2024-10-22', validade: '2025-01-22', arq: 'IBAMA C&A LTDA VALIDADE 22 01 25.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 22/10/2024 — o mais recente da pasta' },
+  },
   // Posto da Serra (documentos enviados avulsos)
   '29120373000188': {
-    AVCB: { data: '2022-09-23', validade: '2023-09-23', arq: 'AVCB_2023.pdf', obs: 'AVCB nº 41852 emitido em 23/09/2022' },
+    AVCB: { data: '2025-02-12', validade: '2026-02-12', arq: 'AVCB POSTO DA SERRA.pdf', obs: 'AVCB emitido em 12/02/2025 (o mais recente da pasta 02)' },
+    TOG: { data: '2026-06-16', arq: '29.120.373 0001-88 POSTO DA SERRA COMBUSTIVEIS LTDA.pdf', obs: 'Coleta em 16/06/2026' },
+    IBAMA: { data: '2025-05-15', validade: '2025-08-15', arq: 'CTF IBAMA 15 08 25.pdf', obs: 'Certificado de Regularidade (CTF/APP) emitido em 15/05/2025 — o mais recente da pasta' },
     TREINAMENTO: { data: '2023-01-28', arq: 'Certificados NR-20 Básico (2 funcionários)', obs: 'NR-20 Básico concluído em 28/01/2023' },
   },
 };
@@ -330,6 +340,14 @@ window.ENVIOS_PASTAS = {
     { data: '2021-10-11', mensagem: '1YI4E-6', cats: ['AVCB', 'LAUDO', 'PLACA'] },
     { data: '2022-11-30', mensagem: '2CEJZ-1', cats: ['TOG'] },
     { data: '2023-09-02', mensagem: '2M7Y9-4', cats: ['TOG'] },
+  ],
+  '03426530000194': [ // C & A Ltda (Posto Independência)
+    { data: '2021-10-03', mensagem: '1Y7QJ-0', cats: ['AVCB'] },
+    { data: '2021-10-13', mensagem: '1YJPM-4', cats: ['ANP'] },
+    { data: '2022-04-12', mensagem: '23WZQ-5', cats: ['TOG'] },
+    { data: '2022-11-30', mensagem: '2CEJU-0', cats: ['TOG'] },
+    { data: '2023-01-24', mensagem: '2EBR1-7', cats: ['ANP'] },
+    { data: '2023-09-20', mensagem: '2MR1P-4', cats: ['TOG'] },
   ],
   '17148809000168': [ // Katarina Lavya (Posto Vieirense)
     { data: '2023-09-02', mensagem: '2M7XY-0', cats: ['TOG', 'ANP'] },
