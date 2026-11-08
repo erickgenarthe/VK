@@ -600,22 +600,42 @@ function applyVagasDelta(slug, delta) {
 }
 
 // Reserva, de forma atômica (transação do Firestore, igual ao claimForAutoPrint), o direito de aplicar
-// UMA VEZ a soma/desconto de vagas de um voluntário — mesmo que a página recarregue, mesmo que fique
-// aberta em mais de um aparelho ao mesmo tempo. Só depois de reservar com sucesso é que mexemos no
-// Realtime Database; assim, se por algum motivo a soma no Realtime Database falhar, não ficamos tentando
-// de novo a cada atualização (o que ficaria somando vaga demais e sobrecarregando o Firestore).
-async function claimVagasFlag(id, field) {
+// a soma/desconto de vagas de um voluntário — mesmo que a página recarregue, mesmo que fique aberta em
+// mais de um aparelho ao mesmo tempo. A reserva é por TEMPO (um "aluguel" de VAGAS_LEASE_MS): se quem
+// reservou não confirmar que terminou dentro desse prazo (porque a aba fechou no meio do caminho, o
+// Wi-Fi caiu, o celular trocou de app — muito comum logo depois do autoatendimento no celular, e foi
+// assim que a gente percebeu isso, num iPhone), a reserva expira sozinha e o próximo aparelho que
+// escutar essa lista tenta de novo. Antes isso marcava "já apliquei" ANTES de realmente conseguir somar
+// no Realtime Database — se essa soma falhasse ou a aba fechasse bem nesse meio tempo, a vaga ficava
+// perdida pra sempre, sem ninguém nunca mais tentar de novo. Esse é exatamente o bug do "cadastrei o
+// voluntário mas não somou a vaga" que a recepção relatou.
+const VAGAS_LEASE_MS = 15000;
+
+async function claimVagasFlag(id, doneField, leaseField) {
   const docRef = doc(db, CHECKINS_COL, id);
   try {
     return await runTransaction(db, async (tx) => {
       const snap = await tx.get(docRef);
-      if (!snap.exists() || snap.data()[field]) return false;
-      tx.update(docRef, { [field]: true });
+      if (!snap.exists()) return false;
+      const data = snap.data();
+      if (data[doneField]) return false; // já foi somado/descontado com sucesso, não repete
+      const leasedAt = data[leaseField];
+      const now = Date.now();
+      if (leasedAt && (now - leasedAt) < VAGAS_LEASE_MS) return false; // outro aparelho está tentando agora
+      tx.update(docRef, { [leaseField]: now });
       return true;
     });
   } catch (e) {
-    console.error('Falha ao reservar ' + field, e);
+    console.error('Falha ao reservar ' + doneField, e);
     return false;
+  }
+}
+
+async function markVagasDone(id, doneField) {
+  try {
+    await updateDoc(doc(db, CHECKINS_COL, id), { [doneField]: true });
+  } catch (e) {
+    console.error('Vaga aplicada, mas falhou ao marcar ' + doneField + ' (deve ficar tentando de novo, sem somar errado)', e);
   }
 }
 
@@ -625,24 +645,26 @@ async function processOneVagasEvent(r) {
 
   // Chegada do voluntário ainda não contabilizada: soma as vagas que ele libera nessa sala.
   if (!r.checkoutTs && !r.vagasCheckinApplied) {
-    const claimed = await claimVagasFlag(r.id, 'vagasCheckinApplied');
+    const claimed = await claimVagasFlag(r.id, 'vagasCheckinApplied', 'vagasCheckinLeaseAt');
     if (claimed) {
       try {
         await applyVagasDelta(cfg.slug, cfg.perVolunteer);
+        await markVagasDone(r.id, 'vagasCheckinApplied');
       } catch (e) {
-        console.error('Reservado, mas falhou ao somar vagas do check-in de ' + r.area, e);
+        console.error('Reservado, mas falhou ao somar vagas do check-in de ' + r.area + ' — tenta de novo em breve', e);
       }
     }
   }
 
   // Saída do voluntário: desconta as vagas que ele tinha aberto (só se a chegada já tinha sido somada).
   if (r.checkoutTs && r.vagasCheckinApplied && !r.vagasCheckoutApplied) {
-    const claimed = await claimVagasFlag(r.id, 'vagasCheckoutApplied');
+    const claimed = await claimVagasFlag(r.id, 'vagasCheckoutApplied', 'vagasCheckoutLeaseAt');
     if (claimed) {
       try {
         await applyVagasDelta(cfg.slug, -cfg.perVolunteer);
+        await markVagasDone(r.id, 'vagasCheckoutApplied');
       } catch (e) {
-        console.error('Reservado, mas falhou ao descontar vagas do check-out de ' + r.area, e);
+        console.error('Reservado, mas falhou ao descontar vagas do check-out de ' + r.area + ' — tenta de novo em breve', e);
       }
     }
   }
@@ -671,12 +693,23 @@ async function processVagasEvents(records) {
 // painel aberto em lugar nenhum), o check-in ficava pendente e a vaga nunca era somada/descontada no
 // painel de vagas. claimVagasFlag() garante que aplicar duas vezes (de duas telas abertas ao mesmo
 // tempo) não gera contagem duplicada.
+// Última lista de check-ins de hoje recebida pelo watcher — guardada à parte pra poder reprocessar
+// de tempos em tempos mesmo se NENHUM check-in novo acontecer (ver setInterval logo abaixo).
+let lastVagasRecords = [];
+
 function startVagasWatcher() {
   try {
     const vagasQuery = query(collection(db, CHECKINS_COL), where('date', '==', dateKey));
     onSnapshot(vagasQuery, (snap) => {
-      processVagasEvents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      lastVagasRecords = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      processVagasEvents(lastVagasRecords);
     }, (err) => console.error('Falha no watcher de vagas', err));
+
+    // onSnapshot só reavisa quando ALGUM check-in muda — uma reserva de vaga que ficou presa (aba
+    // fechou no meio do caminho) só seria tentada de novo quando o próximo voluntário chegasse em
+    // QUALQUER sala. Esse intervalo garante que a reserva vencida (depois de VAGAS_LEASE_MS) seja
+    // percebida e tentada de novo mesmo num momento parado, sem precisar esperar o próximo check-in.
+    setInterval(() => processVagasEvents(lastVagasRecords), VAGAS_LEASE_MS);
   } catch (e) {
     console.error('Falha ao iniciar watcher de vagas', e);
   }
