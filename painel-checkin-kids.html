@@ -389,15 +389,19 @@
   .sync-status[data-state="offline"] .sync-dot { background: #d03b3b; }
   .sync-status + .sync-status { margin-left: 18px; }
 
-  /* Enche o espaço em branco que sobra em telas mais altas com uma animação bem leve
-     (bolinhas quicando), só decorativa — não mexe em QR code nem em contagem nenhuma. */
-  .fun-zone {
-    flex: 1 1 auto;
-    min-height: 120px;
-    position: relative;
-    overflow: hidden;
+  /* Brinquedinhos (emoji num canvas) passando por trás de tudo, na tela inteira — em volta dos QR
+     codes, em cima, embaixo, nas laterais. Fica no MESMO nível do fundo com a logo (z-index negativo,
+     depois dela no HTML pra aparecer por cima só dela), então só aparece nos vãos vazios: por trás
+     dos cards de QR Code e das salas (que têm fundo sólido) ele some, igual a logo de fundo já faz.
+     pointer-events:none pra nunca atrapalhar clique em nada. Só decorativo — não mexe em QR code
+     nem em contagem nenhuma. */
+  .toys-layer {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
   }
-  .fun-zone canvas {
+  .toys-layer canvas {
     display: block;
     width: 100%;
     height: 100%;
@@ -407,6 +411,9 @@
 <body>
 <div class="viz-root">
   <div class="bg-logo" aria-hidden="true"></div>
+  <div class="toys-layer" aria-hidden="true">
+    <canvas id="toysCanvas"></canvas>
+  </div>
   <div class="banner">Aponte a câmera do seu celular no app MyKids Family e faça o check-in das crianças</div>
 
   <section class="checkin">
@@ -503,10 +510,6 @@
       </div>
     </section>
   </main>
-
-  <div class="fun-zone" aria-hidden="true">
-    <canvas id="funCanvas"></canvas>
-  </div>
 
   <footer>
     <span class="sync-status" id="syncStatus" data-state="connecting"><span class="sync-dot"></span><span id="syncStatusText">Conectando…</span></span>
@@ -698,58 +701,63 @@
 })();
 </script>
 
-<!-- Bolinhas quicando no espaço vazio embaixo — só visual, roda sozinho, separado do
-     resto do código de propósito pra nunca interferir em QR code ou contagem de vagas. -->
+<!-- Brinquedinhos (emoji) flutuando pela tela inteira, por trás de tudo — só visual, roda
+     sozinho, separado do resto do código de propósito pra nunca interferir em QR code ou
+     contagem de vagas. Usa emoji em vez de imagem porque já vem colorido e pronto, sem
+     precisar carregar nenhum arquivo extra. -->
 <script>
 (function () {
-  var canvas = document.getElementById('funCanvas');
+  var canvas = document.getElementById('toysCanvas');
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var wrap = canvas.parentElement;
-  var colors = ['#6aabe4', '#f9cf00', '#00ac69', '#8b1a9c', '#f3816e'];
-  var balls = [];
+  var toys = ['🚗', '🦕', '🧸', '🚂', '🪁', '🎈', '🧩', '🦖'];
+  var sprites = [];
 
   function resize() {
     canvas.width = wrap.clientWidth;
     canvas.height = wrap.clientHeight;
   }
 
-  function makeBalls() {
-    var count = Math.max(4, Math.min(10, Math.round(canvas.width / 220)));
-    balls = [];
+  function makeSprites() {
+    // Um brinquedo a cada ~140 mil px² de tela, entre 10 e 22 ao todo — dá pra ter em volta
+    // dos QR codes, em cima, embaixo e nas laterais sem virar bagunça visual.
+    var count = Math.max(10, Math.min(22, Math.round((canvas.width * canvas.height) / 140000)));
+    sprites = [];
     for (var i = 0; i < count; i++) {
-      var r = 16 + Math.random() * 14;
-      balls.push({
-        x: Math.random() * Math.max(1, canvas.width - 2 * r) + r,
-        y: Math.random() * Math.max(1, canvas.height - 2 * r) + r,
-        r: r,
-        vx: (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random()),
-        vy: (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random()),
-        color: colors[i % colors.length]
+      var size = 26 + Math.random() * 20;
+      sprites.push({
+        x: Math.random() * Math.max(1, canvas.width - size) + size / 2,
+        y: Math.random() * Math.max(1, canvas.height - size) + size / 2,
+        size: size,
+        vx: (Math.random() < 0.5 ? -1 : 1) * (0.35 + Math.random() * 0.55),
+        vy: (Math.random() < 0.5 ? -1 : 1) * (0.35 + Math.random() * 0.55),
+        emoji: toys[i % toys.length]
       });
     }
   }
 
   function tick() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    balls.forEach(function (b) {
-      b.x += b.vx; b.y += b.vy;
-      if (b.x - b.r < 0) { b.x = b.r; b.vx = Math.abs(b.vx); }
-      if (b.x + b.r > canvas.width) { b.x = canvas.width - b.r; b.vx = -Math.abs(b.vx); }
-      if (b.y - b.r < 0) { b.y = b.r; b.vy = Math.abs(b.vy); }
-      if (b.y + b.r > canvas.height) { b.y = canvas.height - b.r; b.vy = -Math.abs(b.vy); }
-      ctx.beginPath();
-      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
-      ctx.fillStyle = b.color;
-      ctx.globalAlpha = 0.85;
-      ctx.fill();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.globalAlpha = 0.8;
+    sprites.forEach(function (s) {
+      var half = s.size / 2;
+      s.x += s.vx; s.y += s.vy;
+      if (s.x - half < 0) { s.x = half; s.vx = Math.abs(s.vx); }
+      if (s.x + half > canvas.width) { s.x = canvas.width - half; s.vx = -Math.abs(s.vx); }
+      if (s.y - half < 0) { s.y = half; s.vy = Math.abs(s.vy); }
+      if (s.y + half > canvas.height) { s.y = canvas.height - half; s.vy = -Math.abs(s.vy); }
+      ctx.font = s.size + 'px sans-serif';
+      ctx.fillText(s.emoji, s.x, s.y);
     });
     requestAnimationFrame(tick);
   }
 
   resize();
-  makeBalls();
-  window.addEventListener('resize', function () { resize(); makeBalls(); });
+  makeSprites();
+  window.addEventListener('resize', function () { resize(); makeSprites(); });
   tick();
 })();
 </script>
