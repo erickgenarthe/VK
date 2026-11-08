@@ -388,6 +388,20 @@
   .sync-status[data-state="online"] .sync-dot { background: #0ca30c; }
   .sync-status[data-state="offline"] .sync-dot { background: #d03b3b; }
   .sync-status + .sync-status { margin-left: 18px; }
+
+  /* Enche o espaço em branco que sobra em telas mais altas com uma animação bem leve
+     (bolinhas quicando), só decorativa — não mexe em QR code nem em contagem nenhuma. */
+  .fun-zone {
+    flex: 1 1 auto;
+    min-height: 120px;
+    position: relative;
+    overflow: hidden;
+  }
+  .fun-zone canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
 </style>
 </head>
 <body>
@@ -489,6 +503,10 @@
       </div>
     </section>
   </main>
+
+  <div class="fun-zone" aria-hidden="true">
+    <canvas id="funCanvas"></canvas>
+  </div>
 
   <footer>
     <span class="sync-status" id="syncStatus" data-state="connecting"><span class="sync-dot"></span><span id="syncStatusText">Conectando…</span></span>
@@ -677,6 +695,62 @@
     });
   });
 
+})();
+</script>
+
+<!-- Bolinhas quicando no espaço vazio embaixo — só visual, roda sozinho, separado do
+     resto do código de propósito pra nunca interferir em QR code ou contagem de vagas. -->
+<script>
+(function () {
+  var canvas = document.getElementById('funCanvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var wrap = canvas.parentElement;
+  var colors = ['#6aabe4', '#f9cf00', '#00ac69', '#8b1a9c', '#f3816e'];
+  var balls = [];
+
+  function resize() {
+    canvas.width = wrap.clientWidth;
+    canvas.height = wrap.clientHeight;
+  }
+
+  function makeBalls() {
+    var count = Math.max(4, Math.min(10, Math.round(canvas.width / 220)));
+    balls = [];
+    for (var i = 0; i < count; i++) {
+      var r = 16 + Math.random() * 14;
+      balls.push({
+        x: Math.random() * Math.max(1, canvas.width - 2 * r) + r,
+        y: Math.random() * Math.max(1, canvas.height - 2 * r) + r,
+        r: r,
+        vx: (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random()),
+        vy: (Math.random() < 0.5 ? -1 : 1) * (0.6 + Math.random()),
+        color: colors[i % colors.length]
+      });
+    }
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    balls.forEach(function (b) {
+      b.x += b.vx; b.y += b.vy;
+      if (b.x - b.r < 0) { b.x = b.r; b.vx = Math.abs(b.vx); }
+      if (b.x + b.r > canvas.width) { b.x = canvas.width - b.r; b.vx = -Math.abs(b.vx); }
+      if (b.y - b.r < 0) { b.y = b.r; b.vy = Math.abs(b.vy); }
+      if (b.y + b.r > canvas.height) { b.y = canvas.height - b.r; b.vy = -Math.abs(b.vy); }
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fillStyle = b.color;
+      ctx.globalAlpha = 0.85;
+      ctx.fill();
+    });
+    requestAnimationFrame(tick);
+  }
+
+  resize();
+  makeBalls();
+  window.addEventListener('resize', function () { resize(); makeBalls(); });
+  tick();
 })();
 </script>
 </body>
