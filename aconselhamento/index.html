@@ -246,8 +246,8 @@
   const WHATSAPP_EQUIPE = "5584981575473";
   // Supabase: Project Settings > API. A chave "anon" é pública por design;
   // a segurança vem das regras da tabela (só inserção), ver supabase/schema.sql
-  const SUPABASE_URL = "";      // ex.: https://abcdxyz.supabase.co
-  const SUPABASE_ANON_KEY = ""; // chave anon/public (nunca a service_role)
+  const SUPABASE_URL = "https://ibqzfmqlcxknijawgqef.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_pxgQNBAYl8uU2dtPZeUIeQ_F71zr0KR"; // chave pública (nunca a secret/service_role)
 
   const form = document.getElementById('form');
   const whats = document.getElementById('whats');
@@ -313,7 +313,7 @@
       const r = await fetch(`${SUPABASE_URL}/rest/v1/cadastros`, {
         method: 'POST', body: JSON.stringify(row), signal: ctrl.signal,
         headers: {'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY,
-                  Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: 'return=minimal'}
+                  Prefer: 'return=minimal'}
       });
       if (!r.ok) throw new Error('HTTP ' + r.status);
     } finally { clearTimeout(t); }
