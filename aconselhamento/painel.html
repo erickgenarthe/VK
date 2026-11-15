@@ -77,8 +77,9 @@
   async function auth(grant, body) {
     const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=${grant}`, {
       method: 'POST', headers: {'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY}, body: JSON.stringify(body)});
-    if (!r.ok) throw new Error('auth');
-    return r.json();
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { const e = new Error('auth'); e.codigo = j.error_code || j.code || ''; e.http = r.status; throw e; }
+    return j;
   }
   async function api(path, opts = {}, tentou = false) {
     const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {...opts, headers: {
@@ -87,7 +88,7 @@
       try { salvaSessao(await auth('refresh_token', {refresh_token: sessao.refresh_token})); return api(path, opts, true); }
       catch { sair(); throw new Error('sessão expirada'); }
     }
-    if (!r.ok) throw new Error('HTTP ' + r.status);
+    if (!r.ok) { const e = new Error('HTTP ' + r.status); e.http = r.status; throw e; }
     return r.json();
   }
 
@@ -101,7 +102,15 @@
       await carrega();
     } catch (err) {
       salvaSessao(null);
-      $('loginMsg').textContent = err.message === 'auth' ? 'E-mail ou senha incorretos.' : 'Não foi possível carregar. Tente de novo.';
+      const c = err.codigo || '';
+      $('loginMsg').textContent =
+        c === 'invalid_credentials' ? 'E-mail ou senha incorretos.' :
+        c === 'email_not_confirmed' ? 'Este usuário não foi confirmado. No Supabase, abra o usuário e confirme o e-mail.' :
+        c === 'over_request_rate_limit' || err.http === 429 ? 'Muitas tentativas. Espere alguns minutos.' :
+        err.message === 'auth' ? `Falha no login (${err.http || 'rede'}${c ? ', ' + c : ''}).` :
+        err.http === 401 || err.http === 403 ? 'Login ok, mas este e-mail não tem permissão. Peça para incluí-lo na lista da equipe.' :
+        err.http === 404 ? 'Tabela não encontrada. O SQL do painel foi rodado?' :
+        'Não foi possível carregar (' + (err.http || 'sem conexão') + '). Tente de novo.';
     } finally { b.disabled = false; }
   });
   $('sair').addEventListener('click', sair);
