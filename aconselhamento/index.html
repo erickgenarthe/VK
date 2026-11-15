@@ -244,8 +244,10 @@
   // ===== CONFIGURAÇÃO =====
   // WhatsApp da equipe (só números, com DDI e DDD)
   const WHATSAPP_EQUIPE = "5584981575473";
-  // URL do Web App do Google Apps Script (ver README.md). Termina em /exec
-  const ENDPOINT = "";
+  // Supabase: Project Settings > API. A chave "anon" é pública por design;
+  // a segurança vem das regras da tabela (só inserção), ver supabase/schema.sql
+  const SUPABASE_URL = "";      // ex.: https://abcdxyz.supabase.co
+  const SUPABASE_ANON_KEY = ""; // chave anon/public (nunca a service_role)
 
   const form = document.getElementById('form');
   const whats = document.getElementById('whats');
@@ -294,17 +296,26 @@
     window.scrollTo({top: 0, behavior: 'smooth'});
   }
 
+  const COLS = {'Campus':'campus','Nome':'nome','WhatsApp':'whatsapp','E-mail':'email','Idade':'idade',
+    'Estado civil':'estado_civil','Vínculo':'vinculo','GC':'gc','Líder':'lider_gc','Tipo':'tipo',
+    'Área':'areas','Motivo':'motivo','Modalidade':'modalidade','Período':'periodos','Já fez antes':'ja_fez_antes'};
+
   async function enviar(dados) {
-    if (!ENDPOINT) throw new Error('sem endpoint');
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) throw new Error('sem configuração');
+    const row = {};
+    for (const [k, col] of Object.entries(COLS)) {
+      if (dados[k] === undefined) continue;
+      row[col] = k === 'Idade' ? Number(dados[k]) : dados[k];
+    }
     const ctrl = new AbortController();
     const t = setTimeout(() => ctrl.abort(), 20000);
     try {
-      const r = await fetch(ENDPOINT, {
-        method: 'POST', body: JSON.stringify(dados), signal: ctrl.signal,
-        headers: {'Content-Type': 'text/plain;charset=utf-8'}
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/cadastros`, {
+        method: 'POST', body: JSON.stringify(row), signal: ctrl.signal,
+        headers: {'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY,
+                  Authorization: `Bearer ${SUPABASE_ANON_KEY}`, Prefer: 'return=minimal'}
       });
-      const j = await r.json();
-      if (!j.ok) throw new Error(j.erro || 'falha');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
     } finally { clearTimeout(t); }
   }
 
