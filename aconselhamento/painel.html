@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Painel · Aconselhamento CCVideira</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{--azul:#1D3F9E;--azul-esc:#162f78;--ceu:#8FCBE6;--laranja:#F39A2E;--creme:#F6F3EA;--preto:#111;--suave:#5d5d5d;--borda:#d9d4c6;--erro:#c0392b}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Montserrat,system-ui,sans-serif;color:var(--preto);background:var(--creme);line-height:1.5}
+  [hidden]{display:none!important}
+  header{background:var(--azul);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  header h1{font-size:15px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin:0}
+  header button{background:transparent;border:1.5px solid rgba(255,255,255,.6);color:#fff;border-radius:4px;padding:7px 14px;font:inherit;font-size:13px;cursor:pointer}
+  main{max-width:960px;margin:0 auto;padding:20px}
+  input,select,button{font:inherit;font-size:15px}
+  input,select{width:100%;padding:11px 13px;border:1.5px solid var(--borda);border-radius:4px;background:#fff}
+  input:focus,select:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(29,63,158,.15)}
+  .login{max-width:380px;margin:48px auto;background:#fff;padding:32px 28px}
+  .login h2{margin:0 0 20px;font-weight:500;color:var(--azul);font-size:20px;text-transform:uppercase;letter-spacing:.05em}
+  .login label{display:block;font-size:14px;font-weight:500;margin:14px 0 6px}
+  .btn{width:100%;margin-top:20px;padding:14px;border:0;border-radius:4px;background:var(--azul);color:#fff;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+  .btn:disabled{opacity:.7}
+  .msg{color:var(--erro);font-size:14px;margin-top:12px;min-height:1em}
+  .filtros{display:grid;grid-template-columns:2fr 1fr 1fr;gap:10px;margin-bottom:14px}
+  @media(max-width:640px){.filtros{grid-template-columns:1fr}}
+  .resumo{font-size:13px;color:var(--suave);margin:0 0 12px}
+  .item{background:#fff;border-left:5px solid var(--ceu);margin-bottom:10px}
+  .item[data-status=novo]{border-left-color:var(--laranja)}
+  .item[data-status=concluído]{border-left-color:#aaa}
+  .topo{display:flex;gap:12px;justify-content:space-between;align-items:center;padding:14px 16px;cursor:pointer;flex-wrap:wrap}
+  .topo strong{font-size:16px}
+  .meta{font-size:13px;color:var(--suave)}
+  .tag{display:inline-block;font-size:12px;padding:2px 10px;border-radius:999px;background:var(--creme);margin-right:4px}
+  .det{padding:0 16px 16px;border-top:1px solid var(--borda);font-size:14px}
+  .det dl{display:grid;grid-template-columns:150px 1fr;gap:6px 14px;margin:14px 0}
+  .det dt{color:var(--suave)}.det dd{margin:0;white-space:pre-wrap;word-break:break-word}
+  @media(max-width:560px){.det dl{grid-template-columns:1fr}.det dt{margin-top:6px}}
+  .acoes{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .acoes select{width:auto}
+  .acoes a{background:#25d366;color:#fff;text-decoration:none;font-weight:600;font-size:13px;padding:10px 16px;border-radius:4px}
+  .vazio{text-align:center;color:var(--suave);padding:40px 0}
+</style>
+</head>
+<body>
+<header><h1>Aconselhamento · Painel</h1><button id="sair" hidden>Sair</button></header>
+<main>
+  <form class="login" id="login">
+    <h2>Entrar</h2>
+    <label for="email">E-mail</label><input id="email" type="email" autocomplete="username" required>
+    <label for="senha">Senha</label><input id="senha" type="password" autocomplete="current-password" required>
+    <button class="btn" id="entrar">Entrar</button>
+    <div class="msg" id="loginMsg" role="alert"></div>
+  </form>
+  <section id="lista" hidden>
+    <div class="filtros">
+      <input id="busca" type="search" placeholder="Buscar por nome ou WhatsApp" aria-label="Buscar">
+      <select id="fCampus" aria-label="Campus"><option value="">Todos os campus</option><option>CCVideira Capim Macio</option><option>CCVideira Candelária</option></select>
+      <select id="fStatus" aria-label="Status"><option value="">Todos os status</option><option>novo</option><option>em contato</option><option>agendado</option><option>concluído</option></select>
+    </div>
+    <p class="resumo" id="resumo"></p>
+    <div id="itens"></div>
+  </section>
+</main>
+<script>
+  const SUPABASE_URL = "https://ibqzfmqlcxknijawgqef.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_pxgQNBAYl8uU2dtPZeUIeQ_F71zr0KR";
+  const STATUS = ['novo','em contato','agendado','concluído'];
+  const $ = id => document.getElementById(id);
+  let sessao = null, dados = [];
+
+  const salvaSessao = s => { sessao = s; try { s ? sessionStorage.setItem('sb', JSON.stringify(s)) : sessionStorage.removeItem('sb'); } catch {} };
+  try { sessao = JSON.parse(sessionStorage.getItem('sb') || 'null'); } catch {}
+
+  async function auth(grant, body) {
+    const r = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=${grant}`, {
+      method: 'POST', headers: {'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY}, body: JSON.stringify(body)});
+    if (!r.ok) throw new Error('auth');
+    return r.json();
+  }
+  async function api(path, opts = {}, tentou = false) {
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {...opts, headers: {
+      'Content-Type': 'application/json', apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${sessao.access_token}`, ...(opts.headers || {})}});
+    if (r.status === 401 && !tentou && sessao.refresh_token) {
+      try { salvaSessao(await auth('refresh_token', {refresh_token: sessao.refresh_token})); return api(path, opts, true); }
+      catch { sair(); throw new Error('sessão expirada'); }
+    }
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  }
+
+  function sair() { salvaSessao(null); dados = []; $('lista').hidden = true; $('sair').hidden = true; $('login').hidden = false; $('senha').value = ''; }
+
+  $('login').addEventListener('submit', async e => {
+    e.preventDefault();
+    const b = $('entrar'); b.disabled = true; $('loginMsg').textContent = '';
+    try {
+      salvaSessao(await auth('password', {email: $('email').value.trim().toLowerCase(), password: $('senha').value}));
+      await carrega();
+    } catch (err) {
+      salvaSessao(null);
+      $('loginMsg').textContent = err.message === 'auth' ? 'E-mail ou senha incorretos.' : 'Não foi possível carregar. Tente de novo.';
+    } finally { b.disabled = false; }
+  });
+  $('sair').addEventListener('click', sair);
+
+  async function carrega() {
+    dados = await api('cadastros?select=*&order=criado_em.desc&limit=2000');
+    $('login').hidden = true; $('lista').hidden = false; $('sair').hidden = false;
+    desenha();
+  }
+
+  const el = (tag, props = {}, ...kids) => { const n = Object.assign(document.createElement(tag), props); kids.forEach(k => n.append(k)); return n; };
+  const quando = iso => new Date(iso).toLocaleString('pt-BR', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+  const CAMPOS = [['WhatsApp','whatsapp'],['E-mail','email'],['Idade','idade'],['Estado civil','estado_civil'],['Vínculo','vinculo'],['GC','gc'],
+    ['Líder do GC','lider_gc'],['Tipo','tipo'],['Áreas','areas'],['Motivo','motivo'],['Modalidade','modalidade'],['Períodos','periodos'],['Já fez antes','ja_fez_antes']];
+
+  function desenha() {
+    const q = $('busca').value.trim().toLowerCase(), qd = q.replace(/\D/g, '');
+    const lista = dados.filter(r =>
+      (!$('fCampus').value || r.campus === $('fCampus').value) &&
+      (!$('fStatus').value || r.status === $('fStatus').value) &&
+      (!q || r.nome.toLowerCase().includes(q) || (qd && r.whatsapp.replace(/\D/g, '').includes(qd))));
+    $('resumo').textContent = `${lista.length} de ${dados.length} cadastros · ${dados.filter(r => r.status === 'novo').length} novos`;
+    const box = $('itens'); box.replaceChildren();
+    if (!lista.length) box.append(el('div', {className: 'vazio', textContent: 'Nenhum cadastro encontrado.'}));
+    lista.forEach(r => box.append(cartao(r)));
+  }
+
+  function cartao(r) {
+    const det = el('div', {className: 'det', hidden: true});
+    const dl = el('dl');
+    CAMPOS.forEach(([rot, k]) => { if (r[k] != null && r[k] !== '') dl.append(el('dt', {textContent: rot}), el('dd', {textContent: String(r[k])})); });
+    const sel = el('select', {ariaLabel: 'Status'}, ...STATUS.map(s => el('option', {value: s, textContent: s, selected: s === r.status})));
+    const msg = el('span', {className: 'meta'});
+    sel.addEventListener('change', async () => {
+      msg.textContent = 'Salvando…';
+      try {
+        const res = await api(`cadastros?id=eq.${r.id}`, {method: 'PATCH', body: JSON.stringify({status: sel.value}), headers: {Prefer: 'return=representation'}});
+        if (!res.length) throw new Error('sem permissão');
+        r.status = sel.value; item.dataset.status = r.status; tag.textContent = r.status; msg.textContent = 'Salvo ✓';
+      } catch { sel.value = r.status; msg.textContent = 'Não foi possível salvar.'; }
+    });
+    const fone = r.whatsapp.replace(/\D/g, '');
+    det.append(dl, el('div', {className: 'acoes'}, sel,
+      el('a', {href: `https://wa.me/55${fone}`, target: '_blank', rel: 'noopener', textContent: 'Chamar no WhatsApp'}), msg));
+    const tag = el('span', {className: 'tag', textContent: r.status});
+    const topo = el('div', {className: 'topo', tabIndex: 0, role: 'button'},
+      el('div', {}, el('strong', {textContent: r.nome}), el('div', {className: 'meta', textContent: `${r.campus.replace('CCVideira ', '')} · ${r.tipo} · ${r.modalidade} · ${quando(r.criado_em)}`})), tag);
+    const abre = () => { det.hidden = !det.hidden; };
+    topo.addEventListener('click', abre);
+    topo.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abre(); } });
+    const item = el('div', {className: 'item'}, topo, det); item.dataset.status = r.status;
+    return item;
+  }
+
+  ['busca', 'fCampus', 'fStatus'].forEach(id => $(id).addEventListener('input', desenha));
+  if (sessao) carrega().catch(sair);
+</script>
+</body>
+</html>
