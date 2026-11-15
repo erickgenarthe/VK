@@ -231,10 +231,6 @@
       <div class="rotulo">Cadastro recebido</div>
       <h2>Obrigado, <span id="okNome"></span>.</h2>
       <p>Que bom que você deu esse passo. Nossa equipe de aconselhamento vai entrar em contato com você pelo WhatsApp para combinar o melhor horário.</p>
-      <p id="okSalvo" style="margin-top:20px"><strong>Quer agilizar?</strong> Mande também uma mensagem para a equipe pelo WhatsApp. Ela já vai escrita.</p>
-      <p id="okManual" hidden style="margin-top:20px"><strong>Falta só um passo:</strong> toque no botão abaixo para enviar seus dados à equipe pelo WhatsApp.</p>
-      <a id="btnWhats" class="btn-whats" href="#" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
-      <p class="hint">Número da equipe: +55 84 98157-5473</p>
       <p class="verso">“Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.” · 1 Pedro 5.7</p>
     </div>
 </main>
@@ -284,11 +280,8 @@
     return `https://wa.me/${WHATSAPP_EQUIPE}?text=${encodeURIComponent(texto)}`;
   }
 
-  function mostrarOk(dados, salvo) {
+  function mostrarOk(dados) {
     document.getElementById('okNome').textContent = dados['Nome'].split(' ')[0];
-    document.getElementById('btnWhats').href = linkWhats(dados);
-    document.getElementById('okSalvo').hidden = !salvo;
-    document.getElementById('okManual').hidden = salvo;
     document.querySelector('.card').style.display = 'none';
     const ok = document.getElementById('ok');
     ok.style.display = 'block';
@@ -326,12 +319,12 @@
 
     const dados = {};
     new FormData(form).forEach((v, k) => { if (v && k !== 'site') dados[k] = dados[k] ? dados[k] + ', ' + v : v; });
-    if (form.site.value) { mostrarOk(dados, true); return; } // honeypot (robô)
+    if (form.site.value) { mostrarOk(dados); return; } // honeypot (robô)
 
     btn.disabled = true; btn.textContent = 'Enviando…'; erro.style.display = 'none';
     try {
       await enviar(dados);
-      mostrarOk(dados, true);
+      mostrarOk(dados);
     } catch (err) {
       btn.disabled = false; btn.textContent = 'Enviar cadastro';
       document.getElementById('btnWhatsErro').href = linkWhats(dados);
