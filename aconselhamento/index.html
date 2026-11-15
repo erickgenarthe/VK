@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aconselhamento · CCVideira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Identidade visual: campanha "Isso é Igreja" */
+  :root{
+    --azul:#1D3F9E; --azul-esc:#162f78; --ceu:#8FCBE6; --laranja:#F39A2E; --rosa:#EC8F86;
+    --lilas:#BCB8E8; --creme:#F6F3EA; --preto:#111111; --suave:#5d5d5d; --borda:#d9d4c6; --erro:#c0392b;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Montserrat,system-ui,sans-serif;color:var(--preto);background:var(--creme);line-height:1.55}
+  .topo{display:flex;justify-content:space-between;max-width:1080px;margin:0 auto;padding:28px 24px 0;font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase}
+  header{max-width:1080px;margin:0 auto;padding:0 24px 8px;position:relative}
+  .pincel{display:block;width:min(760px,96%);margin:12px 0 0 auto;-webkit-mask-image:linear-gradient(#000 88%,transparent);mask-image:linear-gradient(#000 88%,transparent)}
+  h1{font-family:Montserrat,sans-serif;font-weight:400;color:var(--azul);font-size:clamp(24px,7.2vw,88px);letter-spacing:.07em;line-height:1;margin:-6px 0 18px;text-transform:uppercase}
+  .tema{font-family:"IBM Plex Sans",sans-serif;font-size:clamp(20px,3vw,28px);text-transform:uppercase;line-height:1.15;margin:0 0 14px}
+  header p{max-width:620px;margin:0;font-size:15.5px}
+  .verso{font-family:"IBM Plex Sans",sans-serif;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--azul);margin-top:16px}
+  main{max-width:1080px;margin:28px auto 56px;padding:0 24px}
+  .card{background:#fff;padding:36px clamp(20px,5vw,48px);max-width:760px}
+  fieldset{border:0;padding:0;margin:0 0 34px}
+  legend{display:block;width:100%;font-size:13px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--azul);padding:0 0 10px;margin-bottom:18px;border-bottom:3px solid var(--laranja)}
+  fieldset:nth-of-type(2) legend{border-color:var(--ceu)}
+  fieldset:nth-of-type(3) legend{border-color:var(--rosa)}
+  fieldset:nth-of-type(4) legend{border-color:var(--lilas)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .full{grid-column:1/-1}
+  @media(max-width:600px){.grid{grid-template-columns:1fr}.topo span+span{display:none}}
+  label{display:block;font-weight:500;font-size:14px;margin-bottom:7px}
+  .req{color:var(--laranja)}
+  input,select,textarea{width:100%;font:inherit;font-size:15px;padding:12px 14px;border:1.5px solid var(--borda);border-radius:4px;background:#fff;color:var(--preto);transition:border .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--azul);box-shadow:0 0 0 3px rgba(29,63,158,.15)}
+  textarea{min-height:110px;resize:vertical}
+  .hint{font-size:12.5px;color:var(--suave);margin-top:5px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chips label{margin:0;font-weight:400;cursor:pointer}
+  .chips input{position:absolute;opacity:0;width:0;height:0}
+  .chips span{display:inline-block;padding:9px 16px;border:1.5px solid var(--borda);border-radius:999px;font-size:14px;transition:all .15s;background:#fff}
+  .chips span:hover{border-color:var(--azul)}
+  .chips input:checked+span{background:var(--azul);border-color:var(--azul);color:#fff}
+  .chips input:focus-visible+span{box-shadow:0 0 0 3px rgba(29,63,158,.25)}
+  .campus{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:600px){.campus{grid-template-columns:1fr}}
+  .campus label{margin:0;cursor:pointer}
+  .campus input{position:absolute;opacity:0;width:0;height:0}
+  .campus span{display:block;padding:16px 18px;border:1.5px solid var(--borda);border-radius:4px;font-weight:400;font-size:13px;text-transform:uppercase;letter-spacing:.05em;transition:all .15s}
+  .campus strong{display:block;font-family:"IBM Plex Sans",sans-serif;font-weight:500;font-size:22px;letter-spacing:.02em;margin-top:2px}
+  .campus span:hover{border-color:var(--azul)}
+  .campus input:checked+span{background:var(--azul);border-color:var(--azul);color:#fff}
+  .campus input:focus-visible+span{box-shadow:0 0 0 3px rgba(29,63,158,.25)}
+  .consent{display:flex;gap:10px;align-items:flex-start;font-weight:400;font-size:14px;color:var(--suave)}
+  .consent input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--azul)}
+  .sigilo{background:var(--creme);border-left:4px solid var(--ceu);padding:14px 16px;font-size:14px;margin-bottom:20px}
+  button{width:100%;font:inherit;font-weight:600;font-size:15px;letter-spacing:.08em;text-transform:uppercase;padding:17px;border:0;border-radius:4px;background:var(--azul);color:#fff;cursor:pointer;transition:background .15s,transform .1s}
+  button:hover{background:var(--azul-esc)} button:active{transform:scale(.99)}
+  button:disabled{opacity:.7;cursor:wait}
+  .erro-msg{color:var(--erro);font-size:12.5px;margin-top:5px;display:none}
+  .invalido input,.invalido select,.invalido textarea,.invalido .chips span,.invalido .campus span{border-color:var(--erro)}
+  .invalido .erro-msg{display:block}
+  .erro-envio a{color:var(--erro);font-weight:600}
+  .erro-envio{display:none;color:var(--erro);font-size:14px;text-align:center;margin-top:12px}
+  .ok{display:none;background:var(--azul);color:var(--creme);padding:44px clamp(20px,5vw,48px);max-width:760px;position:relative;overflow:hidden}
+  .ok .rotulo{font-size:12px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;border-bottom:3px solid var(--laranja);display:inline-block;padding-bottom:8px;margin-bottom:22px}
+  .ok h2{font-weight:400;font-size:clamp(28px,5vw,44px);letter-spacing:.04em;line-height:1.1;text-transform:uppercase;margin:0 0 18px}
+  .ok p{max-width:560px}
+  .ok .verso{color:var(--ceu)}
+  .ok .hint{color:var(--lilas)}
+  .btn-whats{display:inline-block;margin:10px 0 6px;padding:15px 28px;border-radius:4px;background:#25d366;color:#fff;font-weight:600;font-size:14px;letter-spacing:.06em;text-transform:uppercase;text-decoration:none}
+  [hidden]{display:none!important}
+  .btn-whats:hover{background:#1ebe5a}
+  footer{max-width:1080px;margin:0 auto;padding:0 24px 36px;color:var(--suave);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="topo"><span>CCVideira</span><span>Ministério de Aconselhamento</span></div>
+<header>
+  <img class="pincel" alt="" width="760" decoding="async" src="pincel.jpg">
+  <h1>Aconselhamento</h1>
+  <div class="tema">Igreja que cuida.</div>
+  <p>Você não precisa caminhar sozinho. Preencha o cadastro abaixo e nossa equipe de aconselhamento vai entrar em contato para combinar um horário.</p>
+  <div class="verso">“Vinde a mim, todos os que estais cansados e sobrecarregados, e eu vos aliviarei.” · Mateus 11.28</div>
+</header>
+
+<main>
+  <div class="card">
+    <form id="form" novalidate>
+      <fieldset>
+        <legend>Seu campus</legend>
+        <div class="campo">
+          <label>De qual campus você é? <span class="req">*</span></label>
+          <div class="campus">
+            <label><input type="radio" name="Campus" value="CCVideira Capim Macio" required><span>CCVideira<strong>Capim Macio</strong></span></label>
+            <label><input type="radio" name="Campus" value="CCVideira Candelária"><span>CCVideira<strong>Candelária</strong></span></label>
+          </div>
+          <div class="erro-msg">Escolha o seu campus.</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Seus dados</legend>
+        <div class="grid">
+          <div class="full campo">
+            <label for="nome">Nome completo <span class="req">*</span></label>
+            <input id="nome" name="Nome" required autocomplete="name">
+            <div class="erro-msg">Informe seu nome.</div>
+          </div>
+          <div class="campo">
+            <label for="whats">WhatsApp <span class="req">*</span></label>
+            <input id="whats" name="WhatsApp" type="tel" required placeholder="(00) 00000-0000" autocomplete="tel">
+            <div class="erro-msg">Informe um telefone válido.</div>
+          </div>
+          <div class="campo">
+            <label for="email">E-mail</label>
+            <input id="email" name="E-mail" type="email" autocomplete="email">
+            <div class="erro-msg">E-mail inválido.</div>
+          </div>
+          <div class="campo">
+            <label for="idade">Idade</label>
+            <input id="idade" name="Idade" type="number" min="1" max="120" inputmode="numeric" placeholder="Ex.: 32">
+          </div>
+          <div class="campo">
+            <label for="civil">Estado civil</label>
+            <select id="civil" name="Estado civil">
+              <option value="">Selecione</option>
+              <option>Solteiro(a)</option><option>Namorando / Noivo(a)</option>
+              <option>Casado(a)</option><option>Divorciado(a)</option><option>Viúvo(a)</option>
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Vínculo com a igreja</legend>
+        <div class="grid">
+          <div class="full campo">
+            <label>Você é <span class="req">*</span></label>
+            <div class="chips" data-grupo="vinculo">
+              <label><input type="radio" name="Vínculo" value="Membro" required><span>Membro</span></label>
+              <label><input type="radio" name="Vínculo" value="Frequentador"><span>Frequentador</span></label>
+              <label><input type="radio" name="Vínculo" value="Visitante"><span>Visitante</span></label>
+            </div>
+            <div class="erro-msg">Escolha uma opção.</div>
+          </div>
+          <div class="campo">
+            <label for="gc">Participa de GC? Qual?</label>
+            <input id="gc" name="GC" placeholder="Nome do GC">
+          </div>
+          <div class="campo">
+            <label for="lider">Nome do(a) líder do GC</label>
+            <input id="lider" name="Líder">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Sobre o aconselhamento</legend>
+        <div class="grid">
+          <div class="full campo">
+            <label>Tipo de aconselhamento <span class="req">*</span></label>
+            <div class="chips">
+              <label><input type="radio" name="Tipo" value="Individual" required><span>Individual</span></label>
+              <label><input type="radio" name="Tipo" value="Casal"><span>Casal</span></label>
+              <label><input type="radio" name="Tipo" value="Família"><span>Família</span></label>
+              <label><input type="radio" name="Tipo" value="Pré-nupcial"><span>Pré-nupcial</span></label>
+            </div>
+            <div class="erro-msg">Escolha o tipo.</div>
+          </div>
+          <div class="full campo">
+            <label>Área principal (opcional)</label>
+            <div class="chips">
+              <label><input type="checkbox" name="Área" value="Vida espiritual"><span>Vida espiritual</span></label>
+              <label><input type="checkbox" name="Área" value="Casamento/relacionamento"><span>Casamento / relacionamento</span></label>
+              <label><input type="checkbox" name="Área" value="Família e filhos"><span>Família e filhos</span></label>
+              <label><input type="checkbox" name="Área" value="Emocional"><span>Emocional</span></label>
+              <label><input type="checkbox" name="Área" value="Luto"><span>Luto</span></label>
+              <label><input type="checkbox" name="Área" value="Vícios"><span>Vícios</span></label>
+              <label><input type="checkbox" name="Área" value="Finanças"><span>Finanças</span></label>
+              <label><input type="checkbox" name="Área" value="Outro"><span>Outro</span></label>
+            </div>
+          </div>
+          <div class="full campo">
+            <label for="motivo">Conte brevemente o que você gostaria de conversar</label>
+            <textarea id="motivo" name="Motivo" placeholder="Escreva só o que se sentir à vontade. Os detalhes podem ficar para o encontro."></textarea>
+          </div>
+          <div class="full campo">
+            <label>Modalidade <span class="req">*</span></label>
+            <div class="chips">
+              <label><input type="radio" name="Modalidade" value="Presencial" required><span>Presencial</span></label>
+              <label><input type="radio" name="Modalidade" value="Online"><span>Online</span></label>
+            </div>
+            <div class="erro-msg">Escolha a modalidade.</div>
+          </div>
+          <div class="full campo">
+            <label>Melhores períodos</label>
+            <div class="chips">
+              <label><input type="checkbox" name="Período" value="Manhã"><span>Manhã</span></label>
+              <label><input type="checkbox" name="Período" value="Tarde"><span>Tarde</span></label>
+              <label><input type="checkbox" name="Período" value="Noite"><span>Noite</span></label>
+              <label><input type="checkbox" name="Período" value="Sábado"><span>Sábado</span></label>
+            </div>
+          </div>
+          <div class="full campo">
+            <label>Já fez aconselhamento na igreja antes?</label>
+            <div class="chips">
+              <label><input type="radio" name="Já fez antes" value="Sim"><span>Sim</span></label>
+              <label><input type="radio" name="Já fez antes" value="Não"><span>Não</span></label>
+            </div>
+          </div>
+        </div>
+      </fieldset>
+
+      <div class="sigilo">🔒 Tudo o que você compartilhar será tratado com <strong>sigilo</strong> e usado apenas pela equipe de aconselhamento para entrar em contato com você.</div>
+
+      <div class="campo" style="margin-bottom:22px">
+        <label class="consent"><input type="checkbox" id="lgpd" required>Autorizo a CCVideira a usar meus dados para contato e agendamento do aconselhamento, conforme a LGPD. <span class="req">*</span></label>
+        <div class="erro-msg">É preciso autorizar para continuar.</div>
+      </div>
+
+      <button type="submit" id="btnEnviar">Enviar cadastro</button>
+      <div class="erro-envio" id="erroEnvio" role="alert">Não conseguimos enviar seu cadastro agora. Verifique sua internet e tente de novo, ou <a id="btnWhatsErro" href="#" target="_blank" rel="noopener">envie seus dados direto pelo WhatsApp</a>.</div>
+      <input type="text" name="site" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px">
+    </form>
+  </div>
+
+    <div class="ok" id="ok">
+      <div class="rotulo">Cadastro recebido</div>
+      <h2>Obrigado, <span id="okNome"></span>.</h2>
+      <p>Que bom que você deu esse passo. Nossa equipe de aconselhamento vai entrar em contato com você pelo WhatsApp para combinar o melhor horário.</p>
+      <p id="okSalvo" style="margin-top:20px"><strong>Quer agilizar?</strong> Mande também uma mensagem para a equipe pelo WhatsApp. Ela já vai escrita.</p>
+      <p id="okManual" hidden style="margin-top:20px"><strong>Falta só um passo:</strong> toque no botão abaixo para enviar seus dados à equipe pelo WhatsApp.</p>
+      <a id="btnWhats" class="btn-whats" href="#" target="_blank" rel="noopener">Enviar pelo WhatsApp</a>
+      <p class="hint">Número da equipe: +55 84 98157-5473</p>
+      <p class="verso">“Lançando sobre ele toda a vossa ansiedade, porque ele tem cuidado de vós.” · 1 Pedro 5.7</p>
+    </div>
+</main>
+<footer>CCVideira · Capim Macio · Candelária</footer>
+
+<script>
+  // ===== CONFIGURAÇÃO =====
+  // WhatsApp da equipe (só números, com DDI e DDD)
+  const WHATSAPP_EQUIPE = "5584981575473";
+  // URL do Web App do Google Apps Script (ver README.md). Termina em /exec
+  const ENDPOINT = "";
+
+  const form = document.getElementById('form');
+  const whats = document.getElementById('whats');
+  const btn = document.getElementById('btnEnviar');
+  const erro = document.getElementById('erroEnvio');
+
+  whats.addEventListener('input', () => {
+    let d = whats.value.replace(/\D/g, '').slice(0, 11);
+    if (d.length > 6) whats.value = `(${d.slice(0,2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}`;
+    else if (d.length > 2) whats.value = `(${d.slice(0,2)}) ${d.slice(2)}`;
+    else whats.value = d;
+  });
+
+  function valida() {
+    let ok = true;
+    form.querySelectorAll('.campo').forEach(c => c.classList.remove('invalido'));
+    form.querySelectorAll('[required]').forEach(el => {
+      const campo = el.closest('.campo');
+      let valido;
+      if (el.type === 'radio') valido = !!form.querySelector(`input[name="${el.name}"]:checked`);
+      else if (el.type === 'checkbox') valido = el.checked;
+      else if (el === whats) valido = whats.value.replace(/\D/g, '').length >= 10;
+      else valido = el.value.trim() !== '';
+      if (!valido) { campo.classList.add('invalido'); ok = false; }
+    });
+    const email = document.getElementById('email');
+    if (email.value && !email.checkValidity()) { email.closest('.campo').classList.add('invalido'); ok = false; }
+    return ok;
+  }
+
+  function linkWhats(dados) {
+    const texto = '*Novo cadastro – Aconselhamento CCVideira*\n\n' +
+      Object.entries(dados).map(([k, v]) => `*${k}:* ${v}`).join('\n');
+    return `https://wa.me/${WHATSAPP_EQUIPE}?text=${encodeURIComponent(texto)}`;
+  }
+
+  function mostrarOk(dados, salvo) {
+    document.getElementById('okNome').textContent = dados['Nome'].split(' ')[0];
+    document.getElementById('btnWhats').href = linkWhats(dados);
+    document.getElementById('okSalvo').hidden = !salvo;
+    document.getElementById('okManual').hidden = salvo;
+    document.querySelector('.card').style.display = 'none';
+    const ok = document.getElementById('ok');
+    ok.style.display = 'block';
+    ok.setAttribute('tabindex', '-1'); ok.focus({preventScroll: true});
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }
+
+  async function enviar(dados) {
+    if (!ENDPOINT) throw new Error('sem endpoint');
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 20000);
+    try {
+      const r = await fetch(ENDPOINT, {
+        method: 'POST', body: JSON.stringify(dados), signal: ctrl.signal,
+        headers: {'Content-Type': 'text/plain;charset=utf-8'}
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.erro || 'falha');
+    } finally { clearTimeout(t); }
+  }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    if (btn.disabled) return;
+    if (!valida()) { form.querySelector('.invalido')?.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+
+    const dados = {};
+    new FormData(form).forEach((v, k) => { if (v && k !== 'site') dados[k] = dados[k] ? dados[k] + ', ' + v : v; });
+    if (form.site.value) { mostrarOk(dados, true); return; } // honeypot (robô)
+
+    btn.disabled = true; btn.textContent = 'Enviando…'; erro.style.display = 'none';
+    try {
+      await enviar(dados);
+      mostrarOk(dados, true);
+    } catch (err) {
+      btn.disabled = false; btn.textContent = 'Enviar cadastro';
+      document.getElementById('btnWhatsErro').href = linkWhats(dados);
+      erro.style.display = 'block';
+    }
+  });
+</script>
+</body>
+</html>
