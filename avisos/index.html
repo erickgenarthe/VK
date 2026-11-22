@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="google" content="notranslate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>AVISOS · Mensagens da semana</title>
+<meta name="theme-color" content="#1F6F5C">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{--coral:#E8543A;--coral-suave:#FDE7E1;--teal:#1F6F5C;--teal-escuro:#143F35;--teal-suave:#E1F1EC;--ouro:#F4B740;--ouro-suave:#FDF1D6;--bg:#FBF7F1;--card:#fff;--txt:#1d2b27;--mut:#6b7a75;--borda:#e6dfd3}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--txt);padding-bottom:80px}
+  header{background:var(--teal);color:#fff;padding:14px 16px}
+  header h1{margin:0;font-size:20px} header p{margin:2px 0 0;font-size:13px;opacity:.85}
+  main{max-width:640px;margin:0 auto;padding:14px 16px}
+  nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--borda);display:flex;z-index:5}
+  nav button{flex:1;border:0;background:none;padding:10px 2px;font-size:11px;color:var(--mut);cursor:pointer}
+  nav button b{display:block;font-size:20px;font-weight:400}
+  nav button.on{color:var(--teal);font-weight:700}
+  .card{background:var(--card);border:1px solid var(--borda);border-radius:14px;padding:14px;margin-bottom:12px}
+  h2{margin:0 0 8px;font-size:17px} h3{margin:12px 0 6px;font-size:14px;color:var(--teal-escuro)}
+  .hoje{background:var(--ouro-suave);border-color:var(--ouro)}
+  button.p,button.s,button.w{border:0;border-radius:10px;padding:10px 14px;font-size:15px;cursor:pointer;margin:4px 6px 0 0}
+  button.p{background:var(--teal);color:#fff} button.s{background:var(--teal-suave);color:var(--teal-escuro)} button.w{background:#25D366;color:#fff}
+  button.x{background:none;border:0;color:var(--coral);cursor:pointer;font-size:15px}
+  input,select,textarea{width:100%;font:inherit;padding:9px;border:1px solid var(--borda);border-radius:8px;background:#fff;color:var(--txt)}
+  textarea{min-height:90px} label{display:block;font-size:13px;color:var(--mut);margin:8px 0 3px}
+  pre{white-space:pre-wrap;word-wrap:break-word;background:#f4f9f7;border:1px solid var(--teal-suave);border-radius:10px;padding:12px;font:14px/1.45 system-ui,sans-serif;margin:8px 0}
+  .row{display:flex;gap:8px;align-items:center} .row>*{flex:1}
+  .grid{display:grid;grid-template-columns:90px repeat(4,1fr);gap:6px;align-items:center;font-size:13px}
+  .grid input{padding:6px;text-align:center}
+  .err{color:var(--coral);font-size:14px;margin:6px 0} .ok{color:var(--teal);font-size:14px}
+  .tabs{display:flex;gap:6px;margin-bottom:10px}.tabs button{flex:1}
+  .mut{color:var(--mut);font-size:13px}
+</style>
+</head>
+<body>
+<header><h1>AVISOS</h1><p>Mensagens prontas da semana · Videira Kids</p></header>
+<main id="app"></main>
+<nav id="nav"></nav>
+<script type="module">
+import * as L from './lib.js';
+import { WORDS, SUPERVISOR_TEMPLATES } from './content.js';
+
+let S = L.loadState(localStorage);
+const save = () => L.saveState(localStorage, S);
+const $ = (s, r = document) => r.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const words = () => S.words || WORDS;
+const TABS = [['semana', '🏠', 'Semana'], ['escalas', '📋', 'Escalas'], ['cobrar', '💬', 'Cobranças'], ['palavra', '📖', 'Palavra'], ['planner', '📅', 'Planner'], ['contatos', '👥', 'Contatos']];
+let tab = 'semana', escSub = 'domingo', cob = { contato: '', culto: 0, tpl: 'pedido', min: 'ARCA' }, paste = { open: false, err: '' };
+
+async function copy(text, btn) {
+  try { await navigator.clipboard.writeText(text); } catch {
+    const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+  }
+  if (btn) { const o = btn.textContent; btn.textContent = '✔ Copiado'; setTimeout(() => (btn.textContent = o), 1500); }
+}
+const actions = (id, phone) => `<button class="p" data-copy="${id}">Copiar</button><button class="w" data-wa="${id}" data-phone="${esc(phone || '')}">Abrir no WhatsApp</button>`;
+let texts = {};
+const msg = (id, text, phone) => { texts[id] = text; return `<pre id="pre-${id}">${esc(text)}</pre>${actions(id, phone)}`; };
+
+function viewSemana() {
+  const d = new Date(), dow = d.getDay();
+  const dom = L.nextSunday(d);
+  let t, go;
+  if (dow === 2) [t, go] = ['Hoje é terça: gerar a escala QDE.', 'escalas:qde'];
+  else if ([4, 5, 6].includes(dow)) [t, go] = [`Hoje é dia de gerar a escala de domingo (${L.fmtDate(dom)}) e cobrar os supervisores.`, 'escalas:domingo'];
+  else if (dow === 0) [t, go] = ['Hoje é culto! Depois, agradeça a equipe.', 'cobrar'];
+  else [t, go] = ['Dia de preparar a semana: palavra e planner.', 'planner'];
+  return `<div class="card hoje"><h2>Hoje</h2><p>${esc(t)}</p><button class="p" data-go="${go}">Abrir</button></div>
+  <div class="card"><h2>Atalhos</h2>
+   <button class="s" data-go="escalas:qde">Escala QDE</button><button class="s" data-go="escalas:domingo">Escala de domingo</button>
+   <button class="s" data-go="cobrar">Cobrar supervisor</button><button class="s" data-go="palavra">Palavra da semana</button><button class="s" data-go="planner">Planner</button></div>
+  <p class="mut">Próximo domingo: ${L.fmtDate(dom)}. Os dados ficam salvos só neste navegador.</p>`;
+}
+
+function viewEscalas() {
+  const dom = L.nextSunday(new Date());
+  let h = `<div class="tabs"><button class="${escSub === 'domingo' ? 'p' : 's'}" data-sub="domingo">Domingo</button><button class="${escSub === 'qde' ? 'p' : 's'}" data-sub="qde">QDE</button></div>
+  <div class="card"><button class="s" data-paste="1">📥 Colar escala do WhatsApp</button>`;
+  if (paste.open) h += `<textarea id="pasteTxt" placeholder="Cole aqui a escala..."></textarea><button class="p" data-importar="1">Importar</button>${paste.err ? `<div class="err">${esc(paste.err)}</div>` : ''}`;
+  h += `</div>`;
+  if (escSub === 'domingo') {
+    const d = S.sunday;
+    h += `<div class="card"><h2>Voluntários por culto</h2><div class="grid"><b></b>${L.CULTOS.map((c) => `<b>${c}</b>`).join('')}`;
+    for (const m of L.MIN_DOMINGO) h += `<span>${m}</span>` + L.CULTOS.map((c, i) => `<input type="number" min="0" inputmode="numeric" data-cnt="${m}|${i}" value="${d.counts[m][i]}">`).join('');
+    h += `</div>
+    <h3>Produção</h3>${rowIn('producao', d.producao)}<h3>Comunicadores · Ninho/Arca</h3>${rowIn('com-na', d.comunicadores.ninhoArca)}
+    <h3>Comunicadores · Sala entrega</h3>${rowIn('com-se', d.comunicadores.entrega)}<h3>Líder júnior</h3>${rowIn('lj', d.liderJunior)}</div>
+    <div class="card"><h2>Mensagem</h2>${msg('esc-dom', L.formatSunday(d, dom))}</div>`;
+  } else {
+    h += `<div class="card"><h2>QDE</h2>`;
+    for (const m of L.MIN_QDE) {
+      const x = S.qde[m];
+      h += `<h3>${m}</h3><input placeholder="Líder" data-qlider="${m}" value="${esc(x.lider)}"><textarea data-qvol="${m}" placeholder="Voluntários (um por linha)" style="min-height:60px;margin-top:6px">${esc(x.voluntarios.join('\n'))}</textarea>`;
+    }
+    const c = S.qde.COMUNICADORES;
+    h += `<h3>Comunicadores</h3><input placeholder="ARCA/REINO" data-qcom="arcaReino" value="${esc(c.arcaReino)}"><input placeholder="Sala entrega" data-qcom="entrega" value="${esc(c.entrega)}" style="margin-top:6px"></div>
+    <div class="card"><h2>Mensagem</h2>${msg('esc-qde', L.formatQDE(S.qde))}</div>`;
+  }
+  return h;
+}
+const rowIn = (k, arr) => `<div class="grid" style="grid-template-columns:repeat(4,1fr)">${L.CULTOS.map((c, i) => `<input placeholder="${c}" data-row="${k}|${i}" value="${esc(arr[i])}">`).join('')}</div>`;
+
+function viewCobrar() {
+  const dom = L.nextSunday(new Date());
+  const cts = S.contatos;
+  const ct = cts.find((c, i) => String(i) === String(cob.contato));
+  const total = L.totalCulto(S.sunday, cob.culto);
+  const tpl = SUPERVISOR_TEMPLATES.find((t) => t.id === cob.tpl);
+  const mins = [...L.MIN_DOMINGO];
+  const qtd = cob.min && S.sunday.counts[cob.min] ? S.sunday.counts[cob.min][cob.culto] : total;
+  const text = L.fillTemplate(tpl.texto, { nome: ct ? ct.nome.split(' ')[0] : '', ministerio: cob.min, culto: L.CULTOS[cob.culto], data: L.fmtDate(dom), qtd: String(qtd) });
+  return `<div class="card"><h2>Cobrar supervisor</h2>
+   <label>Modelo</label><select data-cob="tpl">${SUPERVISOR_TEMPLATES.map((t) => `<option value="${t.id}" ${t.id === cob.tpl ? 'selected' : ''}>${esc(t.titulo)}</option>`).join('')}</select>
+   <label>Ministério</label><select data-cob="min">${mins.map((m) => `<option ${m === cob.min ? 'selected' : ''}>${m}</option>`).join('')}</select>
+   <label>Culto</label><select data-cob="culto">${L.CULTOS.map((c, i) => `<option value="${i}" ${i === cob.culto ? 'selected' : ''}>${c}</option>`).join('')}</select>
+   <label>Supervisor/líder</label><select data-cob="contato"><option value="">— sem número (escolher no WhatsApp) —</option>${cts.map((c, i) => `<option value="${i}" ${String(i) === String(cob.contato) ? 'selected' : ''}>${esc(c.nome)} · ${esc(c.ministerio)}</option>`).join('')}</select>
+   ${msg('cob', text, ct && ct.telefone)}</div>
+   <p class="mut">Total de voluntários no culto das ${L.CULTOS[cob.culto]}: ${total}.</p>`;
+}
+
+function viewPalavra() {
+  const w = L.wordOfWeek(words(), new Date(), S.wordOffset || 0);
+  return `<div class="card"><h2>Palavra da semana</h2>${msg('palavra', L.formatPalavra(w))}
+   <button class="s" data-word="-1">← Anterior</button><button class="s" data-word="1">Próxima →</button></div>
+   <div class="card"><h3>Editar esta palavra</h3><label>Versículo</label><textarea id="wv">${esc(w.verse)}</textarea><label>Referência</label><input id="wr" value="${esc(w.ref)}"><label>Palavra de sabedoria</label><textarea id="ws">${esc(w.wisdom)}</textarea><button class="p" data-wsave="1">Salvar edição</button></div>`;
+}
+
+function viewPlanner() {
+  const mon = L.mondayOf(new Date());
+  let h = `<div class="card"><h2>Planner da semana</h2>${msg('planner', L.formatPlanner(S.events, mon))}</div>
+  <div class="card"><h2>Eventos</h2>`;
+  S.events.forEach((e, i) => (h += `<div class="row" style="margin-bottom:4px"><span style="flex:3">${['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'][e.dia]} ${esc(e.hora)} · ${esc(e.titulo)}</span><button class="x" style="flex:0" data-evdel="${i}">✕</button></div>`));
+  h += `<h3>Novo evento</h3><div class="row"><select id="evd">${['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'].map((d, i) => `<option value="${i}">${d}</option>`).join('')}</select><input id="evh" placeholder="Hora (opcional)"></div><input id="evt" placeholder="Título" style="margin-top:6px"><button class="p" data-evadd="1">Adicionar</button></div>`;
+  return h;
+}
+
+function viewContatos() {
+  let h = `<div class="card"><h2>Contatos</h2>`;
+  if (!S.contatos.length) h += `<p class="mut">Nenhum contato ainda. Cadastre supervisores e líderes abaixo.</p>`;
+  S.contatos.forEach((c, i) => (h += `<div class="row" style="margin-bottom:4px"><span style="flex:3"><b>${esc(c.nome)}</b> · ${esc(c.funcao)} · ${esc(c.ministerio)}<br><span class="mut">${esc(c.telefone || 'sem número')}</span></span><button class="x" style="flex:0" data-ctdel="${i}">✕</button></div>`));
+  h += `<h3>Novo contato</h3><input id="cn" placeholder="Nome"><div class="row" style="margin-top:6px"><select id="cf"><option>supervisor</option><option>líder</option></select><select id="cm">${[...L.MIN_DOMINGO, 'PRODUÇÃO', 'COMUNICADORES', 'LÍDER JÚNIOR'].map((m) => `<option>${m}</option>`).join('')}</select></div><input id="ct" placeholder="Telefone com DDD" inputmode="tel" style="margin-top:6px"><button class="p" data-ctadd="1">Adicionar</button></div>
+  <div class="card"><h2>Backup</h2><button class="s" data-bkexp="1">Exportar</button><button class="s" data-bkimp="1">Importar</button><textarea id="bk" placeholder="Cole o backup aqui para importar"></textarea><div id="bkmsg"></div></div>`;
+  return h;
+}
+
+function render() {
+  texts = {};
+  const v = { semana: viewSemana, escalas: viewEscalas, cobrar: viewCobrar, palavra: viewPalavra, planner: viewPlanner, contatos: viewContatos }[tab];
+  $('#app').innerHTML = v();
+  $('#nav').innerHTML = TABS.map(([k, ic, n]) => `<button class="${k === tab ? 'on' : ''}" data-tab="${k}"><b>${ic}</b>${n}</button>`).join('');
+}
+
+function setNested(attr, val) {
+  const [k, i] = attr.split('|');
+  if (S.sunday.counts[k]) S.sunday.counts[k][+i] = Math.max(0, parseInt(val) || 0);
+}
+document.addEventListener('click', (e) => {
+  const t = e.target.closest('button'); if (!t) return; const a = t.dataset;
+  if (a.tab) { tab = a.tab; render(); }
+  else if (a.go) { const [tb, sub] = a.go.split(':'); tab = tb; if (sub) escSub = sub; render(); }
+  else if (a.sub) { escSub = a.sub; render(); }
+  else if (a.copy) copy(texts[a.copy], t);
+  else if (a.wa) window.open(L.waLink(a.phone, texts[a.wa]), '_blank');
+  else if (a.paste) { paste.open = !paste.open; paste.err = ''; render(); }
+  else if (a.importar) {
+    try {
+      const r = L.parseSchedule($('#pasteTxt').value);
+      if (r.kind === 'domingo') { S.sunday = r.data; escSub = 'domingo'; } else { S.qde = r.data; escSub = 'qde'; }
+      paste = { open: false, err: '' }; save();
+    } catch (err) { paste.err = err.message; }
+    render();
+  }
+  else if (a.word) { S.wordOffset = (S.wordOffset || 0) + +a.word; save(); render(); }
+  else if (a.wsave) {
+    const cur = L.wordOfWeek(words(), new Date(), S.wordOffset || 0), arr = words().map((w) => w);
+    arr[arr.indexOf(cur)] = { verse: $('#wv').value, ref: $('#wr').value, wisdom: $('#ws').value };
+    S.words = arr; save(); render();
+  }
+  else if (a.evadd) { const ti = $('#evt').value.trim(); if (ti) { S.events.push({ dia: +$('#evd').value, hora: $('#evh').value.trim(), titulo: ti }); save(); render(); } }
+  else if (a.evdel) { S.events.splice(+a.evdel, 1); save(); render(); }
+  else if (a.ctadd) { const n = $('#cn').value.trim(); if (n) { S.contatos.push({ nome: n, funcao: $('#cf').value, ministerio: $('#cm').value, telefone: $('#ct').value.trim() }); save(); render(); } }
+  else if (a.ctdel) { S.contatos.splice(+a.ctdel, 1); save(); render(); }
+  else if (a.bkexp) { $('#bk').value = L.exportBackup(S); }
+  else if (a.bkimp) { try { S = { ...L.defaultState(), ...L.importBackup($('#bk').value) }; save(); render(); $('#bkmsg').innerHTML = '<span class="ok">Backup importado.</span>'; } catch (err) { $('#bkmsg').innerHTML = `<span class="err">${esc(err.message)}</span>`; } }
+});
+document.addEventListener('change', (e) => {
+  const t = e.target, a = t.dataset;
+  if (a.cob) { cob[a.cob] = a.cob === 'culto' ? +t.value : t.value; render(); return; }
+  if (a.cnt) setNested(a.cnt, t.value);
+  else if (a.row) {
+    const [k, i] = a.row.split('|'); const d = S.sunday;
+    ({ producao: d.producao, 'com-na': d.comunicadores.ninhoArca, 'com-se': d.comunicadores.entrega, lj: d.liderJunior })[k][+i] = t.value;
+  }
+  else if (a.qlider) S.qde[a.qlider].lider = t.value;
+  else if (a.qvol) S.qde[a.qvol].voluntarios = t.value.split('\n').map((x) => x.trim()).filter(Boolean);
+  else if (a.qcom) S.qde.COMUNICADORES[a.qcom] = t.value;
+  else return;
+  save(); const pre = tab === 'escalas' ? (escSub === 'domingo' ? 'esc-dom' : 'esc-qde') : null;
+  if (pre) { texts[pre] = escSub === 'domingo' ? L.formatSunday(S.sunday, L.nextSunday(new Date())) : L.formatQDE(S.qde); $('#pre-' + pre).textContent = texts[pre]; }
+});
+render();
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>

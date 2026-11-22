@@ -139,6 +139,25 @@ netlify/functions/vagas-abertas.mjs          → aviso automático de vaga abert
 treino/                           → app pessoal "FORJA" (personal trainer), veja abaixo
 ```
 
+## AVISOS — mensagens semanais para o WhatsApp (`avisos/`)
+
+Terceiro app, independente do SERVE (que está em modo demonstração): gera,
+prontas para copiar/colar nos grupos, a escala QDE (terça), a escala de
+domingo dos 4 cultos (quinta a sábado), cobranças cordiais ao supervisor
+(pedido, lembrete, aviso com a quantidade na sala, vaga em aberto,
+agradecimento, confirmação), a palavra da semana (52 versículos e palavras
+de sabedoria, editáveis) e o planner da semana.
+
+- **Colar escala do WhatsApp** (aba Escalas) preenche tudo sozinho.
+- **Contatos**: cadastre supervisores e líderes depois; "Abrir no WhatsApp" já
+  abre a conversa com o número. O WhatsApp não permite envio automático a
+  grupos, então você copia e cola.
+- Dados só no navegador (`localStorage`), com backup em JSON.
+- Precisa de servidor (usa módulos ES): `python3 -m http.server` na raiz e
+  abra `/avisos/`. Para publicar, novo site Netlify com **Base directory**
+  `avisos`, como o FORJA.
+- Testes da lógica: `node --test avisos/tests/lib.test.mjs`.
+
 ## FORJA — personal trainer digital (`treino/`)
 
 Um segundo app, independente do SERVE, guardado na pasta `treino/`. Não tem
