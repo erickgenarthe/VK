@@ -684,10 +684,31 @@ function isSabado(){ return new Date().getDay()===6; }
 function temWheyNoPlano(){ return dietaPlano.refeicoes.some(r=>r.itens.some(it=>/whey/i.test(it))); }
 function getDietaLogHoje(){
   const k=todayISO();
-  if(!dietaLog[k]) dietaLog[k] = { feitas:[], aguaMl:0, creatina:false };
-  return dietaLog[k];
+  if(!dietaLog[k]) dietaLog[k] = { feitas:[], aguaMl:0, creatina:false, sono:null, proteinaOk:false, blocosMovimento:[], extras:[] };
+  const d = dietaLog[k];
+  if(!d.blocosMovimento) d.blocosMovimento = [];
+  if(!d.extras) d.extras = [];
+  if(d.sono===undefined) d.sono = null;
+  if(d.proteinaOk===undefined) d.proteinaOk = false;
+  return d;
 }
 function treinoDeHojeJaFeito(){ return logTreino.some(l=>l.data===todayISO()); }
+/* ---- Painel adaptativo de calorias/NEAT (Erick) ---- */
+function blocosMovimentoHoje(){ return getDietaLogHoje().blocosMovimento.length; }
+function modoDiaHoje(){ return (treinoDeHojeJaFeito() || blocosMovimentoHoje()>0) ? 'com_movimento' : 'sem_treino'; }
+function bonusKcalHoje(){ return (treinoDeHojeJaFeito()?300:0) + blocosMovimentoHoje()*60; }
+function metaKcalHoje(){ return (dietaPlano.kcalAlvo||0) + bonusKcalHoje(); }
+function kcalConsumidoHoje(){
+  const dLog = getDietaLogHoje();
+  const dasRefeicoes = dietaPlano.refeicoes.filter(r=>dLog.feitas.includes(r.id)).reduce((s,r)=>s+(r.kcal||0),0);
+  const dosExtras = dLog.extras.reduce((s,e)=>s+(Number(e.kcal)||0),0);
+  return dasRefeicoes + dosExtras;
+}
+function proteinaAlvoG(){ const p = pesoAtual(); return p ? Math.round(p*1.8) : 0; }
+function diasRestantesNaSemana(){
+  const now = new Date(); const dow = (now.getDay()+6)%7; // segunda=0
+  return 7 - dow; // inclui hoje
+}
 function ultimoLogDoExercicio(nome){
   const logs = [...logTreino].sort((a,b)=>b.data.localeCompare(a.data));
   for(const l of logs){ const e = l.exercicios.find(x=>x.nome===nome); if(e) return {log:l, ex:e}; }
@@ -751,6 +772,119 @@ function treinosNestaSemana(){
 }
 
 /* ============================= RENDER: HOJE ============================= */
+/* ============================= PAINEL ADAPTATIVO (Erick) ============================= */
+// Em vez de cobrar cardio de madrugada, o painel adapta a meta calórica ao
+// que realmente aconteceu no dia (treino feito, blocos de NEAT) e redistribui
+// sem culpa quando sai do combinado — nunca corta tudo de uma vez.
+function renderPainelAdaptativo(){
+  const dLog = getDietaLogHoje();
+  const modo = modoDiaHoje();
+  const meta = metaKcalHoje();
+  const consumido = kcalConsumidoHoje();
+  const restante = meta - consumido;
+  const pctCal = meta>0 ? Math.min(100, Math.round((consumido/meta)*100)) : 0;
+  const protAlvo = proteinaAlvoG();
+  const sonoBaixo = dLog.sono!=null && dLog.sono < 7;
+  return `
+    <div class="card">
+      <div class="row"><h2>📊 Painel do dia</h2><span class="pill ${modo==='com_movimento'?'success':'ink'}">${modo==='com_movimento'?'Dia com movimento':'Dia sem treino'}</span></div>
+      <p class="sub" style="margin:0 0 10px">O modo muda sozinho conforme você registra treino ou blocos de movimento — sem precisar escolher.</p>
+
+      <div class="row"><span class="small">Calorias hoje</span><span class="small">${consumido} / ${meta} kcal</span></div>
+      <div class="progress-track"><div class="progress-fill ${pctCal>=100?'green':''}" style="width:${pctCal}%"></div></div>
+      <p class="small" style="margin:4px 0 0">${restante>=0 ? `Sobram ~${restante} kcal hoje.` : `Passou ~${Math.abs(restante)} kcal — sem problema, veja abaixo.`} ${bonusKcalHoje()>0?`(inclui +${bonusKcalHoje()}kcal de bônus por movimento hoje)`:''}</p>
+
+      <div class="divider"></div>
+      <div class="row"><span class="small">Proteína (meta ~${protAlvo||'--'}g)</span></div>
+      <div class="checkrow ${dLog.proteinaOk?'done':''}" style="padding-top:4px">
+        <input type="checkbox" ${dLog.proteinaOk?'checked':''} onchange="toggleProteinaOk()">
+        <span class="lbl">Proteína em todas as refeições de hoje</span>
+      </div>
+
+      <div class="divider"></div>
+      <label class="f">Horas de sono essa noite</label>
+      <div class="btn-row">
+        <input type="number" step="0.5" min="0" max="14" id="pSono" value="${dLog.sono!=null?dLog.sono:''}" placeholder="ex: 6.5" style="flex:1">
+        <button class="btn btn-secondary btn-sm" style="flex:0 0 auto" onclick="salvarSono()">Salvar</button>
+      </div>
+      ${sonoBaixo ? `<p class="small" style="margin-top:6px;color:var(--warn)">Dormiu pouco (${dLog.sono}h) — hoje não cobre treino ou cardio extra de você. Foque em água e proteína, o resto espera.</p>` : ''}
+
+      <div class="divider"></div>
+      <div class="row"><span class="small">Blocos de movimento (5-15 min)</span><span class="pill ${blocosMovimentoHoje()>0?'success':'ink'}">${blocosMovimentoHoje()}</span></div>
+      ${dLog.blocosMovimento.length>0 ? `<ul class="exlist" style="margin-top:6px">${dLog.blocosMovimento.map(b=>`<li><span class="exname" style="font-weight:500">${b.nome}</span><span class="exmeta">${b.min}min</span></li>`).join('')}</ul>` : ''}
+      <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="abrirAdicionarBloco()">+ Bloco de movimento</button>
+
+      <div class="divider"></div>
+      <button class="linkbtn" onclick="abrirRegistrarExtra()">Saí do plano / comi algo extra →</button>
+    </div>`;
+}
+function salvarSono(){
+  const v = document.getElementById('pSono').value;
+  const dLog = getDietaLogHoje();
+  dLog.sono = v===''?null:Number(v);
+  save(KEY.dietaLog, dietaLog);
+  renderHoje();
+  toast('Sono registrado');
+}
+function toggleProteinaOk(){
+  const dLog = getDietaLogHoje();
+  dLog.proteinaOk = !dLog.proteinaOk;
+  save(KEY.dietaLog, dietaLog);
+  renderHoje();
+}
+function abrirAdicionarBloco(){
+  abrirModal(`
+    <button class="closebtn" onclick="fecharModal()">&times;</button>
+    <h3>Bloco de movimento</h3>
+    <p class="sub">5 a 15 minutos já contam — caminhada depois do almoço, escada, alongamento, uma pausa ativa.</p>
+    <label class="f">O que você fez (opcional)</label>
+    <input type="text" id="bNome" placeholder="ex: caminhada depois do almoço">
+    <label class="f">Quantos minutos</label>
+    <input type="number" id="bMin" value="10" min="1" max="60">
+    <button class="btn btn-primary" style="margin-top:14px" onclick="salvarBloco()">Adicionar</button>
+  `);
+}
+function salvarBloco(){
+  const nome = document.getElementById('bNome').value || 'Bloco de movimento';
+  const min = Number(document.getElementById('bMin').value) || 10;
+  const dLog = getDietaLogHoje();
+  dLog.blocosMovimento.push({ id:uid(), nome, min });
+  save(KEY.dietaLog, dietaLog);
+  fecharModal();
+  renderHoje();
+  toast('Bloco registrado — +60kcal na meta de hoje');
+}
+function abrirRegistrarExtra(){
+  const restante = metaKcalHoje() - kcalConsumidoHoje();
+  abrirModal(`
+    <button class="closebtn" onclick="fecharModal()">&times;</button>
+    <h3>Saí do plano</h3>
+    <p class="sub">Sem culpa — é só redistribuir. Me diga o que foi e uma estimativa de calorias.</p>
+    <label class="f">O que você comeu</label>
+    <input type="text" id="eDesc" placeholder="ex: pedaço de bolo no aniversário">
+    <label class="f">Estimativa de calorias</label>
+    <input type="number" id="eKcal" placeholder="ex: 350">
+    <button class="btn btn-primary" style="margin-top:14px" onclick="salvarExtra()">Registrar</button>
+  `);
+}
+function salvarExtra(){
+  const desc = document.getElementById('eDesc').value || 'Extra';
+  const kcal = Number(document.getElementById('eKcal').value) || 0;
+  if(kcal<=0){ toast('Informe uma estimativa de calorias'); return; }
+  const dLog = getDietaLogHoje();
+  dLog.extras.push({ id:uid(), desc, kcal });
+  save(KEY.dietaLog, dietaLog);
+  const restante = metaKcalHoje() - kcalConsumidoHoje();
+  const dias = diasRestantesNaSemana();
+  fecharModal();
+  renderHoje();
+  if(restante>=0){
+    toast(`Registrado. Ainda sobram ~${restante} kcal hoje.`);
+  } else {
+    const porDia = Math.round(Math.abs(restante)/Math.max(dias,1));
+    toast(`Registrado. Passou ~${Math.abs(restante)}kcal — ajuste ~${porDia}kcal a menos nos próximos ${dias} dias, sem cortes bruscos.`);
+  }
+}
 function renderHoje(){
   const el = document.getElementById('tab-hoje');
   const domingo = isDomingo();
@@ -823,6 +957,8 @@ function renderHoje(){
       <div class="row"><span class="small">${jaPerdeu.toFixed(1)}kg perdido${jaPerdeu==1?'':'s'}</span><span class="small">${pct}% da meta</span></div>
       ` : `<p class="small" style="margin-top:8px">Defina sua meta de peso em "Mais" → Perfil.</p>`}
     </div>
+
+    ${perfil.trilha==='classica' ? renderPainelAdaptativo() : ''}
 
     ${treinoCardHtml}
 
