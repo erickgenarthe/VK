@@ -217,7 +217,8 @@ const KEY = {
   get dietaPlano(){ return 'forja_dieta_plano__'+perfilAtivo; },
   get dietaLog(){ return 'forja_dieta_log__'+perfilAtivo; },
   get config(){ return 'forja_config__'+perfilAtivo; },
-  get programaInicio(){ return 'forja_programa_inicio__'+perfilAtivo; }
+  get programaInicio(){ return 'forja_programa_inicio__'+perfilAtivo; },
+  get cardioMatinalInicio(){ return 'forja_cardio_matinal_inicio__'+perfilAtivo; }
 };
 function load(k, fallback){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : fallback; }catch(e){ return fallback; } }
 function save(k, v){ localStorage.setItem(k, JSON.stringify(v)); }
@@ -242,7 +243,7 @@ function defaultTreinoEstado(pid){
   return { splitSize: pid==='p2' ? 3 : 5, cursorDia:0 };
 }
 
-let perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, programaInicio;
+let perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, programaInicio, cardioMatinalInicio;
 
 function carregarEstadoDoStorage(){
   perfil = load(KEY.perfil, defaultPerfil(perfilAtivo));
@@ -255,6 +256,7 @@ function carregarEstadoDoStorage(){
   dietaPlano = load(KEY.dietaPlano, perfilAtivo==='p2' ? DEFAULT_DIETA_ELA : DEFAULT_DIETA);
   programaInicio = load(KEY.programaInicio, null);
   if(!programaInicio){ programaInicio = todayISO(); save(KEY.programaInicio, programaInicio); }
+  cardioMatinalInicio = load(KEY.cardioMatinalInicio, null);
   // seed de medida inicial só pro Erick (peso combinado de 101kg) — a Nayara
   // registra a dela do zero em "Medidas".
   if(perfilAtivo==='p1' && medidas.length===0){
@@ -684,19 +686,20 @@ function isSabado(){ return new Date().getDay()===6; }
 function temWheyNoPlano(){ return dietaPlano.refeicoes.some(r=>r.itens.some(it=>/whey/i.test(it))); }
 function getDietaLogHoje(){
   const k=todayISO();
-  if(!dietaLog[k]) dietaLog[k] = { feitas:[], aguaMl:0, creatina:false, sono:null, proteinaOk:false, blocosMovimento:[], extras:[] };
+  if(!dietaLog[k]) dietaLog[k] = { feitas:[], aguaMl:0, creatina:false, sono:null, proteinaOk:false, blocosMovimento:[], extras:[], cardioMatinal:null };
   const d = dietaLog[k];
   if(!d.blocosMovimento) d.blocosMovimento = [];
   if(!d.extras) d.extras = [];
   if(d.sono===undefined) d.sono = null;
   if(d.proteinaOk===undefined) d.proteinaOk = false;
+  if(d.cardioMatinal===undefined) d.cardioMatinal = null;
   return d;
 }
 function treinoDeHojeJaFeito(){ return logTreino.some(l=>l.data===todayISO()); }
 /* ---- Painel adaptativo de calorias/NEAT (Erick) ---- */
 function blocosMovimentoHoje(){ return getDietaLogHoje().blocosMovimento.length; }
-function modoDiaHoje(){ return (treinoDeHojeJaFeito() || blocosMovimentoHoje()>0) ? 'com_movimento' : 'sem_treino'; }
-function bonusKcalHoje(){ return (treinoDeHojeJaFeito()?300:0) + blocosMovimentoHoje()*60; }
+function modoDiaHoje(){ return (treinoDeHojeJaFeito() || blocosMovimentoHoje()>0 || !!getDietaLogHoje().cardioMatinal) ? 'com_movimento' : 'sem_treino'; }
+function bonusKcalHoje(){ return (treinoDeHojeJaFeito()?300:0) + blocosMovimentoHoje()*60 + (getDietaLogHoje().cardioMatinal?250:0); }
 function metaKcalHoje(){ return (dietaPlano.kcalAlvo||0) + bonusKcalHoje(); }
 function kcalConsumidoHoje(){
   const dLog = getDietaLogHoje();
@@ -708,6 +711,49 @@ function proteinaAlvoG(){ const p = pesoAtual(); return p ? Math.round(p*1.8) : 
 function diasRestantesNaSemana(){
   const now = new Date(); const dow = (now.getDay()+6)%7; // segunda=0
   return 7 - dow; // inclui hoje
+}
+/* ---- Desafio: caminhada/corrida matinal (Erick) ---- */
+const PROTOCOLO_CARDIO_MATINAL = [
+  { semanas:'1-2', nome:'Caminhada rápida contínua', texto:'40 min de caminhada rápida, ritmo em que ainda dá pra puxar assunto (teste da fala). Sem correr ainda — o objetivo agora é só criar o hábito de acordar e sair de casa.' },
+  { semanas:'3-4', nome:'Intervalos leves', texto:'5 min de caminhada (aquecimento) + 25-30 min alternando 1 min de trote leve / 2 min de caminhada + 5 min de caminhada (volta à calma).' },
+  { semanas:'5-6', nome:'Intervalos moderados', texto:'5 min de caminhada (aquecimento) + 25-30 min alternando 2 min de corrida leve / 2 min de caminhada + 5 min de caminhada (volta à calma).' },
+  { semanas:'7+', nome:'Corrida contínua leve', texto:'5 min de caminhada (aquecimento) + 20-30 min de corrida leve e constante (teste da fala) + 5 min de caminhada (volta à calma).' }
+];
+function semanaCardioMatinal(){
+  if(!cardioMatinalInicio) return 0;
+  return Math.floor(diffDias(todayISO(), cardioMatinalInicio)/7)+1;
+}
+function protocoloCardioMatinalAtual(){
+  const s = semanaCardioMatinal();
+  if(s<=2) return PROTOCOLO_CARDIO_MATINAL[0];
+  if(s<=4) return PROTOCOLO_CARDIO_MATINAL[1];
+  if(s<=6) return PROTOCOLO_CARDIO_MATINAL[2];
+  return PROTOCOLO_CARDIO_MATINAL[3];
+}
+function streakCardioMatinal(){
+  const datas = Object.keys(dietaLog).filter(k=>dietaLog[k] && dietaLog[k].cardioMatinal).sort().reverse();
+  if(datas.length===0) return 0;
+  let count=1;
+  for(let i=0;i<datas.length-1;i++){
+    if(diffDias(datas[i], datas[i+1])<=1) count++; else break;
+  }
+  if(diffDias(todayISO(), datas[0])>1) return 0;
+  return count;
+}
+function melhorStreakCardioMatinal(){
+  const datas = Object.keys(dietaLog).filter(k=>dietaLog[k] && dietaLog[k].cardioMatinal).sort();
+  if(datas.length===0) return 0;
+  let melhor=1, atual=1;
+  for(let i=1;i<datas.length;i++){
+    if(diffDias(datas[i], datas[i-1])<=1){ atual++; melhor=Math.max(melhor,atual); } else atual=1;
+  }
+  return Math.max(melhor, streakCardioMatinal());
+}
+function fraseCardioMatinal(streak){
+  if(streak===0) return 'Hoje é um ótimo dia pra começar. Só os 40 minutos — o resto se constrói sozinho depois.';
+  if(streak<3) return `${streak} dia${streak===1?'':'s'} seguido${streak===1?'':'s'}! Amanhã é só continuar o que você já começou.`;
+  if(streak<7) return `${streak} dias seguidos — seu corpo já está se acostumando com o horário.`;
+  return `${streak} dias seguidos — isso já é hábito, não força de vontade.`;
 }
 function ultimoLogDoExercicio(nome){
   const logs = [...logTreino].sort((a,b)=>b.data.localeCompare(a.data));
@@ -885,6 +931,58 @@ function salvarExtra(){
     toast(`Registrado. Passou ~${Math.abs(restante)}kcal — ajuste ~${porDia}kcal a menos nos próximos ${dias} dias, sem cortes bruscos.`);
   }
 }
+function renderCardCardioMatinal(){
+  const dLog = getDietaLogHoje();
+  const feitoHoje = !!dLog.cardioMatinal;
+  const streak = streakCardioMatinal();
+  const melhor = melhorStreakCardioMatinal();
+  const protocolo = protocoloCardioMatinalAtual();
+  const semana = semanaCardioMatinal();
+  if(feitoHoje){
+    return `
+    <div class="card">
+      <div class="row"><h2>🌅 Caminhada/Corrida matinal</h2><span class="pill success">Feito hoje</span></div>
+      <p class="sub" style="margin:0">${dLog.cardioMatinal.min} min registrados. ${fraseCardioMatinal(streak)}</p>
+      <div class="row" style="margin-top:10px"><span class="small">Sequência atual</span><span class="small">🔥 ${streak} dia${streak===1?'':'s'} · recorde ${melhor}</span></div>
+    </div>`;
+  }
+  return `
+    <div class="card">
+      <div class="row"><h2>🌅 Caminhada/Corrida matinal</h2><span class="pill ${streak>0?'success':'ink'}">🔥 ${streak} dia${streak===1?'':'s'}</span></div>
+      <p class="sub" style="margin:0 0 8px">${fraseCardioMatinal(streak)}</p>
+      ${cardioMatinalInicio ? `
+      <p style="font-weight:800;font-size:13.5px;margin:8px 0 2px">Semana ${semana} · ${protocolo.nome}</p>
+      <p class="small" style="margin:0 0 10px">${protocolo.texto}</p>
+      ` : `
+      <p class="small" style="margin:0 0 10px">Comece pela caminhada rápida contínua (seus 40 min) — sem pressão de correr ainda. O protocolo evolui sozinho a cada 2 semanas conforme você for registrando.</p>
+      `}
+      <p class="small" style="margin:0 0 10px">Recorde: ${melhor} dia${melhor===1?'':'s'} seguido${melhor===1?'':'s'}</p>
+      <button class="btn btn-primary" onclick="abrirLogCardioMatinal()">Fiz minha caminhada/corrida hoje</button>
+    </div>`;
+}
+function abrirLogCardioMatinal(){
+  abrirModal(`
+    <button class="closebtn" onclick="fecharModal()">&times;</button>
+    <h3>🌅 Caminhada/Corrida matinal</h3>
+    <p class="sub">Mandou bem acordando e saindo de casa — isso já é a parte mais difícil.</p>
+    <label class="f">Quantos minutos</label>
+    <input type="number" id="cmMin" value="40" min="5" max="90">
+    <button class="btn btn-primary" style="margin-top:14px" onclick="salvarCardioMatinal()">Registrar</button>
+  `);
+}
+function salvarCardioMatinal(){
+  const min = Number(document.getElementById('cmMin').value) || 40;
+  const dLog = getDietaLogHoje();
+  dLog.cardioMatinal = { min, criadoEm: Date.now() };
+  save(KEY.dietaLog, dietaLog);
+  if(!cardioMatinalInicio){
+    cardioMatinalInicio = todayISO();
+    save(KEY.cardioMatinalInicio, cardioMatinalInicio);
+  }
+  fecharModal();
+  renderHoje();
+  toast('Registrado! +250kcal na meta de hoje 🌅');
+}
 function renderHoje(){
   const el = document.getElementById('tab-hoje');
   const domingo = isDomingo();
@@ -959,6 +1057,7 @@ function renderHoje(){
     </div>
 
     ${perfil.trilha==='classica' ? renderPainelAdaptativo() : ''}
+    ${perfil.trilha==='classica' ? renderCardCardioMatinal() : ''}
 
     ${treinoCardHtml}
 
@@ -1445,7 +1544,7 @@ function salvarConfig(){
   toast('Configurações salvas');
 }
 function exportarDados(){
-  const data = { perfilAtivo, perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, programaInicio, exportadoEm:new Date().toISOString() };
+  const data = { perfilAtivo, perfil, medidas, treinoEstado, logTreino, dietaPlano, dietaLog, config, programaInicio, cardioMatinalInicio, exportadoEm:new Date().toISOString() };
   const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
@@ -1466,6 +1565,7 @@ function importarDados(evt){
       if(data.dietaLog) { dietaLog=data.dietaLog; save(KEY.dietaLog,dietaLog); }
       if(data.config) { config=data.config; save(KEY.config,config); }
       if(data.programaInicio) { programaInicio=data.programaInicio; save(KEY.programaInicio,programaInicio); }
+      if(data.cardioMatinalInicio) { cardioMatinalInicio=data.cardioMatinalInicio; save(KEY.cardioMatinalInicio,cardioMatinalInicio); }
       renderAll();
       renderProfSwitch();
       toast('Backup importado com sucesso');
